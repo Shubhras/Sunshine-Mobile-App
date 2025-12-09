@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "131127142993",
+    "firebase_url": "https://sun-sign-inc-1e12b-default-rtdb.firebaseio.com",
+    "project_id": "sun-sign-inc-1e12b",
+    "storage_bucket": "sun-sign-inc-1e12b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131127142993:android:6b6a8b9040f5f9e3d86670",
+        "android_client_info": {
+          "package_name": "com.digi.sunshine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2NDuuJP0GgjZZ754nFKpAqxwkmfxk0Rs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131127142993:android:fb8506e0aa5bbe78d86670",
+        "android_client_info": {
+          "package_name": "com.digi.sunsign"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2NDuuJP0GgjZZ754nFKpAqxwkmfxk0Rs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

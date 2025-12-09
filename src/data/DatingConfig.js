@@ -1,0 +1,620 @@
+// const onbordingData = {
+//   isSMSAuthEnabled: true,
+//   appIdentifier: 'rn-dating-android',
+//   facebookIdentifier: '285315185217069',
+//   webClientId:
+//     '525472070731-mg8m3q8v9vp1port7nkbq9le65hp917t.apps.googleusercontent.com',
+//     onboardingConfig: {
+//     welcomeTitle: 'Find your Soulmate',
+//   welcomeCaption: 'Match and chat with people you like from your area.',
+//   walkthroughScreens: [
+//     {
+//       icon: false,
+//       title: false,
+//       description: false,
+//     },
+//     {
+//       icon: require('../assets/icons/png/msg.png'),
+//       title: 'Private Messages',
+//       description: 'Chat privately with people you match.',
+//     },
+//     {
+//       icon: require('../assets/icons/png/insta.png'),
+//       title: 'Send Photos & Videos',
+//       description:
+//         'Have fun with your matches by sending photos and videos to each other.',
+//     },
+//     {
+//       icon: require('../assets/icons/png/bell.png'),
+//       title: 'Get Notified',
+//       backgroundColor: '#20d2bb',
+//       description:
+//         'Receive notifications when you get new messages and matches.',
+//     },
+//   ],
+// },
+// };
+
+import { Platform } from 'react-native';
+
+export const regexForPhoneNumber = /^[0-9]{10,15}$/;
+export const regexForNames = /^[a-zA-Z ]*$/;
+export const regexForEmail = /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/;
+export const regexForPassword = /.*/;
+const regexForAge = /[0-9]/g;
+
+const DatingConfig = {
+  isSMSAuthEnabled: true,
+  appIdentifier: 'rn-dating-android',
+  facebookIdentifier: '285315185217069',
+  webClientId:
+    '525472070731-mg8m3q8v9vp1port7nkbq9le65hp917t.apps.googleusercontent.com',
+  onboardingConfig: {
+    welcomeTitle: 'Find your Soulmate',
+    welcomeCaption: 'Match and chat with people you like from your area.',
+  walkthroughScreens: [
+    {
+      icon: false,
+      title: false,
+      description: false,
+    },
+    {
+      icon: require('../assets/icons/png/msg.png'),
+      title: 'Private Messages',
+      description: 'Chat privately with people you match.',
+    },
+    {
+      icon: require('../assets/icons/png/insta.png'),
+      title: 'Send Photos & Videos',
+      description:
+        'Have fun with your matches by sending photos and videos to each other.',
+    },
+    {
+      icon: require('../assets/icons/png/bell.png'),
+      title: 'Get Notified',
+      backgroundColor: '#20d2bb',
+      description:
+        'Receive notifications when you get new messages and matches.',
+    },
+  ],
+  },
+  tosLink: 'https://sunsigninc.com/terms-conditions/',
+  isUsernameFieldEnabled: false,
+  smsSignupFields: [
+    {
+      displayName: 'First Name',
+      type: 'ascii-capable',
+      editable: true,
+      regex: regexForNames,
+      key: 'firstName',
+      placeholder: 'First Name',
+    },
+    {
+      displayName: 'Last Name',
+      type: 'ascii-capable',
+      editable: true,
+      regex: regexForNames,
+      key: 'lastName',
+      placeholder: 'Last Name',
+    },
+    {
+      displayName: 'Username',
+      type: 'default',
+      editable: true,
+      regex: regexForNames,
+      key: 'username',
+      placeholder: 'Username',
+    },
+    {
+      displayName: 'Age',
+      type: 'number-pad',
+      maxLength: 2,
+      editable: true,
+      regex: /^[1-9]?[0-9]{1}$|^100$/,
+      key: 'age',
+      placeholder: 'Age',
+    },
+  ],
+  signupFields: [
+    {
+      displayName: 'First Name',
+      type: 'ascii-capable',
+      editable: true,
+      regex: regexForNames,
+      key: 'firstName',
+      placeholder: 'First Name',
+    },
+    {
+      displayName: 'Last Name',
+      type: 'ascii-capable',
+      editable: true,
+      regex: regexForNames,
+      key: 'lastName',
+      placeholder: 'Last Name',
+    },
+    {
+      displayName: 'Username',
+      type: 'ascii-capable',
+      editable: true,
+      regex: regexForNames,
+      key: 'username',
+      placeholder: 'Username',
+    },
+    {
+      displayName: 'E-mail Address',
+      type: 'email-address',
+      editable: true,
+      regex: regexForNames,
+      key: 'email',
+      placeholder: 'E-mail Address',
+      autoCapitalize: 'none',
+    },
+    {
+      displayName: 'Password',
+      type: 'default',
+      secureTextEntry: true,
+      editable: true,
+      regex: regexForNames,
+      key: 'password',
+      placeholder: 'Password',
+      autoCapitalize: 'none',
+    },
+    {
+      displayName: 'Age',
+      type: 'number-pad',
+      maxLength: 2,
+      editable: true,
+      regex: /^[1-9]?[0-9]{1}$|^100$/,
+      key: 'age',
+      placeholder: 'Age',
+    },
+  ],
+  privacyPolicyLink: 'https://sunsigninc.com/privacypolicy/',
+  editProfileFields: {
+    sections: [
+      {
+        title: 'PUBLIC PROFILE',
+        fields: [
+          {
+            displayName: 'First Name',
+            type: 'text',
+            editable: true,
+            regex: regexForNames,
+            key: 'firstName',
+            placeholder: 'Your first name',
+          },
+          {
+            displayName: 'Last Name',
+            type: 'text',
+            editable: true,
+            regex: regexForNames,
+            key: 'lastName',
+            placeholder: 'Your last name',
+          },
+          {
+            displayName: 'Age',
+            type: 'text',
+            editable: true,
+            regex: regexForAge,
+            key: 'age',
+            placeholder: 'Your age',
+          },
+          {
+            displayName: 'Bio',
+            type: 'text',
+            editable: true,
+            key: 'bio',
+            placeholder: 'Your bio',
+          },
+          {
+            displayName: 'Education Level',
+            type: 'text',
+            editable: true,
+            key: 'school',
+            placeholder: 'Your bio',
+          },
+        ],
+      },
+      {
+        title: 'PRIVATE DETAILS',
+        fields: [
+          {
+            displayName: 'E-mail Address',
+            type: 'text',
+            editable: false,
+            key: 'email',
+            placeholder: 'Your email address',
+          },
+          {
+            displayName: 'Phone Number',
+            type: 'text',
+            editable: true,
+            regex: regexForPhoneNumber,
+            key: 'phone',
+            placeholder: 'Your phone number',
+          },
+        ],
+      },
+    ],
+  },
+  userSettingsFields: {
+    sections: [
+      {
+        title: 'DISCOVERY',
+        fields: [
+          {
+            displayName: 'Show Me on Sunshine',
+            type: 'switch',
+            editable: true,
+            key: 'show_me',
+            value: true,
+          },
+          {
+            displayName: 'Distance Radius',
+            type: 'select',
+            options: ['5', '10', '15', '25', '50', '100', 'unlimited'],
+            displayOptions: [
+              '5 miles',
+              '10 miles',
+              '15 miles',
+              '25 miles',
+              '50 miles',
+              '100 miles',
+              'Unlimited',
+            ],
+            editable: true,
+            key: 'distance_radius',
+            value: 'Unlimited',
+          },
+          {
+            displayName: 'Sun Sign',
+            type: 'signSelect',
+            options: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'none',
+            ],
+            displayOptions: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'None',
+            ],
+            editable: true,
+            key: 'sun_sign',
+            value: 'None',
+          },
+          {
+            displayName: 'Moon Sign',
+            type: 'signSelect',
+            options: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'none',
+            ],
+            displayOptions: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'None',
+            ],
+            editable: true,
+            key: 'moon_sign',
+            value: 'None',
+          },
+          {
+            displayName: 'Venus Sign',
+            type: 'signSelect',
+            options: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'none',
+            ],
+            displayOptions: [
+              'Aries',
+              'Taurus',
+              'Gemini',
+              'Cancer',
+              'Leo',
+              'Virgo',
+              'Libra',
+              'Scorpio',
+              'Sagittarius',
+              'Capricorn',
+              'Aquarius',
+              'Pisces',
+              'None',
+            ],
+            editable: true,
+            key: 'venus_sign',
+            value: 'None',
+          },
+        ],
+      },
+      {
+        title: 'PUSH NOTIFICATIONS',
+        fields: [
+          {
+            displayName: 'New matches',
+            type: 'switch',
+            editable: true,
+            key: 'push_new_matches_enabled',
+            value: true,
+          },
+          {
+            displayName: 'Messages',
+            type: 'switch',
+            editable: true,
+            key: 'push_new_messages_enabled',
+            value: true,
+          },
+          {
+            displayName: 'Super Likes',
+            type: 'switch',
+            editable: true,
+            key: 'push_super_likes_enabled',
+            value: true,
+          },
+          {
+            displayName: 'Top Picks',
+            type: 'switch',
+            editable: true,
+            key: 'push_top_picks_enabled',
+            value: true,
+          },
+        ],
+      },
+      {
+        title: 'Gender',
+        fields: [
+          {
+            displayName: 'Male',
+            type: 'switchGender',
+            editable: true,
+            key: 'gender_new',
+            value: null,
+          },
+        ],
+      },
+      {
+        title: 'Gender Preference',
+        fields: [
+          {
+            displayName: 'Male',
+            type: 'switchGender',
+            editable: true,
+            key: 'gender_preference_new',
+            value: null,
+          },
+        ],
+      },
+      {
+        title: 'Select Age Range',
+        fields: [
+          {
+            displayName: '',
+            type: 'slider',
+            key: 'min',
+          },
+          {
+            displayName: '',
+            type: 'slider',
+            key: 'max',
+          },
+        ],
+      },
+      {
+        title: '',
+        fields: [
+          {
+            displayName: 'Save',
+            type: 'button',
+            key: 'savebutton',
+          },
+        ],
+      },
+    ],
+  },
+  allSignDummyField: {
+    sections: [
+      {
+        displayName: '',
+        key: 'sun_sign_dummy',
+        type: 'dummy',
+        value: 'None',
+      },
+      {
+        displayName: '',
+        key: 'moon_sign_dummy',
+        type: 'dummy',
+        value: 'None',
+      },
+      {
+        displayName: '',
+        key: 'venus_sign_dummy',
+        type: 'dummy',
+        value: 'None',
+      },
+    ],
+  },
+
+  contactUsFields: {
+    sections: [
+      {
+        title: 'CONTACT',
+        fields: [
+          {
+            displayName: 'Address',
+            type: 'text',
+            editable: false,
+            key: 'push_notifications_enabled',
+            value: 'PO Box 85, Victorville, Ca 92393',
+          },
+          {
+            displayName: 'E-mail us',
+            value: 'mailto:sunsigninc@gmail.com',
+            type: 'text',
+            editable: false,
+            key: 'email',
+            placeholder: 'Your email address',
+          },
+          {
+            displayName: 'Drop a mail and give us 48 hours to revert back to you.',
+            type: 'buttonType',
+            key: 'savebutton',
+          },
+
+          {
+            type: 'image',
+            source: require('../assets/images/mainlogo.png'),
+          },
+
+          {
+            type: 'image',
+            source: require('../assets/images/background.png'),
+          },
+
+          {
+            displayName: 'Corporation',
+            type: 'text',
+            editable: false,
+            key: 'push_notifications_enabled',
+            value: 'Sun Sign INC.',
+          },
+        ],
+      },
+    ],
+  },
+  subscriptionValues: {
+    oneMonthPlan: [
+      {
+        displayName: '',
+        src: require('../assets/images/30SunC.png'),
+        key: 'sunC',
+        value: true,
+        disabled: true,
+      },
+      {
+        displayName: '',
+        src: require('../assets/images/30moonC.png'),
+        key: 'moonC',
+        value: true,
+        disabled: true,
+      },
+      {
+        displayName: '',
+        src: require('../assets/images/30venusC.png'),
+        key: 'venusC',
+        value: true,
+        disabled: true,
+      },
+    ],
+    oneYearPlan: [
+      {
+        displayName: '',
+        src: require('../assets/images/30SunC.png'),
+        key: 'sunCs',
+        value: true,
+        disabled: false,
+      },
+      {
+        displayName: '',
+        src: require('../assets/images/30moonC.png'),
+        key: 'moonCs',
+        value: false,
+        disabled: false,
+      },
+      {
+        displayName: '',
+        src: require('../assets/images/30venusC.png'),
+        key: 'venusCs',
+        value: false,
+        disabled: false,
+      },
+    ],
+  },
+  dailySwipeLimit: 10,
+  subscriptionSlideContents: [
+    {
+      title: 'Upgrade Plan',
+      description: 'When you subscribe, you get unlimited daily swipes, undo actions and more.',
+      src: require('../assets/images/fencing.png'),
+    },
+    {
+      title: '1 Month Plan',
+      description: 'Matching based on any one of the signs, sun, moon or Venus sign for 1 month.',
+      src: require('../assets/images/vip_1.png'),
+    },
+    {
+      title: '1 Year Plan',
+      description: 'Unlock all signs - sun, moon or Venus sign for 1 year.',  
+      src: require('../assets/images/vip_2.png'),
+    },
+  ],
+  contactUsPhoneNumber: '+16504859694',
+  IAP_SHARED_SECRET: '0e204fa5b8e54c6aabfcf404747f5c44',
+  IAP_SKUS: Platform.select({
+    ios: [
+      'vip_access_099_1m',
+      'vip_access_099_03m',
+      'vip_access_099_06m',
+      'vip_access_0999_1m',
+    ],
+    android: ['vip_access_099_1m', 'vip_access_0999_1m'], //vip-access-099-03m
+  }),
+}
+
+
+export default DatingConfig;
+
+
+
+
