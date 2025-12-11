@@ -126,6 +126,9 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
             label={'Send Code'}
             labelColor={Colors.white}
             backgroundColor={Colors.primary}
+            onPress={()=>{
+              alert('sss')
+            }}
           />
         </View>
       </>

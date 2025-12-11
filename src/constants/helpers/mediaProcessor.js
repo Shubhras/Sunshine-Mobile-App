@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { Audio, Video } from 'react-native-compressor';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import RNFS from 'react-native-fs';
-import ImageResizer from 'react-native-image-resizer';
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { v4 as uuidv4 } from 'uuid';
 
 const BASE_DIR = `${RNFS.CachesDirectoryPath}/media-cache/`;
