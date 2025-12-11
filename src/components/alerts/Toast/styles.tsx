@@ -32,6 +32,7 @@ export default StyleSheet.create({
   },
   messageWrapper:{
     marginLeft: scale(5),
+    maxWidth: SCREEN_WIDTH * 0.7,
   },
   ToastTitle:{
     fontSize: FONT_SIZE_XS,
@@ -41,6 +42,7 @@ export default StyleSheet.create({
   ToastText: {
     fontSize: FONT_SIZE_XXS,
     fontFamily: POPPINS_MEDIUM,
+    flexWrap: 'wrap',
     flex: 1,
   },
   toastIcon: {
@@ -79,7 +81,8 @@ export default StyleSheet.create({
     marginHorizontal: scale(8),
   },
   closeButton: {
-    marginLeft: scale(10),
+    position: 'absolute',
+    right: scale(5),
     padding: scale(5),
     backgroundColor: '#aaa',
     borderRadius: scale(30),

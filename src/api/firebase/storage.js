@@ -1,100 +1,99 @@
-import { processMediaFile } from '../../constants/helpers/mediaProcessor'
-import { ErrorCode } from '../../utils/ErrorCode'
-import { firebase } from './config'
+// firebase/firebaseStorage.js
+import { storage } from './config';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { processMediaFile } from '../../constants/helpers/mediaProcessor';
+import { ErrorCode } from '../../utils/ErrorCode';
+import { v4 as uuidv4 } from 'uuid';
 
 const getBlob = async uri => {
   return await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.onload = () => {
-      resolve(xhr.response)
-    }
-    xhr.responseType = 'blob'
-    xhr.open('GET', uri, true)
-    xhr.send(null)
-  })
-}
+    const xhr = new XMLHttpRequest();
+    xhr.onload = () => resolve(xhr.response);
+    xhr.onerror = () => reject(new Error('Failed to fetch blob'));
+    xhr.responseType = 'blob';
+    xhr.open('GET', uri.startsWith('file://') ? uri : 'file://' + uri, true);
+    xhr.send(null);
+  });
+};
 
 const uploadFile = async (processedUri, callbackProgress) => {
-  let finished = false
-  const filename = processedUri.substring(processedUri.lastIndexOf('/') + 1)
-  const blob = await getBlob(processedUri)
-  const storageRef = firebase.storage().ref()
-  const fileRef = storageRef.child(filename)
-  const uploadTask = fileRef.put(blob)
+  if (!processedUri) return Promise.reject(new Error('Invalid file URI'));
+
+  const filename = `${uuidv4()}_${processedUri.substring(
+    processedUri.lastIndexOf('/') + 1,
+  )}`;
+  const blob = await getBlob(processedUri).catch(() => null);
+
+  if (!blob) return Promise.reject({ code: ErrorCode.photoUploadFailed });
+
+  const fileRef = ref(storage, filename);
+  const uploadTask = uploadBytesResumable(fileRef, blob);
 
   return new Promise((resolve, reject) => {
-    uploadTask.on(
-      firebase.storage.TaskEvent.STATE_CHANGED,
-      snapshot => {
-        if (snapshot.state == firebase.storage.TaskState.SUCCESS) {
-          if (finished == true) {
-            return
-          }
-          finished = true
-        }
-        callbackProgress && callbackProgress(snapshot)
-      },
-      error => {
-        reject(error)
-      },
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-          resolve(downloadURL)
-        })
-      },
-    )
-  })
-}
+    let finished = false;
 
-const processAndUploadMediaFileWithProgressTracking = (
+    uploadTask.on(
+      'state_changed',
+      snapshot => callbackProgress && callbackProgress(snapshot),
+      error => reject(error),
+      async () => {
+        if (finished) return;
+        finished = true;
+        const downloadURL = await getDownloadURL(fileRef).catch(() =>
+          reject({ code: ErrorCode.photoUploadFailed }),
+        );
+        resolve(downloadURL);
+      },
+    );
+  });
+};
+
+export const processAndUploadMediaFileWithProgressTracking = (
   file,
   callbackProgress,
   callbackSuccess,
   callbackError,
 ) => {
   processMediaFile(file, ({ processedUri, thumbnail }) => {
-    // Success handler with SUCCESS is called multiple times on Android. We need work around that to ensure we only call it once
     uploadFile(processedUri, callbackProgress)
       .then(downloadURL => {
         if (thumbnail) {
           uploadFile(thumbnail, callbackProgress)
-            .then(thumbnailURL => {
-              callbackSuccess(downloadURL, thumbnailURL)
-            })
-            .catch(callbackError)
-
-          return
+            .then(thumbnailURL => callbackSuccess(downloadURL, thumbnailURL))
+            .catch(callbackError);
+          return;
         }
-        callbackSuccess(downloadURL)
+        callbackSuccess(downloadURL);
       })
-      .catch(callbackError)
-  })
-}
+      .catch(callbackError);
+  });
+};
 
-const processAndUploadMediaFile = file => {
-  return new Promise((resolve, _reject) => {
-    processMediaFile(file, ({ processedUri, thumbnail }) => {
-      uploadFile(processedUri)
-        .then(downloadURL => {
-          if (thumbnail) {
-            uploadFile(thumbnail)
-              .then(thumbnailURL => {
-                resolve({ downloadURL, thumbnailURL })
-              })
-              .catch(() => resolve({ error: ErrorCode.photoUploadFailed }))
+export const processAndUploadMediaFile = async file => {
+  return new Promise(resolve => {
+    processMediaFile(file, async ({ processedUri, thumbnail }) => {
+      try {
+        const downloadURL = await uploadFile(processedUri);
 
-            return
+        if (thumbnail) {
+          try {
+            const thumbnailURL = await uploadFile(thumbnail);
+            resolve({ downloadURL, thumbnailURL });
+          } catch {
+            resolve({ downloadURL, error: ErrorCode.photoUploadFailed });
           }
-          resolve({ downloadURL })
-        })
-        .catch(() => resolve({ error: ErrorCode.photoUploadFailed }))
-    })
-  })
-}
+          return;
+        }
 
-const firebaseStorage = {
+        resolve({ downloadURL });
+      } catch {
+        resolve({ error: ErrorCode.photoUploadFailed });
+      }
+    });
+  });
+};
+
+export default {
   processAndUploadMediaFile,
   processAndUploadMediaFileWithProgressTracking,
-}
-
-export default firebaseStorage
+};

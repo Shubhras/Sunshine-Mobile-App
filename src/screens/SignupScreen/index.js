@@ -175,7 +175,6 @@
 //       </View> */
 // }
 
-
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -202,6 +201,7 @@ import * as Yup from 'yup';
 import { showToast } from '../../components/alerts/Toast/ToastManager';
 import { createUserWithEmailAndPassword } from '@react-native-firebase/auth';
 import { register } from '../../api/firebase/auth';
+import { localizedErrorMessage } from '../../utils/ErrorCode';
 
 // Validation Schema
 const SignupSchema = Yup.object().shape({
@@ -275,11 +275,9 @@ const SignupScreen = ({ navigation, route }) => {
     register(userDetails, appIdentifier)
       .then(response => {
         setSubmitting(false);
-
         if (response.error) {
           // Show error message
           const errorMessage = localizedErrorMessage(response.error);
-
           showToast({
             title: 'Signup Failed',
             text: errorMessage,

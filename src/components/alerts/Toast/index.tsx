@@ -147,7 +147,7 @@ const Toast = forwardRef<ToastRef, ToastProps>(({}, ref) => {
         />
       <View style={styles.messageWrapper}>
           <CustomText style={[styles.ToastTitle, title]}>{toastConfig.title}</CustomText>
-        <CustomText style={[styles.ToastText, text]}>{toastConfig.text}</CustomText>
+        <CustomText style={[styles.ToastText, text]} numberOfLines={3} ellipsizeMode="tail">{toastConfig.text}</CustomText>
       </View>
         <TouchableOpacity onPress={() => setShowing(false)} style={styles.closeButton}>
           <AntDesign name={'close'} color={Colors.white} size={scale(14)} />

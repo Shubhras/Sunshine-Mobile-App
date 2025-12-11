@@ -1,334 +1,203 @@
-import auth from '@react-native-firebase/auth';
-import storage from '@react-native-firebase/storage';
-import firestore from '@react-native-firebase/firestore';
+// firebase/auth.js
+import { auth, db, storage } from './config';
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail as sendResetEmail,
+} from 'firebase/auth';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ErrorCode } from '../../utils/ErrorCode';
 
-const usersRef = firestore().collection('users');
+const usersRef = collection(db, 'users');
 
-/**
- * Upload profile picture to Firebase Storage
- */
-const uploadProfilePicture = (userId, photoFile) => {
-  return new Promise((resolve, reject) => {
-    if (!photoFile || !photoFile.uri) {
-      resolve('');
-      return;
-    }
+// ------------------------------
+// Upload profile picture
+// ------------------------------
+const uploadProfilePicture = async (userId, photoFile) => {
+  if (!photoFile?.uri) return '';
+  const filename = `profile_pictures/${userId}_${Date.now()}.jpg`;
+  const storageRef = ref(storage, filename);
+  const blob = await (await fetch(photoFile.uri)).blob();
 
-    const filename = `profile_pictures/${userId}_${Date.now()}.jpg`;
-    const reference = storage().ref(filename);
-
-    reference
-      .putFile(photoFile.uri)
-      .then(() => reference.getDownloadURL())
-      .then(url => resolve(url))
-      .catch(error => {
-        console.error('Profile upload error:', error);
-        reject({ code: ErrorCode.photoUploadFailed });
-      });
-  });
+  return uploadBytes(storageRef, blob)
+    .then(() => getDownloadURL(storageRef))
+    .catch(() => ({ error: ErrorCode.photoUploadFailed }));
 };
 
-/**
- * Create user document in Firestore
- */
-const createUserInFirestore = (userId, userDetails, profilePictureURL, appIdentifier) => {
-  return new Promise((resolve, reject) => {
-    const timestamp = firestore.FieldValue.serverTimestamp();
+// ------------------------------
+// Create Firestore user
+// ------------------------------
+const createUserInFirestore = async (
+  userId,
+  userDetails,
+  profilePictureURL,
+  appIdentifier,
+) => {
+  const userData = {
+    id: userId,
+    userID: userId,
+    email: userDetails.email || '',
+    firstName: userDetails.firstName || '',
+    lastName: userDetails.lastName || '',
+    username: userDetails.username?.toLowerCase() || '',
+    phone: userDetails.phone || '',
+    age: userDetails.age || '',
+    profilePictureURL: profilePictureURL || '',
+    location: userDetails.location || '',
+    signUpLocation: userDetails.signUpLocation || '',
+    appIdentifier: appIdentifier || '',
+    createdAt: serverTimestamp(),
+  };
 
-    const userData = {
-      id: userId,
-      userID: userId,
-      email: userDetails.email || '',
-      firstName: userDetails.firstName || '',
-      lastName: userDetails.lastName || '',
-      username: userDetails.username?.toLowerCase() || '',
-      phone: userDetails.phone || '',
-      age: userDetails.age || '',
-      profilePictureURL: profilePictureURL || '',
-      location: userDetails.location || '',
-      signUpLocation: userDetails.signUpLocation || '',
-      appIdentifier: appIdentifier || '',
-      createdAt: timestamp,
-    };
-
-    usersRef
-      .doc(userId)
-      .set(userData)
-      .then(() => resolve(userData))
-      .catch(error => {
-        console.error('Firestore error:', error);
-        reject({ code: ErrorCode.serverError });
-      });
-  });
+  const userDocRef = doc(usersRef, userId);
+  return setDoc(userDocRef, userData)
+    .then(() => userData)
+    .catch(() => ({ error: ErrorCode.serverError }));
 };
 
-/**
- * Register new user
- */
-export const register = (userDetails, appIdentifier) => {
+// ------------------------------
+// Register
+// ------------------------------
+export const register = async (userDetails, appIdentifier) => {
   const { email, password, firstName, lastName, photoFile } = userDetails;
 
-  return new Promise((resolve) => {
-    let userId = null;
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password,
+  ).catch(error => ({ error }));
 
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(response => {
-        userId = response.user.uid;
-        return uploadProfilePicture(userId, photoFile);
-      })
-      .then(profilePictureURL => {
-        return createUserInFirestore(userId, userDetails, profilePictureURL, appIdentifier);
-      })
-      .then(userData => {
-        const displayName = `${firstName} ${lastName}`.trim();
-        return auth()
-          .currentUser
-          .updateProfile({
-            displayName: displayName,
-            photoURL: userData.profilePictureURL,
-          })
-          .then(() => userData);
-      })
-      .then(userData => {
-        resolve({ user: userData });
-      })
-      .catch(error => {
-        console.error('Registration error:', error);
+  if (userCredential?.error) {
+    let errorCode = ErrorCode.serverError;
+    switch (userCredential.error.code) {
+      case 'auth/email-already-in-use':
+        errorCode = ErrorCode.emailInUse;
+        break;
+      case 'auth/invalid-email':
+        errorCode = ErrorCode.badEmailFormat;
+        break;
+      case 'auth/weak-password':
+        errorCode = ErrorCode.invalidPassword;
+        break;
+      case 'auth/too-many-requests':
+        errorCode = ErrorCode.rateLimited;
+        break;
+    }
+    return { error: errorCode };
+  }
 
-        let errorCode = ErrorCode.serverError;
+  const userId = userCredential.user.uid;
 
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            errorCode = ErrorCode.emailInUse;
-            break;
-          case 'auth/invalid-email':
-            errorCode = ErrorCode.badEmailFormat;
-            break;
-          case 'auth/weak-password':
-            errorCode = ErrorCode.invalidPassword;
-            break;
-          case 'auth/too-many-requests':
-            errorCode = ErrorCode.rateLimited;
-            break;
-          case ErrorCode.photoUploadFailed:
-            errorCode = ErrorCode.photoUploadFailed;
-            break;
-          default:
-            errorCode = ErrorCode.serverError;
-        }
+  const profilePictureURL = await uploadProfilePicture(userId, photoFile);
+  if (profilePictureURL?.error) return { error: profilePictureURL.error };
 
-        resolve({ error: errorCode });
-      });
-  });
+  const userData = await createUserInFirestore(
+    userId,
+    userDetails,
+    profilePictureURL,
+    appIdentifier,
+  );
+  if (userData?.error) return { error: userData.error };
+
+  await updateProfile(auth.currentUser, {
+    displayName: `${firstName} ${lastName}`.trim(),
+    photoURL: profilePictureURL,
+  }).catch(() => null);
+
+  return { user: userData };
 };
 
-/**
- * Login with email and password
- */
-export const login = (email, password) => {
-  return new Promise((resolve) => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(response => {
-        const uid = response.user.uid;
-        return usersRef.doc(uid).get();
-      })
-      .then(firestoreDocument => {
-        if (!firestoreDocument.exists) {
-          resolve({ error: ErrorCode.noUser });
-          return;
-        }
+// ------------------------------
+// Login
+// ------------------------------
+export const login = async (email, password) => {
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password,
+  ).catch(error => ({ error }));
 
-        const user = firestoreDocument.data();
-        resolve({ user });
-      })
-      .catch(error => {
-        console.error('Login error:', error);
+  if (userCredential?.error) {
+    let errorCode = ErrorCode.serverError;
+    switch (userCredential.error.code) {
+      case 'auth/wrong-password':
+        errorCode = ErrorCode.invalidPassword;
+        break;
+      case 'auth/user-not-found':
+        errorCode = ErrorCode.noUser;
+        break;
+      case 'auth/invalid-email':
+        errorCode = ErrorCode.badEmailFormat;
+        break;
+      case 'auth/too-many-requests':
+        errorCode = ErrorCode.rateLimited;
+        break;
+    }
+    return { error: errorCode };
+  }
 
-        let errorCode = ErrorCode.serverError;
+  const userDoc = await getDoc(doc(usersRef, userCredential.user.uid)).catch(
+    () => ({ error: ErrorCode.serverError }),
+  );
 
-        switch (error.code) {
-          case 'auth/wrong-password':
-            errorCode = ErrorCode.invalidPassword;
-            break;
-          case 'auth/user-not-found':
-            errorCode = ErrorCode.noUser;
-            break;
-          case 'auth/invalid-email':
-            errorCode = ErrorCode.badEmailFormat;
-            break;
-          case 'auth/user-disabled':
-            errorCode = ErrorCode.noUser;
-            break;
-          case 'auth/too-many-requests':
-            errorCode = ErrorCode.rateLimited;
-            break;
-          default:
-            errorCode = ErrorCode.serverError;
-        }
+  if (userDoc?.error) return { error: userDoc.error };
+  if (!userDoc.exists()) return { error: ErrorCode.noUser };
 
-        resolve({ error: errorCode });
-      });
-  });
+  return { user: userDoc.data() };
 };
 
-/**
- * Logout current user
- */
-export const logout = () => {
-  return auth()
+// ------------------------------
+// Logout
+// ------------------------------
+export const logout = async () => {
+  return auth
     .signOut()
+    .then(() => ({ success: true }))
+    .catch(() => ({ error: ErrorCode.serverError }));
+};
+
+// ------------------------------
+// Get current user
+// ------------------------------
+export const getCurrentUser = async () => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return null;
+
+  const docSnap = await getDoc(doc(usersRef, currentUser.uid)).catch(
+    () => null,
+  );
+  if (!docSnap?.exists()) return null;
+
+  return docSnap.data();
+};
+
+// ------------------------------
+// Send password reset
+// ------------------------------
+export const sendPasswordResetEmail = async email => {
+  return sendResetEmail(auth, email)
+    .then(() => ({ success: true }))
     .catch(error => {
-      console.error('Logout error:', error);
-      throw error;
+      let errorCode = ErrorCode.serverError;
+      switch (error?.code) {
+        case 'auth/user-not-found':
+          errorCode = ErrorCode.noUser;
+          break;
+        case 'auth/invalid-email':
+          errorCode = ErrorCode.badEmailFormat;
+          break;
+        case 'auth/too-many-requests':
+          errorCode = ErrorCode.rateLimited;
+          break;
+      }
+      return { error: errorCode };
     });
-};
-
-/**
- * Get current user data from Firestore
- */
-export const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const currentUser = auth().currentUser;
-
-    if (!currentUser) {
-      resolve(null);
-      return;
-    }
-
-    usersRef
-      .doc(currentUser.uid)
-      .get()
-      .then(doc => {
-        if (!doc.exists) {
-          resolve(null);
-          return;
-        }
-        resolve(doc.data());
-      })
-      .catch(error => {
-        console.error('Get user error:', error);
-        reject(error);
-      });
-  });
-};
-
-/**
- * Send password reset email
- */
-export const sendPasswordResetEmail = (email) => {
-  return new Promise((resolve) => {
-    auth()
-      .sendPasswordResetEmail(email)
-      .then(() => {
-        resolve({ success: true });
-      })
-      .catch(error => {
-        console.error('Password reset error:', error);
-
-        let errorCode = ErrorCode.serverError;
-
-        switch (error.code) {
-          case 'auth/user-not-found':
-            errorCode = ErrorCode.noUser;
-            break;
-          case 'auth/invalid-email':
-            errorCode = ErrorCode.badEmailFormat;
-            break;
-          case 'auth/too-many-requests':
-            errorCode = ErrorCode.rateLimited;
-            break;
-          default:
-            errorCode = ErrorCode.serverError;
-        }
-
-        resolve({ error: errorCode });
-      });
-  });
-};
-
-/**
- * Update user password
- */
-export const updateUserPassword = (newPassword) => {
-  return new Promise((resolve) => {
-    const currentUser = auth().currentUser;
-
-    if (!currentUser) {
-      resolve({ error: ErrorCode.noUser });
-      return;
-    }
-
-    currentUser
-      .updatePassword(newPassword)
-      .then(() => {
-        resolve({ success: true });
-      })
-      .catch(error => {
-        console.error('Update password error:', error);
-
-        let errorCode = ErrorCode.serverError;
-
-        switch (error.code) {
-          case 'auth/weak-password':
-            errorCode = ErrorCode.invalidPassword;
-            break;
-          case 'auth/requires-recent-login':
-            errorCode = ErrorCode.requiresRecentLogin;
-            break;
-          default:
-            errorCode = ErrorCode.serverError;
-        }
-
-        resolve({ error: errorCode });
-      });
-  });
-};
-
-/**
- * Re-authenticate user
- */
-export const reauthenticate = (password) => {
-  return new Promise((resolve) => {
-    const currentUser = auth().currentUser;
-
-    if (!currentUser || !currentUser.email) {
-      resolve({ error: ErrorCode.noUser });
-      return;
-    }
-
-    const credential = auth.EmailAuthProvider.credential(
-      currentUser.email,
-      password
-    );
-
-    currentUser
-      .reauthenticateWithCredential(credential)
-      .then(() => {
-        resolve({ success: true });
-      })
-      .catch(error => {
-        console.error('Re-authentication error:', error);
-
-        let errorCode = ErrorCode.serverError;
-
-        switch (error.code) {
-          case 'auth/wrong-password':
-            errorCode = ErrorCode.invalidPassword;
-            break;
-          case 'auth/user-not-found':
-            errorCode = ErrorCode.noUser;
-            break;
-          case 'auth/too-many-requests':
-            errorCode = ErrorCode.rateLimited;
-            break;
-          default:
-            errorCode = ErrorCode.serverError;
-        }
-
-        resolve({ error: errorCode });
-      });
-  });
 };
