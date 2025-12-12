@@ -11,6 +11,7 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import DatingConfig from '../../data/DatingConfig';
 import styles from './styles';
 import { Images } from '../../constants/images';
+import { CustomText } from '../../components/global/CustomText';
 
 const WalkthroughScreen = ({ navigation }) => {
   const slides = DatingConfig.onboardingConfig.walkthroughScreens.map(
@@ -51,8 +52,8 @@ const WalkthroughScreen = ({ navigation }) => {
         )}
         {item.title && (
           <View>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.text}>{item.text}</Text>
+            <CustomText style={styles.title}>{item.title}</CustomText>
+            <CustomText style={styles.text}>{item.text}</CustomText>
           </View>
         )}
         {item.key === 0 && (
@@ -71,26 +72,26 @@ const WalkthroughScreen = ({ navigation }) => {
                   style={{ height: '100%', width: '100%' }}
                 />
               </View>
-              <Text style={styles.title}>
+              <CustomText style={styles.title}>
                 {DatingConfig.onboardingConfig.welcomeTitle}
-              </Text>
-              <Text style={styles.caption}>
+              </CustomText>
+              <CustomText style={styles.caption}>
                 {DatingConfig.onboardingConfig.welcomeCaption}
-              </Text>
+              </CustomText>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.loginContainer}
                   onPress={handleLogin}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.loginText}>Log In</Text>
+                  <CustomText style={styles.loginText}>Log In</CustomText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.signupContainer}
                   onPress={handleSignup}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.signupText}>Sign Up</Text>
+                  <CustomText style={styles.signupText}>Sign Up</CustomText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -101,7 +102,7 @@ const WalkthroughScreen = ({ navigation }) => {
   };
 
   const renderDoneButton = () => {
-    return <Text style={styles.doneButton}>Done</Text>;
+    return <CustomText style={styles.doneButton}>Done</CustomText>;
   };
 
   return (

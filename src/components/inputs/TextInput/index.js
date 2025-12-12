@@ -65,6 +65,7 @@ const TextInput = ({
           maxLength={maxLength}
           selectionColor={Colors.primary}
           underlineColorAndroid={underlineColorAndroid}
+          allowFontScaling={false}
           // textAlignVertical="center"
           {...props}
         />

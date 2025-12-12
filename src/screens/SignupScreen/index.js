@@ -175,7 +175,7 @@
 //       </View> */
 // }
 
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { scale } from 'react-native-size-matters';
@@ -200,8 +200,13 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { showToast } from '../../components/alerts/Toast/ToastManager';
 import { createUserWithEmailAndPassword } from '@react-native-firebase/auth';
-import { register } from '../../api/firebase/auth';
+import { register, updateProfilePhoto } from '../../api/firebase/auth';
 import { localizedErrorMessage } from '../../utils/ErrorCode';
+import { processAndUploadMediaFile } from '../../api/firebase/storage';
+import { defaultProfilePhotoURL } from '../../constants/images';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../redux/slices/SessionUser';
+import TNActivityIndicator from '../../components/TNActivityIndicator';
 
 // Validation Schema
 const SignupSchema = Yup.object().shape({
@@ -238,10 +243,11 @@ const SignupSchema = Yup.object().shape({
 
 const SignupScreen = ({ navigation, route }) => {
   const { appIdentifier } = route.params || {};
-
+  const dispatch = useDispatch();
   // Local states
   const [profilePictureFile, setProfilePictureFile] = useState(null);
-
+  console.log('Profile Picture File:', profilePictureFile);
+  const [loading, setLoading] = useState(false);
   const initialValues = signupFields.reduce((acc, field) => {
     acc[field.key] = '';
     return acc;
@@ -257,7 +263,7 @@ const SignupScreen = ({ navigation, route }) => {
     return trimmedFields;
   };
 
-  const handleSignup = (values, { setSubmitting, setErrors }) => {
+  const handleSignup = async (values, { setSubmitting, setErrors }) => {
     if (!profilePictureFile) {
       showToast({
         title: 'Profile Picture Required',
@@ -268,44 +274,76 @@ const SignupScreen = ({ navigation, route }) => {
       setSubmitting(false);
       return;
     }
+    setLoading(true);
     const userDetails = {
       ...trimFields(values),
       photoFile: profilePictureFile,
     };
-    register(userDetails, appIdentifier)
+    await register(userDetails, appIdentifier)
       .then(response => {
-        setSubmitting(false);
         if (response.error) {
-          // Show error message
-          const errorMessage = localizedErrorMessage(response.error);
+          setSubmitting(false);
+          setLoading(false);
           showToast({
             title: 'Signup Failed',
-            text: errorMessage,
+            text: response?.error?.message || 'Unable to create account',
             duration: 3000,
             type: 'error',
           });
-
-          setErrors({ submit: errorMessage });
         } else {
-          // Success
-          showToast({
-            title: 'Success',
-            text: 'Account created successfully!',
-            duration: 2000,
-            type: 'success',
-          });
-
-          // Navigate to home or next screen
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{ name: 'Home' }],
-          // });
+          let user = response.user;
+          if (profilePictureFile) {
+            processAndUploadMediaFile(profilePictureFile).then(response => {
+              if (response.error) {
+                dispatch(
+                  updateUser({
+                    ...user,
+                    profilePictureURL: defaultProfilePhotoURL,
+                  }),
+                );
+                setLoading(false);
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'HomeScreen' }],
+                });
+                // dispatch
+              } else {
+                updateProfilePhoto(user.id, response.downloadURL).then(
+                  _result => {
+                    dispatch(
+                      updateUser({
+                        ...user,
+                        profilePictureURL: response.downloadURL,
+                      }),
+                    );
+                    setLoading(false);
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: 'HomeScreen' }],
+                    });
+                  },
+                );
+              }
+            });
+          } else {
+            dispatch(
+              updateUser({
+                ...user,
+                profilePictureURL: defaultProfilePhotoURL,
+              }),
+            );
+            setLoading(false);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'HomeScreen' }],
+            });
+          }
         }
       })
       .catch(error => {
         console.error('Unexpected error:', error);
         setSubmitting(false);
-
+        setLoading(false);
         showToast({
           title: 'Error',
           text: 'An unexpected error occurred',
@@ -378,6 +416,28 @@ const SignupScreen = ({ navigation, route }) => {
             label={'Sign Up'}
             labelColor={Colors.white}
             backgroundColor={Colors.primary}
+            // onPress={()=>{
+            //    if (profilePictureFile) {
+            //   processAndUploadMediaFile(profilePictureFile).then(response => {
+            //     console.log("ERERERERERERERERERERERE:",response);
+            //     // if (response.error) {
+            //     //   // if account gets created, but photo upload fails, we still log the user in
+
+            //     // } else {
+            //     //   authAPI
+            //     //     .updateProfilePhoto(user.id, response.downloadURL)
+            //     //     .then(_result => {
+            //     //       resolve({
+            //     //         user: {
+            //     //           ...user,
+            //     //           profilePictureURL: response.downloadURL,
+            //     //         },
+            //     //       })
+            //     //     })
+            //     // }
+            //   })
+            // }
+            // }}
             onPress={formik.handleSubmit}
             disabled={formik.isSubmitting || !formik.isValid}
           />
@@ -449,6 +509,7 @@ const SignupScreen = ({ navigation, route }) => {
           </KeyboardAwareScrollView>
         )}
       </Formik>
+      {loading && <TNActivityIndicator />}
     </CustomSafeAreaView>
   );
 };

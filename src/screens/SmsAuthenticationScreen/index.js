@@ -92,6 +92,7 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
             ref={phoneRef}
             onPressFlag={onPressFlag}
             offset={10}
+            initialCountry="us"
             allowZeroAfterCountryCode
             textProps={{
               placeholder: 'Phone number',
@@ -126,6 +127,9 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
             label={'Send Code'}
             labelColor={Colors.white}
             backgroundColor={Colors.primary}
+            onPress={() => {
+              alert('sss');
+            }}
           />
         </View>
       </>
@@ -208,7 +212,7 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
         {appConfig.smsSignupFields.map(renderInputField)}
 
         {isPhoneVisible ? renderPhoneInput() : renderCodeInput()}
-         <CustomText style={styles.orTextStyle}>OR</CustomText>
+        <CustomText style={styles.orTextStyle}>OR</CustomText>
         {/* Link */}
         <View style={styles.loginMobileLinkWrapper}>
           <Link

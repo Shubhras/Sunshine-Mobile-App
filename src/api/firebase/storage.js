@@ -1,9 +1,12 @@
 // firebase/firebaseStorage.js
-import { storage } from './config';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+// import { storage } from './config';
+// import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { processMediaFile } from '../../constants/helpers/mediaProcessor';
 import { ErrorCode } from '../../utils/ErrorCode';
 import { v4 as uuidv4 } from 'uuid';
+// import { utils } from '@react-native-firebase/app';
+import storage, { TaskEvent, TaskState } from '@react-native-firebase/storage';
+const storageRef = storage().ref();
 
 const getBlob = async uri => {
   return await new Promise((resolve, reject) => {
@@ -18,31 +21,32 @@ const getBlob = async uri => {
 
 const uploadFile = async (processedUri, callbackProgress) => {
   if (!processedUri) return Promise.reject(new Error('Invalid file URI'));
-
+  let finished = false;
   const filename = `${uuidv4()}_${processedUri.substring(
     processedUri.lastIndexOf('/') + 1,
   )}`;
   const blob = await getBlob(processedUri).catch(() => null);
-
-  if (!blob) return Promise.reject({ code: ErrorCode.photoUploadFailed });
-
-  const fileRef = ref(storage, filename);
-  const uploadTask = uploadBytesResumable(fileRef, blob);
-
+  const fileRef = storageRef.child(filename);
+  const uploadTask = fileRef.put(blob);
   return new Promise((resolve, reject) => {
-    let finished = false;
-
     uploadTask.on(
-      'state_changed',
-      snapshot => callbackProgress && callbackProgress(snapshot),
-      error => reject(error),
-      async () => {
-        if (finished) return;
-        finished = true;
-        const downloadURL = await getDownloadURL(fileRef).catch(() =>
-          reject({ code: ErrorCode.photoUploadFailed }),
-        );
-        resolve(downloadURL);
+      TaskEvent.STATE_CHANGED,
+      snapshot => {
+        if (snapshot.state == TaskState.SUCCESS) {
+          if (finished == true) {
+            return;
+          }
+          finished = true;
+        }
+        callbackProgress && callbackProgress(snapshot);
+      },
+      error => {
+        reject(error);
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          resolve(downloadURL);
+        });
       },
     );
   });
@@ -69,29 +73,26 @@ export const processAndUploadMediaFileWithProgressTracking = (
   });
 };
 
-export const processAndUploadMediaFile = async file => {
-  return new Promise(resolve => {
-    processMediaFile(file, async ({ processedUri, thumbnail }) => {
-      try {
-        const downloadURL = await uploadFile(processedUri);
+export const processAndUploadMediaFile = file => {
+  return new Promise((resolve, _reject) => {
+    processMediaFile(file, ({ processedUri, thumbnail }) => {
+      uploadFile(processedUri)
+        .then(downloadURL => {
+          if (thumbnail) {
+            uploadFile(thumbnail)
+              .then(thumbnailURL => {
+                resolve({ downloadURL, thumbnailURL })
+              })
+              .catch(() => resolve({ error: ErrorCode.photoUploadFailed }))
 
-        if (thumbnail) {
-          try {
-            const thumbnailURL = await uploadFile(thumbnail);
-            resolve({ downloadURL, thumbnailURL });
-          } catch {
-            resolve({ downloadURL, error: ErrorCode.photoUploadFailed });
+            return
           }
-          return;
-        }
-
-        resolve({ downloadURL });
-      } catch {
-        resolve({ error: ErrorCode.photoUploadFailed });
-      }
-    });
-  });
-};
+          resolve({ downloadURL })
+        })
+        .catch(() => resolve({ error: ErrorCode.photoUploadFailed }))
+    })
+  })
+}
 
 export default {
   processAndUploadMediaFile,

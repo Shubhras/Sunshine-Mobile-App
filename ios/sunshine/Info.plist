@@ -33,28 +33,20 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>SunSIgn needs the permission from the user to access the camera to click and post and display happy moments and to show it to other users.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>SunSIgn would like to use your location to find people to date with you</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>SunSIgn would like to use your location to find people to date with you</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SunSIgn would like access to your microphone, needed to send voice messages during conversations.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>SunSIgn would like access to your Photo Library to post and display their happy moments and to show it to other users.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SunSIgn would like access to your photo gallery to post and display their happy moments and to show it to other users.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
-	<key>NSCameraUsageDescription</key>
-    <string>SunSIgn needs the permission from the user to access the camera to click and post and display happy moments and to show it to other users.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>SunSIgn would like to use your location to find people to date with you</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>SunSIgn would like to use your location to find people to date with you</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>SunSIgn would like access to your microphone, needed to send voice messages during conversations.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>SunSIgn would like access to your Photo Library to post and display their happy moments and to show it to other users.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>SunSIgn would like access to your photo gallery to post and display their happy moments and to show it to other users.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -81,11 +73,21 @@
 		<string>Poppins-Regular.ttf</string>
 		<string>Poppins-SemiBold.ttf</string>
 	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
