@@ -8,6 +8,10 @@ export const Images = {
   Success: require('../assets/icons/png/toast/success.png'),
   Warning: require('../assets/icons/png/toast/Warning.png'),
   Error: require('../assets/icons/png/toast/error.png'),
+  profileTabIcon: require('../assets/images/person-filled-icon.png'),
+  swipeTabInactiveIcon: require('../assets/images/logo2.png'),
+  swipeTabActiveIcon: require('../assets/images/Logo1.png'),
+  chatTabIcon: require('../assets/images/chat-filled-icon.png'),
   defaultProfilePhotoURL:
     'https://firebasestorage.googleapis.com/v0/b/sun-sign-inc-1e12b.appspot.com/o/pics.png?alt=media&token=c387f3dc-00bc-4535-be43-0d46f3b44bc0',
 

@@ -103,7 +103,7 @@ const TNProfilePictureSelector = props => {
   const onPressTakePhoto = async () => {
     if (Platform.OS === 'android') {
       const checkPermission = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.CAMERA
+        PermissionsAndroid.PERMISSIONS.CAMERA,
       );
       if (checkPermission) {
         launchCameraWithOptions();
@@ -137,12 +137,12 @@ const TNProfilePictureSelector = props => {
                 }
               },
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
           'Permission Denied',
-          'Camera permission is required to take photos.'
+          'Camera permission is required to take photos.',
         );
       }
       return;
@@ -192,8 +192,8 @@ const TNProfilePictureSelector = props => {
   const showActionSheet = () => {
     Keyboard.dismiss();
     setTimeout(() => {
-    SheetManager.show('profile-photo-sheet');
-  }, 200);
+      SheetManager.show('profile-photo-sheet');
+    }, 200);
   };
 
   const onActionDone = index => {
@@ -228,7 +228,7 @@ const TNProfilePictureSelector = props => {
           style={styles.imageContainer}
           onPress={() => handleProfilePictureClick(profilePictureURL)}
         >
-          <Image
+          <FastImage
             style={[styles.image, { opacity: profilePictureURL ? 1 : 0.3 }]}
             source={
               profilePictureURL ? { uri: profilePictureURL } : Images.userAvatar
