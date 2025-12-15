@@ -51,7 +51,9 @@ const LoginScreen = ({ navigation }) => {
           dispatch(
             updateUser({
               ...res.user,
-              createdAt: res.user?.createdAt ? JSON.stringify(res.user?.createdAt) : new Date().toISOString(),
+              createdAt: res.user?.createdAt
+                ? JSON.stringify(res.user?.createdAt)
+                : new Date().toISOString(),
             }),
           );
           setLoading(false);
