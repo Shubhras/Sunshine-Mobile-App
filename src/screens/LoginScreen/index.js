@@ -1,18 +1,24 @@
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Formik } from 'formik';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
+import { loginWithEmailAndPassword } from '../../api/firebase/auth';
+import { showToast } from '../../components/alerts/Toast/ToastManager';
+import Button from '../../components/buttons/Button';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import { CustomText } from '../../components/global/CustomText';
 import Header from '../../components/Header';
 import LargeHeading from '../../components/headings/LargeHeading';
-import Colors from '../../constants/Colors';
-import styles from './styles';
 import TextInput from '../../components/inputs/TextInput';
 import Link from '../../components/links/Link';
-import Button from '../../components/buttons/Button';
+import TNActivityIndicator from '../../components/TNActivityIndicator';
+import Colors from '../../constants/Colors';
 import { STANDARD_SPACING } from '../../constants/Constants';
-import { loginUser } from '../../redux/slices/SessionUser';
-import { CustomText } from '../../components/global/CustomText';
+import { localizedErrorMessage } from '../../utils/ErrorCode';
+import styles from './styles';
+import { updateUser } from '../../redux/slices/SessionUser';
+import { create } from 'react-native/types_generated/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload';
 
 // Validation Schema
 const LoginSchema = Yup.object().shape({
@@ -26,21 +32,56 @@ const LoginSchema = Yup.object().shape({
 
 const LoginScreen = ({ navigation }) => {
   // Local states
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async values => {
     console.log('val', values);
-    return;
-    await loginUser(values)
-      .then(() => {
+    // return;
+    setLoading(true);
+    await loginWithEmailAndPassword({
+      email: values.email,
+      password: values.password,
+    })
+      .then(res => {
         // Handle successful login
-        console.log('Login successful with values:', values);
+        console.log('Login successful with values:', res);
+        if (res?.user) {
+          dispatch(
+            updateUser({
+              ...res.user,
+              createdAt: res.user?.createdAt ? JSON.stringify(res.user?.createdAt) : new Date().toISOString(),
+            }),
+          );
+          setLoading(false);
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'HomeScreen' }],
+          });
+        } else {
+          showToast({
+            title: 'Login Failed',
+            text:
+              localizedErrorMessage(res?.error) ||
+              'Unable to login at this time.',
+            duration: 3000,
+            type: 'error',
+          });
+        }
         // Navigate to the next screen or perform other actions
       })
       .catch(error => {
         // Handle login error
-        console.error('Login failed:', error);
+        showToast({
+          title: 'Login Failed',
+          text: 'Unable to login at this time.',
+          duration: 3000,
+          type: 'error',
+        });
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -151,6 +192,7 @@ const LoginScreen = ({ navigation }) => {
           </>
         )}
       </Formik>
+      {loading && <TNActivityIndicator />}
     </CustomSafeAreaView>
   );
 };
