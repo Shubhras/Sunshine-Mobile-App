@@ -1,44 +1,28 @@
-import {memo} from 'react';
-import {View, Text, Pressable} from 'react-native';
-import FeatherIcons from 'react-native-vector-icons/Feather';
+import FastImage from '@d11/react-native-fast-image';
+import { memo } from 'react';
+import { Pressable, View } from 'react-native';
+import { CustomText } from '../../global/CustomText';
 import styles from './styles';
 
 // Functional component
-const NavigationLink = ({
-  linkBackgroundColor,
-  leftIconName,
-  leftIconColor,
-  leftIconWrapperBackgroundColor,
-  iconSize,
-  label,
-  labelColor,
-  chevronColor,
-  onPress,
-}) => {
+const NavigationLink = ({ images, imageColor, label, labelColor, onPress }) => {
   // Returning
   return (
-    <Pressable
-      style={[styles.link, {backgroundColor: linkBackgroundColor}]}
-      onPress={onPress}>
+    <Pressable style={styles.link} onPress={onPress}>
       {/* Navigation icon & label */}
       <View style={styles.leftIconLabelWrapper}>
-        <View
-          style={[
-            styles.leftIconWrapper,
-            {
-              backgroundColor: leftIconWrapperBackgroundColor,
-            },
-          ]}>
-          <FeatherIcons
-            name={leftIconName}
-            size={iconSize}
-            color={leftIconColor}
+        <View style={styles.leftIconWrapper}>
+          <FastImage
+            source={images}
+            style={styles.images}
+            {...(imageColor && { tintColor: imageColor })}
+            resizeMode={FastImage.resizeMode.contain}
           />
         </View>
-
-        <Text style={[styles.label, {color: labelColor}]}>{label}</Text>
+        <CustomText style={[styles.label, { color: labelColor }]}>
+          {label}
+        </CustomText>
       </View>
-      <FeatherIcons name="chevron-right" size={iconSize} color={chevronColor} />
     </Pressable>
   );
 };

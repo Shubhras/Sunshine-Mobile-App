@@ -14,7 +14,7 @@ const CustomSafeAreaView: FC<CustomSafeAreaViewProps> = ({
 }) => {
 
   return (
-    <SafeAreaView style={[styles.container, style]}>
+    <SafeAreaView style={[styles.container, style]} edges={['top']}>
       <StatusBar
         backgroundColor={Colors.black}
         barStyle={'light-content'}

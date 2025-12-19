@@ -1,11 +1,14 @@
-import {StyleSheet} from 'react-native';
-import {scale} from 'react-native-size-matters';
+import { StyleSheet } from 'react-native';
+import { scale } from 'react-native-size-matters';
 import {
-  OPEN_SANS_MEDIUM,
+  POPPINS_MEDIUM,
   FONT_SIZE_SM,
   STANDARD_NAVIGATION_LINK_HEIGHT,
   STANDARD_NAVIGATION_LINK_LEFT_ICON_WRAPPER_SIZE,
-} from '../../../config/Constants';
+  POPPINS_REGULAR,
+  POPPINS_BOLD,
+  FONT_SIZE_XS,
+} from '../../../constants/Constants';
 
 // Exporting style
 export default StyleSheet.create({
@@ -14,7 +17,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: STANDARD_NAVIGATION_LINK_HEIGHT,
     borderRadius: STANDARD_NAVIGATION_LINK_HEIGHT * 0.2,
   },
   leftIconLabelWrapper: {
@@ -29,8 +31,13 @@ export default StyleSheet.create({
     aspectRatio: 1,
     borderRadius: STANDARD_NAVIGATION_LINK_LEFT_ICON_WRAPPER_SIZE * 0.5,
   },
+  images: {
+    flex: 1,
+    height: scale(22),
+    width: scale(22),
+  },
   label: {
-    fontFamily: OPEN_SANS_MEDIUM,
-    fontSize: FONT_SIZE_SM,
+    fontFamily: POPPINS_REGULAR,
+    fontSize: FONT_SIZE_XS,
   },
 });

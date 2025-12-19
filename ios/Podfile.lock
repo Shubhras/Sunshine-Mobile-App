@@ -4112,6 +4112,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNRangeSlider (1.2.6):
+    - React
   - RNReanimated (4.2.0):
     - boost
     - DoubleConversion
@@ -4542,6 +4544,7 @@ DEPENDENCIES:
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNRangeSlider (from `../node_modules/rn-range-slider`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -4763,6 +4766,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNRangeSlider:
+    :path: "../node_modules/rn-range-slider"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -4891,6 +4896,7 @@ SPEC CHECKSUMS:
   RNFBStorage: 475437443adafec69f8f49710d5440ea187444ab
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: bf1f603bd818932dac6a45c223f23c3a5da3423e
+  RNRangeSlider: 43d8ce3c9552cd5566fba94b8fadc4c2539399c4
   RNReanimated: 358dd84c7596ca3fe0f51f7c66954aafcd14387b
   RNScreens: de996b48c82245c0b68c677da3334c2061e2a951
   RNSVG: 733e3d36693dd7d55f09728dda44a5105ca9622e

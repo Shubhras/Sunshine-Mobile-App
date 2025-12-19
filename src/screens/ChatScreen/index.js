@@ -2,10 +2,11 @@ import React from 'react';
 import { View } from 'react-native';
 import { CustomText } from '../../components/global/CustomText';
 import styles from './styles';
+import Colors from '../../constants/Colors';
 
 const ChatScreen = () => {
   return (
-    <View style={[styles.mainWrapper, { backgroundColor: 'green' }]}>
+    <View style={[styles.mainWrapper, { backgroundColor: Colors.black }]}>
       <CustomText style={styles.text}>Chat Screen</CustomText>
     </View>
   );

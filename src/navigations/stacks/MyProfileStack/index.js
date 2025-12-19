@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ChatScreen from '../../../screens/ChatScreen';
 import MyProfileScreen from '../../../screens/MyProfileScreen';
 
 // Creating stack navigator

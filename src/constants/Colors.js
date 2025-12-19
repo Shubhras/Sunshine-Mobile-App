@@ -17,15 +17,15 @@ export default {
   // darkYellow: '#F3AB3E',
   // gray:'#808080'
   primary: '#B59410',
+  secondary: '#F6F5F6',
   black: '#000000',
   white: '#FFFFFF',
   mainThemeBackgroundColor: 'white',
   mainThemeForegroundColor: '#eb5a6d',
-  mainTextColor: '#464646',
+  mainTextColor: invert('#464646'),
   mainSubtextColor: '#7c7c7c',
   hairlineColor: '#d6d6d6',
   grayBgColor: '#f5f5f5',
-  onlineMarkColor: '#41C61B',
   inputBgColor: 'rgba(0.9, 0.9, 0.9, 0.1)',
   linkColor: '#FFFFFF',
   inputPlaceholder: '#AAAAAA',
@@ -40,4 +40,5 @@ export default {
   inputBgColor: invert('#eeeeee'),
   inlineActionsColor: invert('#ffffee'),
   error: '#FF0000',
+  main: '#4991ec',
 };

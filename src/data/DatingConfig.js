@@ -52,31 +52,31 @@ const DatingConfig = {
   onboardingConfig: {
     welcomeTitle: 'Find your Soulmate',
     welcomeCaption: 'Match and chat with people you like from your area.',
-  walkthroughScreens: [
-    {
-      icon: false,
-      title: false,
-      description: false,
-    },
-    {
-      icon: require('../assets/icons/png/msg.png'),
-      title: 'Private Messages',
-      description: 'Chat privately with people you match.',
-    },
-    {
-      icon: require('../assets/icons/png/insta.png'),
-      title: 'Send Photos & Videos',
-      description:
-        'Have fun with your matches by sending photos and videos to each other.',
-    },
-    {
-      icon: require('../assets/icons/png/bell.png'),
-      title: 'Get Notified',
-      backgroundColor: '#20d2bb',
-      description:
-        'Receive notifications when you get new messages and matches.',
-    },
-  ],
+    walkthroughScreens: [
+      {
+        icon: false,
+        title: false,
+        description: false,
+      },
+      {
+        icon: require('../assets/icons/png/msg.png'),
+        title: 'Private Messages',
+        description: 'Chat privately with people you match.',
+      },
+      {
+        icon: require('../assets/icons/png/insta.png'),
+        title: 'Send Photos & Videos',
+        description:
+          'Have fun with your matches by sending photos and videos to each other.',
+      },
+      {
+        icon: require('../assets/icons/png/bell.png'),
+        title: 'Get Notified',
+        backgroundColor: '#20d2bb',
+        description:
+          'Receive notifications when you get new messages and matches.',
+      },
+    ],
   },
   tosLink: 'https://sunsigninc.com/terms-conditions/',
   isUsernameFieldEnabled: false,
@@ -179,39 +179,51 @@ const DatingConfig = {
             displayName: 'First Name',
             type: 'text',
             editable: true,
+            required: true,
             regex: regexForNames,
             key: 'firstName',
             placeholder: 'Your first name',
+            keyboardType: 'default',
           },
           {
             displayName: 'Last Name',
             type: 'text',
             editable: true,
+            required: true,
             regex: regexForNames,
             key: 'lastName',
             placeholder: 'Your last name',
+            keyboardType: 'default',
           },
           {
             displayName: 'Age',
             type: 'text',
             editable: true,
+            required: true,
             regex: regexForAge,
             key: 'age',
             placeholder: 'Your age',
+            keyboardType: 'number-pad',
           },
           {
             displayName: 'Bio',
             type: 'text',
             editable: true,
+            required: false,
+            multiline: true,
             key: 'bio',
             placeholder: 'Your bio',
+            keyboardType: 'default',
           },
           {
             displayName: 'Education Level',
             type: 'text',
             editable: true,
+            required: false,
+            multiline: true,
             key: 'school',
             placeholder: 'Your bio',
+            keyboardType: 'default',
           },
         ],
       },
@@ -221,17 +233,21 @@ const DatingConfig = {
           {
             displayName: 'E-mail Address',
             type: 'text',
-            editable: false,
+            editable: true,
+            required: true,
             key: 'email',
             placeholder: 'Your email address',
+            keyboardType: 'email-address',
           },
           {
             displayName: 'Phone Number',
             type: 'text',
             editable: true,
+            required: false,
             regex: regexForPhoneNumber,
             key: 'phone',
             placeholder: 'Your phone number',
+            keyboardType: 'phone-pad',
           },
         ],
       },
@@ -495,38 +511,40 @@ const DatingConfig = {
             displayName: 'Address',
             type: 'text',
             editable: false,
-            key: 'push_notifications_enabled',
+            multiline: false,
+            key: 'address',
+            keyboardType: 'default',
             value: 'PO Box 85, Victorville, Ca 92393',
           },
           {
             displayName: 'E-mail us',
-            value: 'mailto:sunsigninc@gmail.com',
+            value: 'sunsigninc@gmail.com',
             type: 'text',
             editable: false,
+            multiline: false,
             key: 'email',
+            keyboardType: 'email-address',
             placeholder: 'Your email address',
           },
           {
-            displayName: 'Drop a mail and give us 48 hours to revert back to you.',
+            displayName:
+              'Drop a mail and give us 48 hours to revert back to you.',
             type: 'buttonType',
             key: 'savebutton',
           },
 
           {
             type: 'image',
+            key: 'mainlogo',
             source: require('../assets/images/mainlogo.png'),
           },
-
-          {
-            type: 'image',
-            source: require('../assets/images/background.png'),
-          },
-
           {
             displayName: 'Corporation',
             type: 'text',
             editable: false,
-            key: 'push_notifications_enabled',
+            multiline: false,
+            key: 'corporation',
+            keyboardType: 'default',
             value: 'Sun Sign INC.',
           },
         ],
@@ -585,17 +603,19 @@ const DatingConfig = {
   subscriptionSlideContents: [
     {
       title: 'Upgrade Plan',
-      description: 'When you subscribe, you get unlimited daily swipes, undo actions and more.',
+      description:
+        'When you subscribe, you get unlimited daily swipes, undo actions and more.',
       src: require('../assets/images/fencing.png'),
     },
     {
       title: '1 Month Plan',
-      description: 'Matching based on any one of the signs, sun, moon or Venus sign for 1 month.',
+      description:
+        'Matching based on any one of the signs, sun, moon or Venus sign for 1 month.',
       src: require('../assets/images/vip_1.png'),
     },
     {
       title: '1 Year Plan',
-      description: 'Unlock all signs - sun, moon or Venus sign for 1 year.',  
+      description: 'Unlock all signs - sun, moon or Venus sign for 1 year.',
       src: require('../assets/images/vip_2.png'),
     },
   ],
@@ -610,11 +630,6 @@ const DatingConfig = {
     ],
     android: ['vip_access_099_1m', 'vip_access_0999_1m'], //vip-access-099-03m
   }),
-}
-
+};
 
 export default DatingConfig;
-
-
-
-

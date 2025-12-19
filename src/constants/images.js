@@ -12,6 +12,12 @@ export const Images = {
   swipeTabInactiveIcon: require('../assets/images/logo2.png'),
   swipeTabActiveIcon: require('../assets/images/Logo1.png'),
   chatTabIcon: require('../assets/images/chat-filled-icon.png'),
+  accountDetails: require('../assets/images/account-male-icon.png'),
+  upgradeAccount: require('../assets/icons/png/vip.png'),
+  settings: require('../assets/images/settings-menu-item.png'),
+  connectUs: require('../assets/images/contact-call-icon.png'),
+  numerology: require('../assets/icons/png/numrology.png'),
+  blockedUsers: require('../assets/icons/png/blocked-user-64.png'),
   defaultProfilePhotoURL:
     'https://firebasestorage.googleapis.com/v0/b/sun-sign-inc-1e12b.appspot.com/o/pics.png?alt=media&token=c387f3dc-00bc-4535-be43-0d46f3b44bc0',
 

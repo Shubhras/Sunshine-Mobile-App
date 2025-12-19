@@ -1,19 +1,16 @@
-import React, { use } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Badge, Surface, Text } from 'react-native-paper';
-import Feather from 'react-native-vector-icons/Feather';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Colors from '../../constants/Colors';
-import { scale } from 'react-native-size-matters';
-import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
-import { FONT_SIZE_LG } from '../../constants/Constants';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import { Badge, Surface, Text } from 'react-native-paper';
+import { scale } from 'react-native-size-matters';
+import Feather from 'react-native-vector-icons/Feather';
+import { CustomText } from '../global/CustomText';
+import styles from './styles';
 
-const IconSize = scale(22);
+const IconSize = scale(20);
 
-const Header = ({
+const ProfileHeader = ({
   style,
-  menu,
   back,
   title,
   right,
@@ -25,25 +22,20 @@ const Header = ({
   iconColor,
   titleAlight,
   optionalBadge,
-  titleFontSize,
+  rightTitle,
 }) => {
   // Navigation hook
   const navigation = useNavigation();
   // Left view component
   const LeftView = () => (
     <View style={styles.view}>
-      {menu && (
-        <TouchableOpacity onPress={() => {}}>
-          <Feather name="menu" size={IconSize} color={iconColor} />
-        </TouchableOpacity>
-      )}
       {back && (
         <TouchableOpacity
           onPress={() => {
             navigation.goBack();
           }}
         >
-          <Entypo name="chevron-thin-left" size={IconSize} color={iconColor} />
+          <Feather name="arrow-left" size={IconSize} color={iconColor} />
         </TouchableOpacity>
       )}
     </View>
@@ -66,7 +58,7 @@ const Header = ({
         )}
         {right && (
           <TouchableOpacity onPress={onRightPress}>
-            <Feather name={right} size={IconSize} color={iconColor} />
+            <CustomText style={styles.rightTitle}>{rightTitle}</CustomText>
           </TouchableOpacity>
         )}
       </View>
@@ -77,13 +69,7 @@ const Header = ({
       <Text
         variant="titleLarge"
         allowFontScaling={false}
-        style={[
-          styles.title,
-          {
-            textAlign: titleAlight,
-            fontSize: titleFontSize ? titleFontSize : FONT_SIZE_LG,
-          },
-        ]}
+        style={[styles.title, { color: iconColor, textAlign: titleAlight }]}
       >
         {title}
       </Text>
@@ -99,4 +85,4 @@ const Header = ({
   );
 };
 
-export default Header;
+export default ProfileHeader;

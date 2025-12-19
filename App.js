@@ -8,6 +8,7 @@ import { PortalProvider } from './src/components/global/Portal';
 import Routes from './src/navigations/Routes';
 import store, { persistor } from './src/redux/store/Store';
 import ToastProvider from './src/components/alerts/Toast/ToastManager';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // create a component
 const App = () => {
@@ -17,9 +18,11 @@ const App = () => {
         <GestureHandlerRootView style={AppStyles.gestureHandlerRootView}>
           <NavigationContainer>
             <PortalProvider>
-              <ToastProvider>
-                <Routes />
-              </ToastProvider>
+              <SafeAreaProvider>
+                <ToastProvider>
+                  <Routes />
+                </ToastProvider>
+              </SafeAreaProvider>
             </PortalProvider>
           </NavigationContainer>
         </GestureHandlerRootView>

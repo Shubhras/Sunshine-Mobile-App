@@ -24,8 +24,8 @@ import Colors from '../../constants/Colors';
 import { CustomText } from '../global/CustomText';
 
 const { height } = Dimensions.get('window');
-const imageSize = height * 0.14;
-const photoIconSize = imageSize * 0.27;
+const imageSize = height * 0.12;
+const photoIconSize = imageSize * 0.28;
 
 const TNProfilePictureSelector = props => {
   const [profilePictureURL, setProfilePictureURL] = useState(
@@ -239,7 +239,7 @@ const TNProfilePictureSelector = props => {
         </TouchableHighlight>
 
         <TouchableOpacity onPress={showActionSheet} style={styles.addButton}>
-          <Icon name="camera" size={scale(16)} color="white" />
+          <Icon name="camera" size={scale(14)} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -314,13 +314,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   imageBlock: {
-    flex: 2,
+    // flex: 2,
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: scale(10),
-    marginBottom: scale(40),
+    marginBottom: scale(20),
   },
   imageContainer: {
     height: imageSize,

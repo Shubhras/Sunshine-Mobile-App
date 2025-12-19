@@ -1,16 +1,19 @@
-import { StyleSheet } from 'react-native';
+import { PixelRatio, StyleSheet } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../constants/Colors';
 import {
-  FONT_SIZE_LG,
+  FONT_SIZE_MD,
+  FONT_SIZE_XS,
   POPPINS_SEMIBOLD,
   SCREEN_WIDTH,
 } from '../../constants/Constants';
 
+const HAIRLINE = 1 / PixelRatio.get();
+
 // Exporting style
 export default StyleSheet.create({
   header: {
-    height: scale(50),
+    height: scale(45),
     width: SCREEN_WIDTH,
     alignSelf: 'center',
     elevation: 0,
@@ -18,6 +21,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     backgroundColor: Colors.white,
+    borderBottomWidth: HAIRLINE,
+    borderBottomColor: Colors.hairlineColor,
   },
   view: {
     marginHorizontal: scale(15),
@@ -28,9 +33,8 @@ export default StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: FONT_SIZE_LG,
+    fontSize: FONT_SIZE_MD,
     fontFamily: POPPINS_SEMIBOLD,
-    color: Colors.white,
   },
   rightView: {
     justifyContent: 'flex-end',
@@ -39,5 +43,10 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: scale(10),
+  },
+  rightTitle: {
+    fontSize: FONT_SIZE_XS,
+    fontFamily: POPPINS_SEMIBOLD,
+    color: Colors.primary,
   },
 });
