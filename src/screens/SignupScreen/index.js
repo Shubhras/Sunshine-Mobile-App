@@ -304,7 +304,7 @@ const SignupScreen = ({ navigation, route }) => {
                 setLoading(false);
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'HomeScreen' }],
+                  routes: [{ name: 'HomeTopTab' }],
                 });
                 // dispatch
               } else {

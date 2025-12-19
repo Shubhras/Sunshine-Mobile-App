@@ -219,7 +219,6 @@ import {
 import { ErrorCode } from '../../utils/ErrorCode';
 import { Images } from '../../constants/images';
 
-const usersRef = firestore().collection('users');
 const timestamp = serverTimestamp();
 const db = getFirestore(); // Modular DB instance
 const auth = getAuth();
@@ -239,7 +238,6 @@ export const register = (userDetails, appIdentifier) => {
   } = userDetails;
 
   return new Promise((resolve, _reject) => {
-
     createUserWithEmailAndPassword(auth, email, password)
       .then(response => {
         const uid = response.user.uid;
@@ -281,15 +279,15 @@ export const register = (userDetails, appIdentifier) => {
   });
 };
 
-export const loginWithEmailAndPassword = async (email, password) => {
-  return new Promise((resolve) => {
-    const auth = getAuth();
+export const loginWithEmailAndPassword = async ({ email, password }) => {
+  return new Promise(async resolve => {
+    // const auth = getAuth();
 
-    signInWithEmailAndPassword(auth, email, password)
+    await signInWithEmailAndPassword(auth, email, password)
       .then(response => {
         const uid = response.user.uid;
         // const db = getFirestore();
-        const userDocRef = doc(db, 'users', uid);  // Modular doc ref
+        const userDocRef = doc(db, 'users', uid); // Modular doc ref
 
         getDoc(userDocRef)
           .then(firestoreDocument => {
@@ -314,7 +312,7 @@ export const loginWithEmailAndPassword = async (email, password) => {
         let errorCode = ErrorCode.serverError;
         switch (error.code) {
           case 'auth/wrong-password':
-          case 'auth/invalid-credential':  // Common in newer SDKs for wrong password
+          case 'auth/invalid-credential': // Common in newer SDKs for wrong password
             errorCode = ErrorCode.invalidPassword;
             break;
           case 'auth/user-not-found':
@@ -332,16 +330,15 @@ export const loginWithEmailAndPassword = async (email, password) => {
 };
 
 export const updateProfilePhoto = (userID, profilePictureURL) => {
-  return new Promise((resolve) => {
-
-    const userDocRef = doc(db, 'users', userID);  // Modular doc ref
+  return new Promise(resolve => {
+    const userDocRef = doc(db, 'users', userID); // Modular doc ref
 
     updateDoc(userDocRef, { profilePictureURL })
       .then(() => {
         resolve({ success: true });
       })
       .catch(error => {
-        console.error('Update error:', error);  // Optional: better logging
+        console.error('Update error:', error); // Optional: better logging
         resolve({ error });
       });
   });

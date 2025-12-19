@@ -14,7 +14,7 @@ const Stack = createNativeStackNavigator();
 
 const Routes = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeTopTab">
+    <Stack.Navigator initialRouteName="WalkthroughScreen">
       <Stack.Screen
         name="WalkthroughScreen"
         component={WalkthroughScreen}

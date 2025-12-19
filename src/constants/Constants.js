@@ -148,6 +148,7 @@ export const signupFields= [
       regex: regexForNames,
       key: 'username',
       placeholder: 'Username',
+      autoCapitalize: 'none',
     },
     {
       displayName: 'E-mail Address',
