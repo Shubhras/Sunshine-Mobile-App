@@ -1,26 +1,19 @@
-import FastImage from '@d11/react-native-fast-image';
 import React, { useState } from 'react';
 import {
-  FlatList,
   ImageBackground,
   Pressable,
   ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Swiper from 'react-native-swiper';
+import { scale } from 'react-native-size-matters';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TNProfilePictureSelector from '../../components/TNProfilePictureSelector';
 import { CustomText } from '../../components/global/CustomText';
-import Colors from '../../constants/Colors';
-import styles from './styles';
-import { scale } from 'react-native-size-matters';
-import NavigationData from '../../data/NavigationData';
 import NavigationLink from '../../components/links/NavigationLink';
-import {
-  STANDARD_BORDER_WIDTH,
-  STANDARD_VECTOR_ICON_SIZE,
-} from '../../constants/Constants';
+import Colors from '../../constants/Colors';
+import NavigationData from '../../data/NavigationData';
+import styles from './styles';
 
 const MyProfileScreen = ({ navigation }) => {
   const [myphotos, setMyphotos] = useState([]);

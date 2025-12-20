@@ -32,10 +32,10 @@ const NavigationData = [
         onPress: 'Contactus',
       },
       {
-        label: 'Numerology Numbers Match',
+        label: 'Numerology in Scripture',
         images: Images.numerology,
         imageColor: null,
-        hederTitle: 'Numerology Numbers',
+        hederTitle: 'Numerology in Scripture',
         onPress: 'NumerogogyNumberMatch',
       },
       {

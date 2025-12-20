@@ -4,6 +4,7 @@ import Colors from '../../constants/Colors';
 import {
   FONT_SIZE_MD,
   FONT_SIZE_SM,
+  FONT_SIZE_XS,
   FONT_SIZE_XXS,
   POPPINS_SEMIBOLD,
   SCREEN_WIDTH,
@@ -19,18 +20,17 @@ export default StyleSheet.create({
   },
   ScrollViewWrapper: {
     flexGrow: STANDARD_FLEX,
-    paddingBottom: STANDARD_SPACING * 15,
+    paddingBottom: STANDARD_SPACING * 5,
   },
   numerologyWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingVertical: STANDARD_SPACING * 2,
-    marginBottom: STANDARD_SPACING * 3,
   },
   myNumerologyWrapper: {
     flexDirection: 'column',
-    width: SCREEN_WIDTH * 0.45,
+    width: SCREEN_WIDTH * 0.48,
   },
   horizontalDivider: {
     height: '100%',
@@ -39,7 +39,7 @@ export default StyleSheet.create({
   },
   searchNumerogogyWrapper: {
     flexDirection: 'column',
-    width: SCREEN_WIDTH * 0.45,
+    width: SCREEN_WIDTH * 0.48,
   },
   title: {
     textAlign: 'center',
@@ -55,7 +55,6 @@ export default StyleSheet.create({
     padding: STANDARD_SPACING * 2,
   },
   switchLabel: {
-    width: '78%',
     fontSize: FONT_SIZE_XXS,
     fontFamily: POPPINS_SEMIBOLD,
     color: Colors.white,
@@ -68,7 +67,7 @@ export default StyleSheet.create({
     width: '85%',
     height: STANDARD_BUTTON_HEIGHT,
     borderRadius: STANDARD_BUTTON_HEIGHT * 0.2,
-    bottom: STANDARD_SPACING * 7,
+    bottom: STANDARD_SPACING * 6,
     backgroundColor: Colors.primary,
   },
   buttonLabel: {

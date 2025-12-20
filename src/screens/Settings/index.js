@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import { CustomText } from '../../components/global/CustomText';
@@ -11,10 +11,11 @@ import { Switch } from 'react-native-switch';
 import styles from './styles';
 import ActionSheet from 'react-native-actions-sheet';
 import SelectionList from '../../components/radios/SelectionList';
+import Icons from '../../components/Icons/Icons';
 
 const settingField = DatingConfig.userSettingsFields.sections;
 
-const Settings = ({ route }) => {
+const Settings = ({ route, navigation }) => {
   const { title } = route.params;
   const actionSheetRefs = useRef({});
   const [switchStates, setSwitchStates] = useState({});
@@ -239,29 +240,45 @@ const Settings = ({ route }) => {
   };
 
   const renderSelectSignField = (field, index) => {
+    console.log('field', field);
     if (!actionSheetRefs.current[field.key]) {
       actionSheetRefs.current[field.key] = React.createRef();
     }
     const ref = actionSheetRefs.current[field.key];
-
     return (
       <View key={`sign-select-${field.key}-${index}`}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => ref.current?.show()}
-          style={[
-            styles.settingsTypeContainer,
-            styles.appSettingsTypeContainer,
-          ]}
+        <Pressable
+          style={styles.link}
+          onPress={() => {
+            if (field?.sheet) {
+              ref.current?.show();
+            } else {
+              navigation.navigate(field?.navigation, {
+                title: field?.title,
+              });
+            }
+          }}
         >
-          <CustomText style={styles.inputTitle}>{field.displayName}</CustomText>
-          <View style={styles.textinputWrapper}>
-            <CustomText style={styles.selectValueText}>
-              {computeValue(field)}
-            </CustomText>
-          </View>
-        </TouchableOpacity>
-
+          <CustomText style={[styles.label, { color: Colors.mainTextColor }]}>
+            {field.displayName}
+          </CustomText>
+          {field?.sheet ? (
+            <View style={styles.textinputWrapper}>
+              <CustomText style={styles.selectValueText}>
+                {computeValue(field)}
+              </CustomText>
+            </View>
+          ) : (
+            <View style={styles.leftIconWrapper}>
+              <Icons
+                iconType={'Feather'}
+                name="chevron-right"
+                size={scale(14)}
+                color={Colors.white}
+              />
+            </View>
+          )}
+        </Pressable>
         <ActionSheet
           ref={ref}
           gestureEnabled
@@ -277,37 +294,40 @@ const Settings = ({ route }) => {
               </CustomText>
             </View>
 
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={styles.optionsList}
-            >
-              {field.displayOptions.map((item, idx) => {
-                const value = field.options[idx];
-                const isSelected =
-                  (selectStates[field.key] ?? field.value) === value;
+            {Array.isArray(field.displayOptions) && (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={styles.optionsList}
+              >
+                {field.displayOptions.map((item, idx) => {
+                  const value = field.options?.[idx];
+                  const isSelected =
+                    (selectStates[field.key] ?? field.value) === value;
 
-                return (
-                  <View
-                    key={`${field.key}-sign-option-${idx}`}
-                    style={[
-                      idx === 0 && styles.languageComponentWrapperWithMarginTop,
-                      styles.languageComponentWrapper,
-                    ]}
-                  >
-                    <SelectionList
-                      backgroundColor={Colors.secondary}
-                      label={item}
-                      labelColor={Colors.black}
-                      uncheckedRadioBackgroundColor={Colors.white}
-                      checkedRadioBackgroundColor={Colors.onlineMarkColor}
-                      checkIconColor={Colors.white}
-                      isSelected={isSelected}
-                      onPress={() => onSelectOption(field, value)}
-                    />
-                  </View>
-                );
-              })}
-            </ScrollView>
+                  return (
+                    <View
+                      key={`${field.key}-sign-option-${idx}`}
+                      style={[
+                        idx === 0 &&
+                          styles.languageComponentWrapperWithMarginTop,
+                        styles.languageComponentWrapper,
+                      ]}
+                    >
+                      <SelectionList
+                        backgroundColor={Colors.secondary}
+                        label={item}
+                        labelColor={Colors.black}
+                        uncheckedRadioBackgroundColor={Colors.white}
+                        checkedRadioBackgroundColor={Colors.onlineMarkColor}
+                        checkIconColor={Colors.white}
+                        isSelected={isSelected}
+                        onPress={() => onSelectOption(field, value)}
+                      />
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            )}
 
             <TouchableOpacity
               activeOpacity={0.8}
@@ -321,6 +341,90 @@ const Settings = ({ route }) => {
       </View>
     );
   };
+
+  // const renderSelectSignField = (field, index) => {
+  //   if (!actionSheetRefs.current[field.key]) {
+  //     actionSheetRefs.current[field.key] = React.createRef();
+  //   }
+  //   const ref = actionSheetRefs.current[field.key];
+
+  //   return (
+  //     <View key={`sign-select-${field.key}-${index}`}>
+  //       <TouchableOpacity
+  //         activeOpacity={0.7}
+  //         onPress={() => ref.current?.show()}
+  //         style={[
+  //           styles.settingsTypeContainer,
+  //           styles.appSettingsTypeContainer,
+  //         ]}
+  //       >
+  //         <CustomText style={styles.inputTitle}>{field.displayName}</CustomText>
+  //         <View style={styles.textinputWrapper}>
+  //           <CustomText style={styles.selectValueText}>
+  //             {computeValue(field)}
+  //           </CustomText>
+  //         </View>
+  //       </TouchableOpacity>
+
+  //       <ActionSheet
+  //         ref={ref}
+  //         gestureEnabled
+  //         headerAlwaysVisible
+  //         containerStyle={styles.sheetContainer}
+  //         indicatorStyle={styles.indicator}
+  //         closeOnTouchBackdrop
+  //       >
+  //         <View style={styles.sheetContent}>
+  //           <View style={styles.sheetHeader}>
+  //             <CustomText style={styles.sheetTitle}>
+  //               {field.displayName}
+  //             </CustomText>
+  //           </View>
+
+  //           <ScrollView
+  //             showsVerticalScrollIndicator={false}
+  //             style={styles.optionsList}
+  //           >
+  //             {field.displayOptions.map((item, idx) => {
+  //               const value = field.options[idx];
+  //               const isSelected =
+  //                 (selectStates[field.key] ?? field.value) === value;
+
+  //               return (
+  //                 <View
+  //                   key={`${field.key}-sign-option-${idx}`}
+  //                   style={[
+  //                     idx === 0 && styles.languageComponentWrapperWithMarginTop,
+  //                     styles.languageComponentWrapper,
+  //                   ]}
+  //                 >
+  //                   <SelectionList
+  //                     backgroundColor={Colors.secondary}
+  //                     label={item}
+  //                     labelColor={Colors.black}
+  //                     uncheckedRadioBackgroundColor={Colors.white}
+  //                     checkedRadioBackgroundColor={Colors.onlineMarkColor}
+  //                     checkIconColor={Colors.white}
+  //                     isSelected={isSelected}
+  //                     onPress={() => onSelectOption(field, value)}
+  //                   />
+  //                 </View>
+  //               );
+  //             })}
+  //           </ScrollView>
+
+  //           <TouchableOpacity
+  //             activeOpacity={0.8}
+  //             onPress={() => ref.current?.hide()}
+  //             style={styles.cancelButton}
+  //           >
+  //             <CustomText style={styles.cancelButtonText}>Cancel</CustomText>
+  //           </TouchableOpacity>
+  //         </View>
+  //       </ActionSheet>
+  //     </View>
+  //   );
+  // };
 
   const renderGenderSwitches = (genderField, fieldIndex) => {
     const activeIndex = genderStates[genderField.key] ?? 0;

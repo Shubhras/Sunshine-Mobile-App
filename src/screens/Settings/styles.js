@@ -7,6 +7,8 @@ import {
   SCREEN_HEIGHT,
   STANDARD_BUTTON_HEIGHT,
   STANDARD_FLEX,
+  STANDARD_NAVIGATION_LINK_HEIGHT,
+  STANDARD_NAVIGATION_LINK_LEFT_ICON_WRAPPER_SIZE,
   STANDARD_SPACING,
 } from '../../constants/Constants';
 import Colors from '../../constants/Colors';
@@ -213,5 +215,25 @@ export default StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     color: Colors.mainTextColor,
+  },
+  link: {
+    paddingHorizontal: scale(10),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: scale(35),
+    paddingVertical: STANDARD_SPACING,
+  },
+  leftIconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: scale(20),
+    aspectRatio: 1,
+    borderRadius: scale(10),
+    backgroundColor: '#2C2D2D',
+  },
+  label: {
+    fontSize: scale(13),
+    fontFamily: POPPINS_MEDIUM,
   },
 });

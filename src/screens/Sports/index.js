@@ -1,36 +1,32 @@
 import React, { useState } from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { scale } from 'react-native-size-matters';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import ProfileHeader from '../../components/ProfileHeader';
 import Colors from '../../constants/Colors';
-import { Switch } from 'react-native-switch';
 import styles from './styles';
-import { scale } from 'react-native-size-matters';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { CustomText } from '../../components/global/CustomText';
-import Button from '../../components/buttons/Button';
+import { Switch } from 'react-native-switch';
 
 const generateSwitchArray = () => {
   const baseArray = [
-    'God’s Unity',
-    'Witness or Partnership',
-    'Divine Perfection – Trinity',
-    'Creation',
-    'Divine Grace – Redemption',
-    'Humanity, Imperfection',
-    'Spiritual Perfection, Completeness',
-    'Earthly Completion',
-    'Governmental Perfection',
-    'Probation, Testing, Preparation',
-    'Other',
+    'Football',
+    'Soccer',
+    'Basketball',
+    'Tennis',
+    'Track',
+    'Boxing',
+    'Gym',
+    'All',
     'None',
   ];
   return [baseArray, baseArray];
 };
 
-const sectionHeadings = ['My Numerology', 'Search Numerology']; // Headings for the two lines
+const sectionHeadings = ['You', 'Partner']; // Headings for the two lines
 const switchArrays = generateSwitchArray();
 
-const NumerogogyNumberMatch = ({ route }) => {
+const Sports = ({ route }) => {
   const { title } = route.params;
   const [switchStates, setSwitchStates] = useState(
     switchArrays.map(array => array.map(() => false)),
@@ -107,7 +103,6 @@ const NumerogogyNumberMatch = ({ route }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                  outerCircleStyle={{}}
                   renderActiveText={false}
                   renderInActiveText={false}
                   switchLeftPx={2.2}
@@ -123,14 +118,12 @@ const NumerogogyNumberMatch = ({ route }) => {
             <CustomText style={styles.title}>{sectionHeadings[1]}</CustomText>
             {switchArrays[1].map((value, switchIndex) => (
               <View key={switchIndex} style={styles.switchContainer}>
-                <CustomText numberOfLines={3} style={styles.switchLabel}>
-                  {value}
-                </CustomText>
+                <CustomText style={styles.switchLabel}>{value}</CustomText>
                 <Switch
                   value={switchStates[1][switchIndex]}
                   onValueChange={() => toggleSwitch(1, switchIndex)}
-                  circleSize={scale(18)}
-                  barHeight={scale(23)}
+                  circleSize={scale(16)}
+                  barHeight={scale(20)}
                   circleBorderWidth={0}
                   backgroundActive={'#77cc5c'}
                   backgroundInactive={'#3e3e3e'}
@@ -141,7 +134,6 @@ const NumerogogyNumberMatch = ({ route }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                  outerCircleStyle={{}}
                   renderActiveText={false}
                   renderInActiveText={false}
                   switchLeftPx={2.2}
@@ -161,4 +153,4 @@ const NumerogogyNumberMatch = ({ route }) => {
   );
 };
 
-export default NumerogogyNumberMatch;
+export default Sports;

@@ -41,28 +41,25 @@ const ProfileHeader = ({
     </View>
   );
   // Right view component
-  const RightView = () =>
-    rightComponent ? (
-      rightComponent
-    ) : (
-      <View style={[styles.view, styles.rightView]}>
-        {optionalBtn && (
-          <TouchableOpacity style={styles.rowView} onPress={optionalBtnPress}>
-            <Feather name={optionalBtn} size={IconSize} color={iconColor} />
-            {optionalBadge && (
-              <Badge style={{ position: 'absolute', top: -5, right: -10 }}>
-                {optionalBadge}
-              </Badge>
-            )}
-          </TouchableOpacity>
-        )}
-        {right && (
-          <TouchableOpacity onPress={onRightPress}>
-            <CustomText style={styles.rightTitle}>{rightTitle}</CustomText>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
+  const RightView = () => (
+    <View style={[styles.view, styles.rightView]}>
+      {optionalBtn && (
+        <TouchableOpacity style={styles.rowView} onPress={optionalBtnPress}>
+          <Feather name={optionalBtn} size={IconSize} color={iconColor} />
+          {optionalBadge && (
+            <Badge style={{ position: 'absolute', top: -5, right: -10 }}>
+              {optionalBadge}
+            </Badge>
+          )}
+        </TouchableOpacity>
+      )}
+      {right && (
+        <TouchableOpacity onPress={onRightPress}>
+          <CustomText style={styles.rightTitle}>{rightTitle}</CustomText>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
   // Title view component
   const TitleView = () => (
     <View style={styles.titleView}>
