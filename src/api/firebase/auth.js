@@ -204,6 +204,7 @@
 // };
 
 import firestore, {
+  deleteDoc,
   doc,
   getDoc,
   getFirestore,
@@ -215,15 +216,18 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
 } from '@react-native-firebase/auth';
 import { ErrorCode } from '../../utils/ErrorCode';
 import { Images } from '../../constants/images';
+import DatingConfig from '../../data/DatingConfig';
+import { Platform } from 'react-native';
 
 const timestamp = serverTimestamp();
 const db = getFirestore(); // Modular DB instance
 const auth = getAuth();
 
-export const register = (userDetails, appIdentifier) => {
+export const register = userDetails => {
   const {
     email,
     firstName,
@@ -256,16 +260,22 @@ export const register = (userDetails, appIdentifier) => {
           profilePictureURL,
           location: location || '',
           signUpLocation: signUpLocation || '',
-          appIdentifier,
-          createdAt: timestamp, // Modular timestamp
+          appIdentifier: DatingConfig.appIdentifier,
+          signUpPlatform: Platform.OS,
+          settings: {
+            show_me: true,
+            min: age,
+            max: 100,
+            distance_radius: 'Unlimited',
+          },
+          createdAt: serverTimestamp(), // Modular timestamp
         };
 
         setDoc(userDocRef, data) // Modular set
-          .then(() => {
+          .then(val => {
             resolve({ user: data });
           })
           .catch(error => {
-            alert(error);
             resolve({ error: ErrorCode.serverError });
           });
       })
@@ -340,6 +350,121 @@ export const updateProfilePhoto = (userID, profilePictureURL) => {
       .catch(error => {
         console.error('Update error:', error); // Optional: better logging
         resolve({ error });
+      });
+  });
+};
+
+export const userLogout = async userID => {
+  try {
+    const userDocRef = doc(db, 'users', userID);
+
+    await updateDoc(userDocRef, {
+      pushToken: '',
+      isOnline: false,
+      lastOnlineTimestamp: firestore.FieldValue.serverTimestamp(),
+    });
+
+    await auth.signOut();
+
+    console.log('User logged out successfully');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Logout error:', error);
+    return { error };
+  }
+};
+
+export const updateUserInfo = (userID, data) => {
+  return new Promise((resolve, reject) => {
+    const userDocRef = doc(db, 'users', userID); // Modular doc ref
+
+    updateDoc(userDocRef, data)
+      .then(() => {
+        resolve({ success: true });
+      })
+      .catch(error => {
+        console.error('Update error:', error); // Optional: better logging
+        reject({ error });
+      });
+  });
+};
+
+export const removeUser = userID => {
+  return new Promise(resolve => {
+    // Step 1: Delete Firestore user document
+    const userDocRef = doc(db, 'users', userID);
+
+    deleteDoc(userDocRef)
+      .then(() => {
+        // Step 2: Delete the Firebase Auth user
+        const currentUser = auth.currentUser;
+
+        if (!currentUser) {
+          resolve({ success: false, error: 'No authenticated user found' });
+          return;
+        }
+
+        if (currentUser.uid !== userID) {
+          resolve({
+            success: false,
+            error:
+              'Trying to delete different user than current authenticated user',
+          });
+          return;
+        }
+
+        deleteUser(currentUser)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(error => {
+            // ──────────────────────────────────────────────────────
+            // Most common case: requires recent authentication
+            // ──────────────────────────────────────────────────────
+            if (error.code === 'auth/requires-recent-login') {
+              // In most real apps you should:
+              // 1. Sign out the user
+              // 2. Show re-authentication screen (email+password or other provider)
+              auth
+                .signOut()
+                .then(() => {
+                  resolve({
+                    success: false,
+                    error: ErrorCode.requiresRecentLogin,
+                    message:
+                      'Requires recent authentication. Please sign in again.',
+                  });
+                })
+                .catch(signOutErr => {
+                  console.error(
+                    'Sign out failed during account deletion:',
+                    signOutErr,
+                  );
+                  resolve({
+                    success: false,
+                    error: ErrorCode.requiresRecentLogin,
+                    message: 'Cannot sign out automatically',
+                  });
+                });
+            } else {
+              // Other errors (permission denied, network, etc.)
+              console.error('Account deletion failed:', error);
+              resolve({
+                success: false,
+                error: ErrorCode.serverError,
+                message: error?.message || 'Failed to delete account',
+              });
+            }
+          });
+      })
+      .catch(error => {
+        console.error('Failed to delete user document:', error);
+        resolve({
+          success: false,
+          error: ErrorCode.serverError,
+          message: 'Could not delete user data from database',
+        });
       });
   });
 };

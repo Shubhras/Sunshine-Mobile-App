@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
-import React from 'react';
-import { ImageBackground, ScrollView, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, ImageBackground, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 import ProfileHeader from '../../components/ProfileHeader';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
@@ -11,6 +11,13 @@ import {
 import Colors from '../../constants/Colors';
 import DatingConfig from '../../data/DatingConfig';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeUser, updateUserInfo } from '../../api/firebase/auth';
+import { logoutUser, updateUser } from '../../redux/slices/SessionUser';
+import { showToast } from '../../components/alerts/Toast/ToastManager';
+import TNActivityIndicator from '../../components/TNActivityIndicator';
+import Button from '../../components/buttons/Button';
+import { ErrorCode, localizedErrorMessage } from '../../utils/ErrorCode';
 
 const editInputField = DatingConfig.editProfileFields.sections;
 
@@ -49,20 +56,46 @@ const validationSchema = Yup.object().shape({
 const AccountDetails = ({ route, navigation }) => {
   const { title } = route.params;
 
+  const userInfo = useSelector(state => state.users.users);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  console.log('userInfouserInfouserInfo', userInfo);
+
   const initialValues = {
-    firstName: '',
-    lastName: '',
-    age: '',
-    bio: '',
-    school: '',
-    email: '',
-    phone: '',
+    firstName: userInfo?.firstName ?? '',
+    lastName: userInfo?.lastName ?? '',
+    age: userInfo?.age ?? '',
+    bio: userInfo?.bio ?? '',
+    school: userInfo?.school ?? '',
+    email: userInfo?.email ?? '',
+    phone: userInfo?.phone ?? '',
   };
 
   const handleSubmit = values => {
     console.log('Submitted Form Data:', values);
     // Add your API call here
-    // navigation.goBack();
+    setLoading(true);
+    updateUserInfo(userInfo?.userID, values)
+      .then(res => {
+        dispatch(updateUser({ ...userInfo, ...values }));
+        console.log('resrsrrrrrsrrsrsrsrsrsrrs', res);
+
+        setLoading(false);
+        navigation.goBack();
+      })
+      .catch(error => {
+        // const { message } = error;
+        setLoading(false);
+        dispatch(updateUser({ ...userInfo }));
+        showToast({
+          title: 'Update Failed',
+          text: 'Unable to update user information. Please try again.',
+          duration: 2000,
+          type: 'error',
+        });
+      });
+
+    //
   };
 
   const renderTextField = (field, index, totalLen, formik) => {
@@ -122,6 +155,56 @@ const AccountDetails = ({ route, navigation }) => {
     );
   };
 
+const onDeletePrompt = () => {
+  Alert.alert(
+    'Confirmation',
+    'Are you sure you want to remove your account? This will delete all your data and the action is not reversible.',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Yes',
+        onPress: () => onDeleteAccount(), // ✅ correct
+        style: 'destructive',
+      },
+    ],
+    {
+      cancelable: false,
+    },
+  );
+};
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+     setLoading(false);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'AuthStack' }],
+    });
+  };
+
+  const onDeleteAccount = () => {
+    setLoading(true)
+    removeUser(userInfo?.userID).then(response => {
+      if (response.success) {
+        Alert.alert('Success', 'Successfully deleted account');
+        handleLogout();
+
+        return;
+      }
+      if (response.error === ErrorCode.requiresRecentLogin) {
+         setLoading(false);
+        Alert.alert('Error', localizedErrorMessage(response?.error));
+        return;
+      }else{
+        Alert.alert('Error', 'We were not able to delete your account');
+        setLoading(false);
+      }
+    });
+  };
+
   return (
     <CustomSafeAreaView
       style={[styles.mainWrapper, { backgroundColor: Colors.black }]}
@@ -163,6 +246,15 @@ const AccountDetails = ({ route, navigation }) => {
             </>
           )}
         </Formik>
+        <Button
+          backgroundColor={'red'}
+          label={'delete'}
+          onPress={() => {
+            onDeletePrompt();
+          }}
+        />
+        <Button backgroundColor={'red'} label={'restore'} onPress={() => {alert('subscription module IN development')}} />
+        {loading && <TNActivityIndicator />}
       </ImageBackground>
     </CustomSafeAreaView>
   );

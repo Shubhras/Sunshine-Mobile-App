@@ -242,7 +242,6 @@ const SignupSchema = Yup.object().shape({
 });
 
 const SignupScreen = ({ navigation, route }) => {
-  const { appIdentifier } = route.params || {};
   const dispatch = useDispatch();
   // Local states
   const [profilePictureFile, setProfilePictureFile] = useState(null);
@@ -279,14 +278,18 @@ const SignupScreen = ({ navigation, route }) => {
       ...trimFields(values),
       photoFile: profilePictureFile,
     };
-    await register(userDetails, appIdentifier)
+    await register(userDetails)
       .then(response => {
+        console.log('responseresponseresponse', response);
+
         if (response.error) {
           setSubmitting(false);
           setLoading(false);
           showToast({
             title: 'Signup Failed',
-            text: response?.error?.message || 'Unable to create account',
+            text:
+              localizedErrorMessage(response?.error) ||
+              'Unable to create account',
             duration: 3000,
             type: 'error',
           });
@@ -299,6 +302,10 @@ const SignupScreen = ({ navigation, route }) => {
                   updateUser({
                     ...user,
                     profilePictureURL: defaultProfilePhotoURL,
+                    isLogin: true,
+                    createdAt: user?.createdAt
+                      ? JSON.stringify(user?.createdAt)
+                      : new Date().toISOString(),
                   }),
                 );
                 setLoading(false);
@@ -314,12 +321,16 @@ const SignupScreen = ({ navigation, route }) => {
                       updateUser({
                         ...user,
                         profilePictureURL: response.downloadURL,
+                        isLogin: true,
+                        createdAt: user?.createdAt
+                          ? JSON.stringify(user?.createdAt)
+                          : new Date().toISOString(),
                       }),
                     );
                     setLoading(false);
                     navigation.reset({
                       index: 0,
-                      routes: [{ name: 'HomeScreen' }],
+                      routes: [{ name: 'HomeTopTab' }],
                     });
                   },
                 );
@@ -330,12 +341,16 @@ const SignupScreen = ({ navigation, route }) => {
               updateUser({
                 ...user,
                 profilePictureURL: defaultProfilePhotoURL,
+                isLogin: true,
+                createdAt: user?.createdAt
+                  ? JSON.stringify(user?.createdAt)
+                  : new Date().toISOString(),
               }),
             );
             setLoading(false);
             navigation.reset({
               index: 0,
-              routes: [{ name: 'HomeScreen' }],
+              routes: [{ name: 'HomeTopTab' }],
             });
           }
         }

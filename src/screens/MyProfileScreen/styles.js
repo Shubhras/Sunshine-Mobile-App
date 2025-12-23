@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../constants/Colors';
 import {
@@ -14,6 +14,7 @@ import {
   STANDARD_SPACING,
 } from '../../constants/Constants';
 
+const width = Dimensions.get('window').width
 // Exporting style
 export default StyleSheet.create({
   mainWrapper: {
@@ -32,6 +33,7 @@ export default StyleSheet.create({
   profileName: {
     fontFamily: POPPINS_BOLD,
     fontSize: FONT_SIZE_MD,
+    textTransform:'capitalize'
   },
   photosSectionWrapper: {
     paddingHorizontal: STANDARD_SPACING * 3,
@@ -71,4 +73,45 @@ export default StyleSheet.create({
   text: {
     color: 'white',
   },
+
+
+
+  inactiveDot: {
+      backgroundColor: Colors.grey6,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginLeft: 3,
+      marginRight: 3,
+      marginTop: 3,
+      marginBottom: 3,
+    },
+     slide: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    slideActivity: {
+      height: '100%',
+      width: '100%',
+    },
+       myphotosItemView: {
+      width: Math.floor(width * 0.24),
+      height: Math.floor(width * 0.24),
+      marginHorizontal: 8,
+      marginVertical: 8,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'grey',
+      overflow: 'hidden',
+    },
+     myphotosView: {
+      width: '100%',
+      paddingHorizontal: 12,
+      marginTop: 20,
+      marginBottom: 15,
+      flexDirection:'row',
+      borderWidth:2, borderColor:'white'
+    },
 });

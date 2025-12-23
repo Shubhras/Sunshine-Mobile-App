@@ -21,12 +21,18 @@ import Lifestyle from '../../screens/Lifestyle';
 import Children from '../../screens/Children';
 import Religion from '../../screens/Religion';
 import Sports from '../../screens/Sports';
+import InitalLoadScreen from '../../screens/InitalLoadScreen';
 
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeTopTab">
+    <Stack.Navigator initialRouteName="InitalLoadScreen">
+       <Stack.Screen
+        name="InitalLoadScreen"
+        component={InitalLoadScreen}
+        options={{ headerShown: false, animation: 'none' }}
+      />
       <Stack.Screen
         name="WalkthroughScreen"
         component={WalkthroughScreen}

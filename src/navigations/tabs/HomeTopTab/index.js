@@ -139,6 +139,7 @@ const HomeTopTab = () => {
           tabBarShowLabel: false,
           tabBarIndicatorStyle: { height: 0 },
         }}
+        initialRouteName='SwipeStack'
         tabBar={props => <CustomTabBar {...props} />}
       >
         {TAB_CONFIG.map(tab => (
