@@ -18,7 +18,6 @@ import { STANDARD_SPACING } from '../../constants/Constants';
 import { localizedErrorMessage } from '../../utils/ErrorCode';
 import styles from './styles';
 import { updateUser } from '../../redux/slices/SessionUser';
-import { create } from 'react-native/types_generated/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload';
 
 // Validation Schema
 const LoginSchema = Yup.object().shape({

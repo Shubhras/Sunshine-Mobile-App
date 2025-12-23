@@ -5,7 +5,7 @@ import { STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
 export default StyleSheet.create({
   mainWrapper: {
     flex: STANDARD_FLEX,
-    paddingHorizontal: STANDARD_SPACING * 3.5,
+    // paddingHorizontal: STANDARD_SPACING * 3.5,
   },
   text: {
     color: 'white',

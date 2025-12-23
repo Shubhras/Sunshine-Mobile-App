@@ -14,6 +14,7 @@ import NavigationLink from '../../components/links/NavigationLink';
 import Colors from '../../constants/Colors';
 import NavigationData from '../../data/NavigationData';
 import styles from './styles';
+import { Images } from '../../constants/images';
 
 const MyProfileScreen = ({ navigation }) => {
   const [myphotos, setMyphotos] = useState([]);
@@ -38,7 +39,7 @@ const MyProfileScreen = ({ navigation }) => {
   return (
     <View style={[styles.mainWrapper, { backgroundColor: Colors.black }]}>
       <ImageBackground
-        source={require('../../assets/images/black.png')}
+        source={Images.backgroundImage}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
