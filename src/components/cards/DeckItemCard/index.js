@@ -162,32 +162,32 @@ const DeckItemCard = props => {
     }
   };
 
-  const renderCardDetail = (item, isDone) => {
-    return (
-      item && (
-        <CardDetailsView
-          key={'CardDetail' + item.id}
-          usrid={item.id}
-          profilePictureURL={item?.profilePictureURL}
-          firstName={item.firstName}
-          lastName={item.lastName}
-          age={item.age}
-          school={item.school}
-          distance={item.distance}
-          bio={item.bio}
-          instagramPhotos={
-            item?.photos?.length > 0 ? item.photos : [item?.profilePictureURL]
-          }
-          setShowMode={setShowMode}
-          onSwipeTop={onSuperLikePressed}
-          onSwipeRight={onLikePressed}
-          onSwipeLeft={onDislikePressed}
-          isDone={isDone}
-          bottomTabBar={true}
-        />
-      )
-    );
-  };
+  // const renderCardDetail = (item, isDone) => {
+  //   return (
+  //     item && (
+  //       <CardDetailsView
+  //         key={'CardDetail' + item.id}
+  //         usrid={item.id}
+  //         profilePictureURL={item?.profilePictureURL}
+  //         firstName={item.firstName}
+  //         lastName={item.lastName}
+  //         age={item.age}
+  //         school={item.school}
+  //         distance={item.distance}
+  //         bio={item.bio}
+  //         instagramPhotos={
+  //           item?.photos?.length > 0 ? item.photos : [item?.profilePictureURL]
+  //         }
+  //         setShowMode={setShowMode}
+  //         onSwipeTop={onSuperLikePressed}
+  //         onSwipeRight={onLikePressed}
+  //         onSwipeLeft={onDislikePressed}
+  //         isDone={isDone}
+  //         bottomTabBar={true}
+  //       />
+  //     )
+  //   );
+  // };
 
   const renderOverlayLabel = (label, color) => {
     return (
@@ -264,7 +264,7 @@ const DeckItemCard = props => {
         }}
       />
       {renderBottomTabBar()}
-      {showMode == 1 && data[currentDeckIndex.current] && (
+      {/* {showMode == 1 && data[currentDeckIndex.current] && (
         <Modal animationType={'slide'}>
           <View style={styles.cardDetailContainer}>
             <View style={styles.cardDetailL}>
@@ -281,7 +281,7 @@ const DeckItemCard = props => {
         >
           <View style={styles.newMatch}>{renderNewMatch()}</View>
         </Modal>
-      )}
+      )} */}
     </View>
   );
 };

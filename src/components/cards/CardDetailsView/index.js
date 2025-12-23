@@ -134,7 +134,8 @@ const CardDetailsView = props => {
   };
 
   const onSettingsPress = () => {
-    privateSettingsActionSheetRef.current.show();
+    alert('deveploment');
+    // privateSettingsActionSheetRef.current.show();
   };
 
   const onPrivateSettingsActionDone = index => {
@@ -221,10 +222,7 @@ const CardDetailsView = props => {
             })}
           </Swiper>
         </View>
-        <TouchableOpacity
-          style={styles.backView}
-          onPress={() => props.setShowMode(0)}
-        >
+        <TouchableOpacity style={styles.backView} onPress={props.onPress}>
           <Image style={styles.backIcon} source={Images.arrowdownIcon} />
         </TouchableOpacity>
         <View style={styles.titleView}>
@@ -389,7 +387,7 @@ CardDetailsView.propTypes = {
   profilePictureURL: PropTypes.string,
   instagramPhotos: PropTypes.array,
   bio: PropTypes.string,
-  isDone: PropTypes.bool,
+  onPress: PropTypes.bool,
   setShowMode: PropTypes.func,
   SwipeControls: PropTypes.bool,
 };

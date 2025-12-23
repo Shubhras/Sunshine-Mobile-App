@@ -56,7 +56,7 @@ const PostUserProfileInfoSheet = props => {
             onSwipeTop={onSuperLikePressed}
             onSwipeRight={onLikePressed}
             onSwipeLeft={onDislikePressed}
-            isDone={isDone}
+            onPress={() => SheetManager.hide('PostUserProfileInfoSheet')}
             bottomTabBar={bottomTabBar}
           />
         )}
