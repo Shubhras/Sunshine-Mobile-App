@@ -255,7 +255,7 @@
 //   };
 
 //   const renderSelectSignField = (field, index) => {
-    
+
 //     if (!actionSheetRefs.current[field.key]) {
 //       actionSheetRefs.current[field.key] = React.createRef();
 //     }
@@ -623,7 +623,6 @@
 
 // export default Settings;
 
-
 // // 2nd Attemp
 // import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import {
@@ -932,14 +931,8 @@
 
 // export default Settings;
 
-
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import { CustomText } from '../../components/global/CustomText';
@@ -953,6 +946,10 @@ import ActionSheet from 'react-native-actions-sheet';
 import SelectionList from '../../components/radios/SelectionList';
 import Icons from '../../components/Icons/Icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateUserInfo } from '../../api/firebase/auth';
+import { updateUser } from '../../redux/slices/SessionUser';
+import { showToast } from '../../components/alerts/Toast/ToastManager';
+import TNActivityIndicator from '../../components/TNActivityIndicator';
 
 const settingField = DatingConfig.userSettingsFields.sections;
 
@@ -970,7 +967,20 @@ const Settings = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const userInfo = useSelector(state => state.users.users);
   const reduxSettings = userInfo?.settings || {};
-
+  //   const reduxSettings = {
+  //     "show_me": true,
+  //     "push_new_matches_enabled": false,
+  //     "push_new_messages_enabled": false,
+  //     "push_super_likes_enabled": false,
+  //     "push_top_picks_enabled": false,
+  //     "distance_radius": "Unlimited",
+  //     "travel_option": "No",
+  //     "children_option": "No",
+  //     "gender_new": "Male",
+  //     "gender_preference_new": "Male",
+  //     "min": 18,
+  //     "max": 25
+  // }
   const actionSheetRefs = useRef({});
 
   const [switchStates, setSwitchStates] = useState({});
@@ -978,6 +988,7 @@ const Settings = ({ route, navigation }) => {
   const [genderStates, setGenderStates] = useState({});
   const [low, setLow] = useState(18);
   const [high, setHigh] = useState(100);
+  const [loading, setLoading] = useState(false);
 
   /* ---------------- INIT FROM JSON + REDUX ---------------- */
 
@@ -991,8 +1002,7 @@ const Settings = ({ route, navigation }) => {
         const reduxValue = reduxSettings[field.key];
 
         if (field.type === 'switch') {
-          switches[field.key] =
-            reduxValue !== undefined ? reduxValue : false;
+          switches[field.key] = reduxValue !== undefined ? reduxValue : false;
         }
 
         if (
@@ -1070,8 +1080,7 @@ const Settings = ({ route, navigation }) => {
     });
 
     Object.keys(genderStates).forEach(key => {
-      payload[key] =
-        switchFields[genderStates[key]]?.displayName ?? null;
+      payload[key] = switchFields[genderStates[key]]?.displayName ?? null;
     });
 
     payload.min = low;
@@ -1085,37 +1094,109 @@ const Settings = ({ route, navigation }) => {
     console.log('✅ FINAL SETTINGS PAYLOAD', finalData);
 
     // dispatch(updateUserSettings(finalData));
+    const payload = {
+      settings: finalData,
+    };
+    handleSubmit(payload);
+  };
+
+  const handleSubmit = values => {
+    console.log('Submitted Form Data:', values);
+    // Add your API call here
+    setLoading(true);
+    updateUserInfo(userInfo?.userID, values)
+      .then(res => {
+        dispatch(updateUser({ ...userInfo, ...values }));
+        console.log('resrsrrrrrsrrsrsrsrsrsrrs', res);
+
+        setLoading(false);
+        navigation.goBack();
+      })
+      .catch(error => {
+        // const { message } = error;
+        setLoading(false);
+        dispatch(updateUser({ ...userInfo }));
+        showToast({
+          title: 'Update Failed',
+          text: 'Unable to update user information. Please try again.',
+          duration: 2000,
+          type: 'error',
+        });
+      });
+
+    //
   };
 
   /* ---------------- RENDERERS ---------------- */
 
-  const renderSwitchField = (field, index) => {
-    const value = switchStates[field.key] ?? false;
-
+  const renderSwitchField = (switchField, index) => {
+    const currentValue = switchStates[switchField.key] ?? switchField.value;
     return (
       <View
-        key={`switch-${index}`}
+        key={`switch-${switchField.key}-${index}`}
         style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
       >
         <CustomText style={styles.inputTitle}>
-          {field.displayName}
+          {switchField.displayName}
         </CustomText>
-
         <View style={styles.textinputWrapper}>
           <Switch
-            value={value}
-            onValueChange={val =>
-              handleSwitchChange(field.key, val)
-            }
+            value={currentValue}
+            onValueChange={val => handleSwitchChange(switchField.key, val)}
+            disabled={!switchField.editable}
+            activeText={''}
+            inActiveText={''}
+            circleSize={scale(18)}
+            barHeight={scale(23)}
+            circleBorderWidth={0}
             backgroundActive={Colors.onlineMarkColor}
             backgroundInactive={'#3e3e3e'}
             circleActiveColor={Colors.white}
             circleInActiveColor={Colors.white}
+            changeValueImmediately={true}
+            innerCircleStyle={{
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            outerCircleStyle={{}}
+            renderActiveText={false}
+            renderInActiveText={false}
+            switchLeftPx={2.2}
+            switchRightPx={2.2}
+            switchWidthMultiplier={2.15}
+            switchBorderRadius={scale(20)}
           />
         </View>
       </View>
     );
   };
+  // const renderSwitchField = (field, index) => {
+  //   const value = switchStates[field.key] ?? false;
+
+  //   return (
+  //     <View
+  //       key={`switch-${index}`}
+  //       style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
+  //     >
+  //       <CustomText style={styles.inputTitle}>
+  //         {field.displayName}
+  //       </CustomText>
+
+  //       <View style={styles.textinputWrapper}>
+  //         <Switch
+  //           value={value}
+  //           onValueChange={val =>
+  //             handleSwitchChange(field.key, val)
+  //           }
+  //           backgroundActive={Colors.onlineMarkColor}
+  //           backgroundInactive={'#3e3e3e'}
+  //           circleActiveColor={Colors.white}
+  //           circleInActiveColor={Colors.white}
+  //         />
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
   /* 🔴 FIXED: signSelect SAFE HANDLING (USES YOUR CSS) */
   const renderSelectSignField = (field, index) => {
@@ -1136,9 +1217,7 @@ const Settings = ({ route, navigation }) => {
             })
           }
         >
-          <CustomText
-            style={[styles.label, { color: Colors.mainTextColor }]}
-          >
+          <CustomText style={[styles.label, { color: Colors.mainTextColor }]}>
             {field.displayName}
           </CustomText>
 
@@ -1162,13 +1241,8 @@ const Settings = ({ route, navigation }) => {
 
     return (
       <View key={`sign-sheet-${index}`}>
-        <Pressable
-          style={styles.link}
-          onPress={() => ref.current?.show()}
-        >
-          <CustomText
-            style={[styles.label, { color: Colors.mainTextColor }]}
-          >
+        <Pressable style={styles.link} onPress={() => ref.current?.show()}>
+          <CustomText style={[styles.label, { color: Colors.mainTextColor }]}>
             {field.displayName}
           </CustomText>
 
@@ -1201,15 +1275,13 @@ const Settings = ({ route, navigation }) => {
               {field.displayOptions.map((item, idx) => {
                 const value = field.options[idx];
                 const isSelected =
-                  (selectStates[field.key] ?? field.value) ===
-                  value;
+                  (selectStates[field.key] ?? field.value) === value;
 
                 return (
                   <View
                     key={`${field.key}-${idx}`}
                     style={[
-                      idx === 0 &&
-                        styles.languageComponentWrapperWithMarginTop,
+                      idx === 0 && styles.languageComponentWrapperWithMarginTop,
                       styles.languageComponentWrapper,
                     ]}
                   >
@@ -1218,14 +1290,10 @@ const Settings = ({ route, navigation }) => {
                       label={item}
                       labelColor={Colors.black}
                       uncheckedRadioBackgroundColor={Colors.white}
-                      checkedRadioBackgroundColor={
-                        Colors.onlineMarkColor
-                      }
+                      checkedRadioBackgroundColor={Colors.onlineMarkColor}
                       checkIconColor={Colors.white}
                       isSelected={isSelected}
-                      onPress={() =>
-                        onSelectOption(field, value)
-                      }
+                      onPress={() => onSelectOption(field, value)}
                     />
                   </View>
                 );
@@ -1236,9 +1304,7 @@ const Settings = ({ route, navigation }) => {
               style={styles.cancelButton}
               onPress={() => ref.current?.hide()}
             >
-              <CustomText style={styles.cancelButtonText}>
-                Cancel
-              </CustomText>
+              <CustomText style={styles.cancelButtonText}>Cancel</CustomText>
             </TouchableOpacity>
           </View>
         </ActionSheet>
@@ -1246,33 +1312,85 @@ const Settings = ({ route, navigation }) => {
     );
   };
 
-  const renderGenderSwitches = (field, index) => {
-    const activeIndex = genderStates[field.key] ?? 0;
+  // const renderGenderSwitches = (field, index) => {
+  //   const activeIndex = genderStates[field.key] ?? 0;
+
+  //   return (
+  //     <View key={`gender-${index}`}>
+  //       {switchFields.map((item, idx) => (
+  //         <View
+  //           key={`${item.displayName}-${idx}`}
+  //           style={[
+  //             styles.settingsTypeContainer,
+  //             styles.appSettingsTypeContainer,
+  //           ]}
+  //         >
+  //           <CustomText style={styles.inputTitle}>
+  //             {item.displayName}
+  //           </CustomText>
+
+  //           <View style={styles.textinputWrapper}>
+  //             <Switch
+  //               value={activeIndex === idx}
+  //               onValueChange={() =>
+  //                 handleGenderSwitchChange(field.key, idx)
+  //               }
+  //               backgroundActive={Colors.onlineMarkColor}
+  //               backgroundInactive={'#2C2D2D'}
+  //               circleActiveColor={Colors.white}
+  //               circleInActiveColor={Colors.white}
+  //             />
+  //           </View>
+  //         </View>
+  //       ))}
+  //     </View>
+  //   );
+  // };
+
+  const renderGenderSwitches = (genderField, fieldIndex) => {
+    const activeIndex = genderStates[genderField.key] ?? 0;
 
     return (
-      <View key={`gender-${index}`}>
-        {switchFields.map((item, idx) => (
+      <View key={`gender-group-${genderField.key}-${fieldIndex}`}>
+        {switchFields.map((switchField, idx) => (
           <View
-            key={`${item.displayName}-${idx}`}
+            key={`gender-switch-${genderField.key}-${idx}`}
             style={[
               styles.settingsTypeContainer,
               styles.appSettingsTypeContainer,
             ]}
           >
             <CustomText style={styles.inputTitle}>
-              {item.displayName}
+              {switchField.displayName}
             </CustomText>
-
             <View style={styles.textinputWrapper}>
               <Switch
                 value={activeIndex === idx}
-                onValueChange={() =>
-                  handleGenderSwitchChange(field.key, idx)
-                }
+                onValueChange={() => {
+                  handleGenderSwitchChange(genderField.key, idx);
+                }}
+                disabled={!genderField.editable}
+                activeText={''}
+                inActiveText={''}
+                circleSize={scale(18)}
+                barHeight={scale(23)}
+                circleBorderWidth={0}
                 backgroundActive={Colors.onlineMarkColor}
                 backgroundInactive={'#2C2D2D'}
                 circleActiveColor={Colors.white}
                 circleInActiveColor={Colors.white}
+                changeValueImmediately={true}
+                innerCircleStyle={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                outerCircleStyle={{}}
+                renderActiveText={false}
+                renderInActiveText={false}
+                switchLeftPx={2.2}
+                switchRightPx={2.2}
+                switchWidthMultiplier={2.15}
+                switchBorderRadius={scale(20)}
               />
             </View>
           </View>
@@ -1281,18 +1399,64 @@ const Settings = ({ route, navigation }) => {
     );
   };
 
-  const renderAgeSlider = (field, index) => {
-    if (field.key !== 'min') return null;
+  // const renderAgeSlider = (field, index) => {
+  //   if (field.key !== 'min') return null;
+
+  //   return (
+  //     <View key={`slider-${index}`} style={styles.rangeSliderWrapper}>
+  //       <RangeSlider
+  //         min={17}
+  //         max={100}
+  //         initialLowValue={low}
+  //         initialHighValue={high}
+  //         onValueChanged={handleValueChange}
+  //       />
+  //     </View>
+  //   );
+  // };
+
+  const renderAgeSlider = (selectField, index) => {
+    // Only render the slider once when we hit the 'min' field
+    if (selectField.key !== 'min') {
+      return null;
+    }
 
     return (
-      <View key={`slider-${index}`} style={styles.rangeSliderWrapper}>
-        <RangeSlider
-          min={17}
-          max={100}
-          initialLowValue={low}
-          initialHighValue={high}
-          onValueChanged={handleValueChange}
-        />
+      <View key={`age-slide-${index}`}>
+        <View style={styles.rangeSliderWrapper}>
+          <RangeSlider
+            style={styles.slider}
+            min={18}
+            max={100}
+            step={1}
+            initialLowValue={low}
+            initialHighValue={high}
+            thumbRadius={scale(10)}
+            thumbBorderWidth={scale(2)}
+            thumbColor={Colors.white}
+            thumbBorderColor={Colors.primary}
+            lineWidth={4}
+            selectionColor={Colors.primary}
+            blankColor="#e0e0e0"
+            labelStyle="bubble"
+            labelBackgroundColor={Colors.primary}
+            labelBorderColor={Colors.primary}
+            labelTextColor={Colors.white}
+            textSize={14}
+            labelBorderRadius={4}
+            labelPadding={4}
+            floatingLabel
+            onValueChanged={handleValueChange}
+          />
+          <View style={styles.sliderboxContainer}>
+            <View style={styles.sliderbox}>
+              <CustomText style={styles.boxLable}>{low}</CustomText>
+            </View>
+            <View style={styles.sliderbox}>
+              <CustomText style={styles.boxLable}>{high}</CustomText>
+            </View>
+          </View>
+        </View>
       </View>
     );
   };
@@ -1303,23 +1467,17 @@ const Settings = ({ route, navigation }) => {
       style={styles.saveButtonWrapper}
       onPress={onFormButtonPress}
     >
-      <CustomText style={styles.saveBtnLable}>
-        {field.displayName}
-      </CustomText>
+      <CustomText style={styles.saveBtnLable}>{field.displayName}</CustomText>
     </TouchableOpacity>
   );
 
   const renderField = (field, index) => {
-    if (field.type === 'switch')
-      return renderSwitchField(field, index);
-    if (field.type === 'signSelect')
-      return renderSelectSignField(field, index);
+    if (field.type === 'switch') return renderSwitchField(field, index);
+    if (field.type === 'signSelect') return renderSelectSignField(field, index);
     if (field.type === 'switchGender')
       return renderGenderSwitches(field, index);
-    if (field.type === 'slider')
-      return renderAgeSlider(field, index);
-    if (field.type === 'button')
-      return renderButtonField(field, index);
+    if (field.type === 'slider') return renderAgeSlider(field, index);
+    if (field.type === 'button') return renderButtonField(field, index);
     return null;
   };
 
@@ -1328,13 +1486,20 @@ const Settings = ({ route, navigation }) => {
       style={[styles.mainWrapper, { backgroundColor: Colors.black }]}
     >
       <ProfileHeader
-        back
+        back={true}
+        iconColor={Colors.white}
         title={title}
-        titleAlight="center"
+        titleAlight={'center'}
+        titleFontSize={scale(16)}
         headerBg={Colors.black}
       />
 
-      <ScrollView contentContainerStyle={styles.ScrollViewWrapper}>
+      <ScrollView
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        contentContainerStyle={styles.ScrollViewWrapper}
+      >
         {settingField.map((section, idx) => (
           <View key={`section-${idx}`}>
             {section.title ? (
@@ -1351,6 +1516,7 @@ const Settings = ({ route, navigation }) => {
           </View>
         ))}
       </ScrollView>
+      {loading && <TNActivityIndicator />}
     </CustomSafeAreaView>
   );
 };
