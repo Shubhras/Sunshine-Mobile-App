@@ -12,8 +12,11 @@ import DatingConfig from '../../data/DatingConfig';
 import styles from './styles';
 import { Images } from '../../constants/images';
 import { CustomText } from '../../components/global/CustomText';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../redux/slices/SessionUser';
 
 const WalkthroughScreen = ({ navigation }) => {
+  const dispatch = useDispatch()
   const slides = DatingConfig.onboardingConfig.walkthroughScreens.map(
     (screenSpec, index) => ({
       key: index,
@@ -24,14 +27,17 @@ const WalkthroughScreen = ({ navigation }) => {
   );
 
   const handleDone = () => {
+    dispatch(updateUser({isOnbording:true}))
     navigation.navigate('AuthStack', { screen: 'Welcome' });
   };
 
   const handleLogin = () => {
+    dispatch(updateUser({isOnbording:true}))
     navigation.navigate('AuthStack', { screen: 'Login' });
   };
 
   const handleSignup = () => {
+    dispatch(updateUser({isOnbording:true}))
     navigation.navigate('AuthStack', {
       screen: 'Signup',
       params: {

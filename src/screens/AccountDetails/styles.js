@@ -73,6 +73,7 @@ export default StyleSheet.create({
     fontFamily: POPPINS_MEDIUM,
     fontSize: FONT_SIZE_XS,
     textAlign: 'right',
+    color: Colors.mainTextColor,
   },
   errorText: {
     color: Colors.error,

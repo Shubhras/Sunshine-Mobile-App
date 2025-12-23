@@ -27,7 +27,7 @@ const { height } = Dimensions.get('window');
 const imageSize = height * 0.12;
 const photoIconSize = imageSize * 0.28;
 
-const TNProfilePictureSelector = props => {
+const PostPictureMoreOption = props => {
   const [profilePictureURL, setProfilePictureURL] = useState(
     props.profilePictureURL || '',
   );
@@ -35,39 +35,7 @@ const TNProfilePictureSelector = props => {
   const [tappedImage, setTappedImage] = useState([]);
   const actionSheet = useRef(null);
 
-  // ✅ Proper way to sync with props changes
-  useEffect(() => {
-    if (props.profilePictureURL !== profilePictureURL) {
-      setProfilePictureURL(props.profilePictureURL || '');
-    }
-  }, [props.profilePictureURL]);
 
-  const handleProfilePictureClick = url => {
-    if (url) {
-      const isAvatar = url.includes('avatar');
-      const image = [
-        {
-          uri: url,
-        },
-      ];
-      if (!isAvatar) {
-        setTappedImage(image);
-        setIsImageViewerVisible(true);
-      } else {
-        showActionSheet();
-      }
-    } else {
-      showActionSheet();
-    }
-  };
-
-  const onImageError = () => {
-    console.warn('Profile picture failed to load');
-    // Optionally set a default image
-    const defaultProfilePhotoURL =
-      'https://firebasestorage.googleapis.com/v0/b/sun-sign-inc-1e12b.appspot.com/o/pics.png?alt=media&token=c387f3dc-00bc-4535-be43-0d46f3b44bc0';
-    setProfilePictureURL(defaultProfilePhotoURL);
-  };
 
   const onPressAddPhotoBtn = () => {
     const options = {
@@ -192,28 +160,22 @@ const TNProfilePictureSelector = props => {
   const showActionSheet = () => {
     Keyboard.dismiss();
     setTimeout(() => {
-      SheetManager.show('profile-photo-sheet');
+      SheetManager.show('profile-photo-sheet-post-more-option');
     }, 200);
   };
 
   const onActionDone = index => {
-    SheetManager.hide('profile-photo-sheet');
+    SheetManager.hide('profile-photo-sheet-post-more-option');
 
     setTimeout(() => {
       switch (index) {
         case 0: // Take Photo
-          onPressTakePhoto();
+           props.onPressRemove();
           break;
         case 1: // Choose from Library
-          onPressAddPhotoBtn();
+          props.onPressMakeProfile();
           break;
         case 2: // Cancel - do nothing
-          break;
-        case 3: // Remove Profile Photo
-          setProfilePictureURL('');
-          if (props.setProfilePictureFile) {
-            props.setProfilePictureFile(null);
-          }
           break;
         default:
           break;
@@ -223,28 +185,10 @@ const TNProfilePictureSelector = props => {
 
   return (
     <>
-      <View style={styles.imageBlock}>
-        <TouchableHighlight
-          style={styles.imageContainer}
-          onPress={() => handleProfilePictureClick(profilePictureURL)}
-        >
-          <FastImage
-            style={[styles.image, { opacity: profilePictureURL ? 1 : 0.3 }]}
-            source={
-              profilePictureURL ? { uri: profilePictureURL } : Images.userAvatar
-            }
-            resizeMode="cover"
-            onError={onImageError}
-          />
-        </TouchableHighlight>
-
-        <TouchableOpacity onPress={showActionSheet} style={styles.addButton}>
-          <Icon name="camera" size={scale(14)} color="white" />
-        </TouchableOpacity>
-      </View>
+      
 
       <ActionSheet
-        id="profile-photo-sheet"
+        id="profile-photo-sheet-post-more-option"
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
@@ -255,8 +199,8 @@ const TNProfilePictureSelector = props => {
             style={styles.optionButton}
             onPress={() => onActionDone(0)}
           >
-            <Icon name="camera" size={20} color={Colors.text} />
-            <CustomText style={styles.optionText}>Take Photo</CustomText>
+            <Icon name="camera" size={20} color={Colors.error} />
+            <CustomText style={[styles.optionText,{color:Colors.error}]}>Remove Photo</CustomText>
           </TouchableOpacity>
 
           <View style={styles.optionDivider} />
@@ -267,24 +211,9 @@ const TNProfilePictureSelector = props => {
           >
             <Icon name="image" size={20} color={Colors.text} />
             <CustomText style={styles.optionText}>
-              Choose from Library
+              Make Profile Picture
             </CustomText>
           </TouchableOpacity>
-
-          {profilePictureURL && (
-            <>
-              <View style={styles.optionDivider} />
-              <TouchableOpacity
-                style={[styles.optionButton, styles.destructiveButton]}
-                onPress={() => onActionDone(3)}
-              >
-                <Icon name="trash" size={20} color="#FF3B30" />
-                <CustomText style={[styles.optionText, styles.destructiveText]}>
-                  Remove Profile Photo
-                </CustomText>
-              </TouchableOpacity>
-            </>
-          )}
 
           <View style={styles.optionDivider} />
 
@@ -297,23 +226,18 @@ const TNProfilePictureSelector = props => {
         </View>
       </ActionSheet>
 
-      <ImageView
-        images={tappedImage}
-        imageIndex={0}
-        visible={isImageViewerVisible}
-        onRequestClose={() => setIsImageViewerVisible(false)}
-        FooterComponent={() => closeButton()}
-      />
+    
     </>
   );
 };
+const width = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    backgroundColor:Colors.grayBgColor,
-    borderWidth:0.3
+    backgroundColor: Colors.grayBgColor,
+    borderWidth: 0.3,
   },
   imageBlock: {
     // flex: 2,
@@ -418,6 +342,17 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontWeight: '600',
   },
+  myphotosItemView: {
+    width: Math.floor(width * 0.24),
+    height: Math.floor(width * 0.24),
+    marginHorizontal: 8,
+    marginVertical: 8,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
+    overflow: 'hidden',
+  },
 });
 
-export default TNProfilePictureSelector;
+export default PostPictureMoreOption;

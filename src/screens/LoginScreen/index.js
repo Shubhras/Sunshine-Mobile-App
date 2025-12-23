@@ -50,9 +50,13 @@ const LoginScreen = ({ navigation }) => {
           dispatch(
             updateUser({
               ...res.user,
+              isLogin: true,
               createdAt: res.user?.createdAt
                 ? JSON.stringify(res.user?.createdAt)
                 : new Date().toISOString(),
+              lastOnlineTimestamp: res.user?.lastOnlineTimestamp
+                ? JSON.stringify(res.user?.lastOnlineTimestamp)
+                : '',
             }),
           );
           setLoading(false);
