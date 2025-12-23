@@ -1405,7 +1405,7 @@ const Settings = ({ route, navigation }) => {
   //   return (
   //     <View key={`slider-${index}`} style={styles.rangeSliderWrapper}>
   //       <RangeSlider
-  //         min={17}
+  //         min={18}
   //         max={100}
   //         initialLowValue={low}
   //         initialHighValue={high}

@@ -32,6 +32,7 @@ import FastImage from '@d11/react-native-fast-image';
 import Icons from '../../components/Icons/Icons';
 import PostPictureSelector from '../../components/PostPictureSelector';
 import PostPictureMoreOption from '../../components/PostPictureSelector/PostPictureMoreOption';
+import { Images } from '../../constants/images';
 
 var selectedItemIndex = -1;
 // const myphotoss = [
@@ -273,16 +274,16 @@ const MyProfileScreen = ({ navigation }) => {
 
   const onSelectDelPhoto = index => {
     selectedItemIndex = index;
-    
+
     // photoDialogActionSheetRef.current?.show();
     setTimeout(() => {
       SheetManager.show('profile-photo-sheet-post-more-option');
     }, 200);
   };
-  
+
   // const onPhotoDialogDone = actionSheetActionIndex => {
   //   const { photos=[] } = userInfo
-    
+
   //   console.log("selectedItemIndex",selectedItemIndex);
   //   if (selectedItemIndex == -1 || selectedItemIndex >= photos.length) {
   //     return
@@ -293,7 +294,7 @@ const MyProfileScreen = ({ navigation }) => {
   //       photos.splice(selectedItemIndex, 1)
   //     }
   //     console.log('photosphotosphotosphotosphotosSPlice',photos);
-      
+
   //     updatePostInfo(photos)
   //     updatePhotos(photos)
   //   }
@@ -303,42 +304,39 @@ const MyProfileScreen = ({ navigation }) => {
   //     updatePostInfo({ profilePictureURL: photoToUpdate })
   //   }
   // }
-const onPhotoDialogDone = actionSheetActionIndex => {
-  const photos = userInfo?.photos ?? [];
+  const onPhotoDialogDone = actionSheetActionIndex => {
+    const photos = userInfo?.photos ?? [];
 
-  console.log('selectedItemIndex', selectedItemIndex);
+    console.log('selectedItemIndex', selectedItemIndex);
 
-  if (
-    selectedItemIndex === -1 ||
-    selectedItemIndex >= photos.length
-  ) {
-    return;
-  }
+    if (selectedItemIndex === -1 || selectedItemIndex >= photos.length) {
+      return;
+    }
 
-  // 🗑 Remove photo
-  if (actionSheetActionIndex === 0) {
-    const updatedPhotos = photos.filter(
-      (_, index) => index !== selectedItemIndex
-    );
+    // 🗑 Remove photo
+    if (actionSheetActionIndex === 0) {
+      const updatedPhotos = photos.filter(
+        (_, index) => index !== selectedItemIndex,
+      );
 
-    console.log('updatedPhotos', updatedPhotos);
+      console.log('updatedPhotos', updatedPhotos);
 
-    updatePostInfo({ photos: updatedPhotos });
-    updatePhotos(updatedPhotos);
-  }
+      updatePostInfo({ photos: updatedPhotos });
+      updatePhotos(updatedPhotos);
+    }
 
-  // ⭐ Set profile picture
-  if (actionSheetActionIndex === 2) {
-    const photoToUpdate = photos[selectedItemIndex];
+    // ⭐ Set profile picture
+    if (actionSheetActionIndex === 2) {
+      const photoToUpdate = photos[selectedItemIndex];
 
-    updatePostInfo({ profilePictureURL: photoToUpdate });
-  }
-};
+      updatePostInfo({ profilePictureURL: photoToUpdate });
+    }
+  };
 
   return (
     <View style={[styles.mainWrapper, { backgroundColor: Colors.black }]}>
       <ImageBackground
-        source={require('../../assets/images/black.png')}
+        source={Images.backgroundImage}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
@@ -486,10 +484,10 @@ const onPhotoDialogDone = actionSheetActionIndex => {
         {loading && <TNActivityIndicator />}
         <PostPictureMoreOption
           onPressRemove={() => {
-           onPhotoDialogDone(0);
+            onPhotoDialogDone(0);
           }}
           onPressMakeProfile={() => {
-           onPhotoDialogDone(2)
+            onPhotoDialogDone(2);
           }}
         />
       </ImageBackground>
