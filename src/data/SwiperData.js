@@ -24,7 +24,10 @@ const SwiperData = [
     school: 'University of Toronto',
     distance: '8 km away',
     bio: 'Fitness enthusiast and foodie',
-    photos: ['https://randomuser.me/api/portraits/women/3.jpg'],
+    photos: [
+      'https://randomuser.me/api/portraits/women/3.jpg',
+      'https://images.unsplash.com/photo-1533618821901-9e69d5f5360e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fGdpcmxzfGVufDB8fDB8fHww',
+    ],
   },
   {
     id: '3',
@@ -48,7 +51,10 @@ const SwiperData = [
     school: 'Mumbai University',
     distance: '12 km away',
     bio: 'Coffee addict and adventure seeker',
-    photos: ['https://randomuser.me/api/portraits/women/7.jpg'],
+    photos: [
+      'https://randomuser.me/api/portraits/women/7.jpg',
+      'https://images.unsplash.com/photo-1533618821901-9e69d5f5360e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fGdpcmxzfGVufDB8fDB8fHww',
+    ],
   },
   {
     id: '5',
@@ -62,6 +68,7 @@ const SwiperData = [
     bio: 'Tech geek and yoga practitioner',
     photos: [
       'https://images.unsplash.com/photo-1685571310105-73020ae623cd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTA5fHxnaXJsc3xlbnwwfHwwfHx8MA%3D%3D',
+      'https://images.unsplash.com/photo-1533618821901-9e69d5f5360e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fGdpcmxzfGVufDB8fDB8fHww',
     ],
   },
   {
@@ -76,6 +83,7 @@ const SwiperData = [
     bio: 'Tech geek and yoga practitioner',
     photos: [
       'https://images.unsplash.com/photo-1685571310105-73020ae623cd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTA5fHxnaXJsc3xlbnwwfHwwfHx8MA%3D%3D',
+      'https://images.unsplash.com/photo-1533618821901-9e69d5f5360e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fGdpcmxzfGVufDB8fDB8fHww',
     ],
   },
 ];

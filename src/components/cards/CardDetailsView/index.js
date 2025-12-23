@@ -178,6 +178,8 @@ const CardDetailsView = props => {
         overScrollMode="never"
         showsVerticalScrollIndicator={false}
         style={styles.body}
+        nestedScrollEnabled={true}
+        scrollEnabled={true}
       >
         <View style={styles.photoView}>
           <Swiper
