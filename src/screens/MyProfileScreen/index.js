@@ -136,7 +136,7 @@ const MyProfileScreen = ({ navigation }) => {
 
   const updatePostInfo = data => {
     console.log('updatePostInfoupdatePostInfoupdatePostInfo', data);
-
+    setLoading(true)
     const tempUser = userInfo;
     // optimistically update the UI
     dispatch(updateUser({ ...userInfo, ...data }));
@@ -368,8 +368,8 @@ const MyProfileScreen = ({ navigation }) => {
               style={[
                 styles.myphotosView,
                 myphotos[0] && myphotos[0].length <= 3
-                  ? { height: 158 }
-                  : { height: 268 },
+                  ? { height: scale(150) }
+                  : { height: scale(230) },
               ]}
             >
               {/* <Pressable
@@ -382,7 +382,7 @@ const MyProfileScreen = ({ navigation }) => {
                 removeClippedSubviews={false}
                 showsButtons={false}
                 loop={false}
-                paginationStyle={{ top: -230, left: null, right: 0 }}
+                paginationStyle={{ top: scale(-225), left: null, right: 0 }}
                 dot={<View style={styles.inactiveDot} />}
                 activeDot={
                   <View
