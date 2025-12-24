@@ -155,30 +155,30 @@ const AccountDetails = ({ route, navigation }) => {
     );
   };
 
-const onDeletePrompt = () => {
-  Alert.alert(
-    'Confirmation',
-    'Are you sure you want to remove your account? This will delete all your data and the action is not reversible.',
-    [
+  const onDeletePrompt = () => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to remove your account? This will delete all your data and the action is not reversible.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => onDeleteAccount(), // ✅ correct
+          style: 'destructive',
+        },
+      ],
       {
-        text: 'Cancel',
-        style: 'cancel',
+        cancelable: false,
       },
-      {
-        text: 'Yes',
-        onPress: () => onDeleteAccount(), // ✅ correct
-        style: 'destructive',
-      },
-    ],
-    {
-      cancelable: false,
-    },
-  );
-};
+    );
+  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
-     setLoading(false);
+    setLoading(false);
     navigation.reset({
       index: 0,
       routes: [{ name: 'AuthStack' }],
@@ -186,7 +186,7 @@ const onDeletePrompt = () => {
   };
 
   const onDeleteAccount = () => {
-    setLoading(true)
+    setLoading(true);
     removeUser(userInfo?.userID).then(response => {
       if (response.success) {
         Alert.alert('Success', 'Successfully deleted account');
@@ -195,10 +195,10 @@ const onDeletePrompt = () => {
         return;
       }
       if (response.error === ErrorCode.requiresRecentLogin) {
-         setLoading(false);
+        setLoading(false);
         Alert.alert('Error', localizedErrorMessage(response?.error));
         return;
-      }else{
+      } else {
         Alert.alert('Error', 'We were not able to delete your account');
         setLoading(false);
       }
@@ -211,7 +211,7 @@ const onDeletePrompt = () => {
     >
       <ImageBackground
         source={require('../../assets/images/black.png')}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: Colors.error }}
         resizeMode="cover"
       >
         <Formik
@@ -231,7 +231,14 @@ const onDeletePrompt = () => {
                 rightTitle={'Done'}
                 onRightPress={formik.handleSubmit}
               />
-              <ScrollView bounces={false} overScrollMode="never">
+              <ScrollView
+                bounces={false}
+                overScrollMode="never"
+                contentContainerStyle={[
+                  styles.scrollViewWrapper,
+                  { backgroundColor: Colors.black },
+                ]}
+              >
                 <View
                   style={[
                     styles.mainWrapper,
@@ -246,14 +253,22 @@ const onDeletePrompt = () => {
             </>
           )}
         </Formik>
-        <Button
-          backgroundColor={'red'}
-          label={'delete'}
-          onPress={() => {
-            onDeletePrompt();
-          }}
-        />
-        <Button backgroundColor={'red'} label={'restore'} onPress={() => {alert('subscription module IN development')}} />
+        <View style={styles.buttonWrapper}>
+          <Button
+            label={'Delete Account'}
+            labelColor={Colors.error}
+            onPress={() => {
+              onDeletePrompt();
+            }}
+          />
+          <Button
+            label={'Restore Purchase'}
+            labelColor={Colors.primary}
+            onPress={() => {
+              alert('subscription module IN development');
+            }}
+          />
+        </View>
         {loading && <TNActivityIndicator />}
       </ImageBackground>
     </CustomSafeAreaView>

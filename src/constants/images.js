@@ -2,7 +2,7 @@ export const defaultProfilePhotoURL =
   'https://firebasestorage.googleapis.com/v0/b/sun-sign-inc-1e12b.appspot.com/o/pics.png?alt=media&token=c387f3dc-00bc-4535-be43-0d46f3b44bc0';
 
 export const Images = {
-  MainLogo: require('../assets/images/mainlogo.png'),
+  MainLogo: require('../assets/images/splash_logo.png'),
   Logo: require('../assets/images/Logo1.png'),
   backArrow: require('../assets/icons/png/arrow-back-icon.png'),
   userAvatar: require('../assets/images/default-avatar.jpg'),

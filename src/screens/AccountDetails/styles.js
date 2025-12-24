@@ -6,6 +6,7 @@ import {
   FONT_SIZE_XS,
   POPPINS_MEDIUM,
   POPPINS_REGULAR,
+  SCREEN_HEIGHT,
   STANDARD_FLEX,
   STANDARD_SPACING,
 } from '../../constants/Constants';
@@ -16,6 +17,9 @@ const HAIRLINE = 1 / PixelRatio.get();
 export default StyleSheet.create({
   mainWrapper: {
     flex: STANDARD_FLEX,
+  },
+  scrollViewWrapper: {
+    flexWrap: STANDARD_FLEX,
   },
   settingsTitleContainer: {
     width: '100%',
@@ -80,5 +84,13 @@ export default StyleSheet.create({
     fontSize: scale(8),
     fontFamily: POPPINS_REGULAR,
     alignSelf: 'flex-end',
+  },
+  buttonWrapper: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    justifyContent: 'space-around',
+    position: 'absolute',
+    width: '100%',
+    bottom: SCREEN_HEIGHT * 0.12,
   },
 });
