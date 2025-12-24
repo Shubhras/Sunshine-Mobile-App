@@ -6,7 +6,6 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../constants/Constants';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'red',
   },
   overlayLabel: {
     justifyContent: 'center',
@@ -47,7 +46,6 @@ export default StyleSheet.create({
     bottom: 0,
     width: '100%',
     alignSelf: 'center',
-    backgroundColor: 'green',
   },
   noMoreCards: {
     position: 'absolute',

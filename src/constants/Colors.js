@@ -41,4 +41,5 @@ export default {
   inlineActionsColor: invert('#ffffee'),
   error: '#FF0000',
   main: '#4991ec',
+  orange: '#C78023',
 };

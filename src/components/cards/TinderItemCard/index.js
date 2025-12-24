@@ -1,21 +1,14 @@
 import FastImage from '@d11/react-native-fast-image';
 import React, { memo, useEffect, useState } from 'react';
-import {
-  Image,
-  ImageBackground,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import { Images } from '../../../constants/images';
-import styles from './styles';
 import { CustomText } from '../../global/CustomText';
+import styles from './styles';
 
 const TinderItemCard = props => {
   const { url, name, age, school, distance, lastName } = props;
 
   const [profileImage, setProfileImage] = useState('');
-
   useEffect(() => {
     if (
       url ===
@@ -30,68 +23,44 @@ const TinderItemCard = props => {
   }, [url]);
   return (
     <View style={[styles.container, styles.cardStyle]}>
-      <FastImage source={{ uri: profileImage }} style={styles.news_image_style}>
-        <View style={styles.userDetailContainer}>
-          <CustomText style={styles.name_style}>
-            {name ? name : ' '} {lastName ? lastName : ' '}, {age ? age : ' '}
-          </CustomText>
-          <View style={styles.txtBox}>
-            <Image style={styles.icon} source={Images.schoolIcon} />
-            <CustomText style={styles.label}>
-              {school ? school : ' '}
+      <FastImage
+        source={{
+          uri: profileImage,
+          cache: FastImage.cacheControl.immutable,
+          priority: FastImage.priority.high,
+        }}
+        style={styles.news_image_style}
+        resizeMode={FastImage.resizeMode.cover}
+      >
+        <View style={styles.name_info_container}>
+          <View style={styles.userDetailContainer}>
+            <CustomText style={styles.name_style}>
+              {name ? name : ' '} {lastName ? lastName : ' '}, {age ? age : ' '}
             </CustomText>
-          </View>
-          {distance && (
             <View style={styles.txtBox}>
-              <Image style={styles.icon} source={Images.markerIcon} />
-              <CustomText style={styles.label}>{distance}</CustomText>
+              <Image style={styles.icon} source={Images.schoolIcon} />
+              <CustomText style={styles.label}>
+                {school ? school : ' '}
+              </CustomText>
             </View>
-          )}
-        </View>
-        <View style={styles.undoIconContainer}>
-          <TouchableOpacity
-            onPress={props.undoSwipe}
-            style={styles.roundUndoIconContainer}
-          >
-            <Image style={styles.icon} source={Images.undo} />
-          </TouchableOpacity>
+            {distance && (
+              <View style={styles.txtBox}>
+                <Image style={styles.icon} source={Images.markerIcon} />
+                <CustomText style={styles.label}>{distance}</CustomText>
+              </View>
+            )}
+          </View>
+          <View style={styles.undoIconContainer}>
+            <TouchableOpacity
+              onPress={props.undoSwipe}
+              style={styles.roundUndoIconContainer}
+            >
+              <Image style={styles.undoIcon} source={Images.undo} />
+            </TouchableOpacity>
+          </View>
         </View>
       </FastImage>
     </View>
-    // <View style={[styles.container, styles.cardStyle]}>
-    //   <FastImage source={{ uri: profileImage }} style={styles.news_image_style}>
-    //     <ImageBackground
-    //       style={styles.name_info_container}
-    //       source={Images.backgroundImage}
-    //     >
-    //       <View style={styles.userDetailContainer}>
-    //         <CustomText style={styles.name_style}>
-    //           {name ? name : ' '} {lastName ? lastName : ' '}, {age ? age : ' '}
-    //         </CustomText>
-    //         <View style={styles.txtBox}>
-    //           <Image style={styles.icon} source={Images.schoolIcon} />
-    //           <CustomText style={styles.label}>
-    //             {school ? school : ' '}
-    //           </CustomText>
-    //         </View>
-    //         {distance && (
-    //           <View style={styles.txtBox}>
-    //             <Image style={styles.icon} source={Images.markerIcon} />
-    //             <CustomText style={styles.label}>{distance}</CustomText>
-    //           </View>
-    //         )}
-    //       </View>
-    //       <View style={styles.undoIconContainer}>
-    //         <TouchableOpacity
-    //           onPress={props.undoSwipe}
-    //           style={styles.roundUndoIconContainer}
-    //         >
-    //           <Image style={styles.icon} source={Images.undo} />
-    //         </TouchableOpacity>
-    //       </View>
-    //     </ImageBackground>
-    //   </FastImage>
-    // </View>
   );
 };
 

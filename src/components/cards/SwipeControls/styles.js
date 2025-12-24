@@ -12,22 +12,22 @@ export default StyleSheet.create({
     marginBottom: scale(35),
   },
   button_container: {
-    padding: scale(15),
+    padding: scale(10),
     backgroundColor: 'white',
-    borderRadius: 30,
+    borderRadius: scale(30),
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#ddd',
     overflow: 'hidden',
   },
   small_icon: {
-    width: scale(23),
-    height: scale(23),
+    width: scale(20),
+    height: scale(20),
     resizeMode: 'contain',
     tintColor: '#3c94dc',
   },
   large_icon: {
-    width: scale(33),
-    height: scale(33),
+    width: scale(30),
+    height: scale(30),
     resizeMode: 'contain',
   },
 });

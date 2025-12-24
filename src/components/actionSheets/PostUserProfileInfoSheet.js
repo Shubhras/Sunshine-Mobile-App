@@ -6,6 +6,7 @@ import ActionSheet, {
 } from 'react-native-actions-sheet';
 import CardDetailsView from '../cards/CardDetailsView';
 import Colors from '../../constants/Colors';
+import { CustomText } from '../global/CustomText';
 
 const PostUserProfileInfoSheet = props => {
   const { sheetId, payload, item } = props;
@@ -36,13 +37,14 @@ const PostUserProfileInfoSheet = props => {
         onClose={() => SheetManager.hide(props.sheetId)}
         gestureEnabled={true}
         keyboardHandlerEnabled={true}
-        enableGesturesInScrollView={Platform.OS === 'ios'}
+        enableGesturesInScrollView={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
       >
         <ScrollView
           bounces={false}
           overScrollMode="never"
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
         >
           {item && (
@@ -78,7 +80,10 @@ const PostUserProfileInfoSheet = props => {
 const styles = StyleSheet.create({
   actionSheetContainer: {
     flex: 1,
-    backgroundColor: Colors.white,
+    top: 0,
+    backgroundColor: Colors.black,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     // paddingBottom: 20,
   },
   actionSheetIndicator: {

@@ -1,7 +1,15 @@
 import { StyleSheet } from 'react-native';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
 import { scale } from 'react-native-size-matters';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../constants/Constants';
+import {
+  POPPINS_BOLD,
+  POPPINS_REGULAR,
+  POPPINS_SEMIBOLD,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  STANDARD_SPACING,
+} from '../../../constants/Constants';
+import Colors from '../../../constants/Colors';
 
 const undoIconSize = scale(20);
 const undoIconContainerSize = undoIconSize + 8;
@@ -9,8 +17,9 @@ const undoIconContainerSize = undoIconSize + 8;
 // Exporting style
 export default StyleSheet.create({
   container: {
+    height: '82%',
     alignItems: 'center',
-    // backgroundColor: 'red',
+    justifyContent: 'center',
   },
   cardStyle: {
     position: 'absolute',
@@ -69,25 +78,24 @@ export default StyleSheet.create({
   },
   name_style: {
     fontSize: scale(24),
-    fontWeight: '700',
-    color: 'white',
-    marginBottom: scale(5),
+    fontFamily: POPPINS_SEMIBOLD,
+    color: Colors.white,
     backgroundColor: 'transparent',
   },
   txtBox: {
-    marginTop: scale(3),
     flexDirection: 'row',
+    alignItems: 'center',
   },
   icon: {
-    width: scale(20),
-    height: scale(20),
+    width: scale(18),
+    height: scale(18),
     tintColor: 'white',
   },
   label: {
     paddingLeft: scale(10),
-    fontSize: scale(16),
-    fontWeight: '400',
-    color: 'white',
+    fontSize: scale(14),
+    fontFamily: POPPINS_REGULAR,
+    color: Colors.white,
     backgroundColor: 'transparent',
   },
   detailBtn: {
@@ -97,5 +105,10 @@ export default StyleSheet.create({
     right: 0,
     bottom: 0,
     // zIndex: 3000
+  },
+  undoIcon: {
+    width: scale(16),
+    height: scale(16),
+    tintColor: 'white',
   },
 });
