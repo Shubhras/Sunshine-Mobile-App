@@ -16,7 +16,7 @@ export default {
   // warning: '#EED202',
   // darkYellow: '#F3AB3E',
   // gray:'#808080'
-  primary: '#B59410',
+  primary: '#fab034',
   secondary: '#F6F5F6',
   black: '#000000',
   white: '#FFFFFF',
