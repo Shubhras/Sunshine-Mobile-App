@@ -29,6 +29,7 @@
     "react": "19.1.1",
     "react-native": "0.82.1",
     "react-native-actions-sheet": "^10.0.1",
+    "react-native-animatable": "^1.4.0",
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-compressor": "^1.13.0",
     "react-native-confirmation-code-field": "^8.0.1",
