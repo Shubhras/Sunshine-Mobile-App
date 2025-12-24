@@ -16,7 +16,7 @@ export default {
   // warning: '#EED202',
   // darkYellow: '#F3AB3E',
   // gray:'#808080'
-  primary: '#fab034',
+  primary: '#B59410',
   secondary: '#F6F5F6',
   black: '#000000',
   white: '#FFFFFF',
@@ -41,4 +41,5 @@ export default {
   inlineActionsColor: invert('#ffffee'),
   error: '#FF0000',
   main: '#4991ec',
+  orange: '#C78023',
 };

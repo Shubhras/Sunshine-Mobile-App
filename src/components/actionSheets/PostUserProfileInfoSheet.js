@@ -1,8 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import ActionSheet, { SheetManager } from 'react-native-actions-sheet';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import ActionSheet, {
+  SheetManager,
+  ScrollView,
+} from 'react-native-actions-sheet';
 import CardDetailsView from '../cards/CardDetailsView';
 import Colors from '../../constants/Colors';
+import { CustomText } from '../global/CustomText';
 
 const PostUserProfileInfoSheet = props => {
   const { sheetId, payload, item } = props;
@@ -28,39 +32,46 @@ const PostUserProfileInfoSheet = props => {
     <>
       <ActionSheet
         id={'PostUserProfileInfoSheet'}
+        defaultOverlayOpacity={0.3}
+        isModal={true}
+        onClose={() => SheetManager.hide(props.sheetId)}
         gestureEnabled={true}
+        keyboardHandlerEnabled={true}
+        enableGesturesInScrollView={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
-        defaultOverlayOpacity={0.3}
-        snapPoints={[100]}
-        initialSnapIndex={0}
-        drawUnderStatusBar={true}
-        statusBarTranslucent={true}
       >
-        {/* <View style={styles.contentContainer}> */}
-        {item && (
-          <CardDetailsView
-            key={'CardDetail' + item.id}
-            usrid={item.id}
-            profilePictureURL={item?.profilePictureURL}
-            firstName={item.firstName}
-            lastName={item.lastName}
-            age={item.age}
-            school={item.school}
-            distance={item.distance}
-            bio={item.bio}
-            instagramPhotos={
-              item?.photos?.length > 0 ? item.photos : [item?.profilePictureURL]
-            }
-            setShowMode={setShowMode}
-            onSwipeTop={onSuperLikePressed}
-            onSwipeRight={onLikePressed}
-            onSwipeLeft={onDislikePressed}
-            isDone={isDone}
-            bottomTabBar={bottomTabBar}
-          />
-        )}
-        {/* </View> */}
+        <ScrollView
+          bounces={false}
+          overScrollMode="never"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          {item && (
+            <CardDetailsView
+              key={'CardDetail' + item.id}
+              usrid={item.id}
+              profilePictureURL={item?.profilePictureURL}
+              firstName={item.firstName}
+              lastName={item.lastName}
+              age={item.age}
+              school={item.school}
+              distance={item.distance}
+              bio={item.bio}
+              instagramPhotos={
+                item?.photos?.length > 0
+                  ? item.photos
+                  : [item?.profilePictureURL]
+              }
+              setShowMode={setShowMode}
+              onSwipeTop={onSuperLikePressed}
+              onSwipeRight={onLikePressed}
+              onSwipeLeft={onDislikePressed}
+              onPress={() => SheetManager.hide('PostUserProfileInfoSheet')}
+              bottomTabBar={bottomTabBar}
+            />
+          )}
+        </ScrollView>
       </ActionSheet>
     </>
   );
@@ -69,8 +80,11 @@ const PostUserProfileInfoSheet = props => {
 const styles = StyleSheet.create({
   actionSheetContainer: {
     flex: 1,
+    top: 0,
     backgroundColor: Colors.black,
-    paddingBottom: 20,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    // paddingBottom: 20,
   },
   actionSheetIndicator: {
     width: 0,

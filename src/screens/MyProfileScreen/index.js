@@ -136,7 +136,7 @@ const MyProfileScreen = ({ navigation }) => {
 
   const updatePostInfo = data => {
     console.log('updatePostInfoupdatePostInfoupdatePostInfo', data);
-
+    setLoading(true)
     const tempUser = userInfo;
     // optimistically update the UI
     dispatch(updateUser({ ...userInfo, ...data }));

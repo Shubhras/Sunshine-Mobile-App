@@ -1,7 +1,18 @@
-import { StyleSheet } from 'react-native';
+import { PixelRatio, StyleSheet } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../../constants/Colors';
-import { SCREEN_HEIGHT } from '../../../constants/Constants';
+import {
+  FONT_SIZE_LG,
+  FONT_SIZE_SM,
+  FONT_SIZE_XL,
+  POPPINS_MEDIUM,
+  POPPINS_REGULAR,
+  POPPINS_SEMIBOLD,
+  SCREEN_HEIGHT,
+  STANDARD_SPACING,
+} from '../../../constants/Constants';
+
+const HAIRLINE = 1 / PixelRatio.get();
 
 export default StyleSheet.create({
   body: {
@@ -13,49 +24,57 @@ export default StyleSheet.create({
     height: SCREEN_HEIGHT * 0.5,
     backgroundColor: 'skyblue',
   },
+  imageWrapper: {
+    height: SCREEN_HEIGHT * 0.5,
+  },
   profilePhoto: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
+    width: null,
+    height: null,
+    aspectRatio: 1,
   },
   backView: {
     position: 'absolute',
     top: SCREEN_HEIGHT * 0.467,
-    right: 20,
-    width: 55,
-    height: 55,
-    borderRadius: 27.5,
-    backgroundColor: '#db6470',
+    right: scale(15),
+    width: scale(45),
+    height: scale(45),
+    borderRadius: scale(22.5),
+    backgroundColor: Colors.mainThemeForegroundColor,
     justifyContent: 'center',
     alignItems: 'center',
   },
   backIcon: {
-    width: 30,
-    height: 30,
+    width: scale(25),
+    height: scale(25),
     resizeMode: 'contain',
     tintColor: 'white',
   },
   titleView: {
-    width: '100%',
-    paddingHorizontal: 12,
-    marginVertical: 20,
+    paddingHorizontal: STANDARD_SPACING * 3,
+    padding: STANDARD_SPACING * 3,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    // backgroundColor: 'red',
   },
   nameText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginRight: 10,
+    fontSize: FONT_SIZE_XL,
+    fontFamily: POPPINS_SEMIBOLD,
     color: Colors.mainTextColor,
   },
   ageText: {
-    bottom: 1,
-    fontSize: 25,
+    paddingLeft: STANDARD_SPACING * 2,
+    fontSize: FONT_SIZE_LG,
+    fontFamily: POPPINS_MEDIUM,
     color: Colors.mainTextColor,
   },
   captionView: {
     width: '100%',
-    paddingHorizontal: 12,
+    paddingHorizontal: STANDARD_SPACING * 2.5,
+    paddingBottom: STANDARD_SPACING * 2,
+    borderBottomWidth: HAIRLINE,
+    borderBottomColor: Colors.hairlineColor,
+    // backgroundColor: 'red',
   },
   itemView: {
     width: '100%',
@@ -72,26 +91,22 @@ export default StyleSheet.create({
   },
   text: {
     paddingLeft: scale(10),
-    fontSize: scale(16),
+    fontSize: scale(14),
+    fontFamily: POPPINS_REGULAR,
     color: Colors.mainTextColor,
     backgroundColor: 'transparent',
   },
-  lineView: {
-    marginTop: 4,
-    width: '100%',
-    height: 1,
-    backgroundColor: Colors.hairlineColor,
-  },
   bioView: {
     width: '100%',
-    paddingHorizontal: 12,
-    marginVertical: 15,
+    paddingHorizontal: STANDARD_SPACING * 3,
+    padding: STANDARD_SPACING * 3,
   },
   label: {
     fontSize: scale(20),
   },
   bioText: {
-    fontSize: scale(16),
+    fontSize: scale(14),
+    fontFamily: POPPINS_REGULAR,
     color: Colors.mainTextColor,
   },
   instagramView: {
@@ -140,5 +155,75 @@ export default StyleSheet.create({
     lineHeight: 35,
     color: '#FFF',
     textAlign: 'center',
+  },
+  // New styles extracted from inline CSS
+  rootContainer: {
+    flex: 1,
+  },
+  reportButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: scale(40),
+    borderRadius: scale(20),
+    paddingHorizontal: scale(15),
+    borderWidth: scale(0.5),
+    borderColor: Colors.orange,
+    marginHorizontal: STANDARD_SPACING * 3,
+  },
+  reportButtonText: {
+    fontFamily: POPPINS_MEDIUM,
+    fontSize: scale(15),
+    color: '#7A7A7A',
+    textAlign: 'center',
+  },
+  distanceText: {
+    // marginLeft: 2,
+    paddingLeft: scale(10),
+    fontSize: scale(14),
+    fontFamily: POPPINS_REGULAR,
+    color: Colors.mainTextColor,
+    backgroundColor: 'transparent',
+  },
+  photosLabel: {
+    fontWeight: 'bold',
+  },
+  photoFullSize: {
+    width: '100%',
+    height: '100%',
+  },
+  swipeControlsContainer: {
+    width: '58%',
+  },
+  swiperDot: {
+    backgroundColor: 'rgba(0,0,0,.2)',
+    height: 4,
+    borderRadius: 4,
+    margin: 2,
+  },
+  swiperActiveDot: {
+    backgroundColor: 'white',
+    height: 4,
+    borderRadius: 4,
+    margin: 2,
+  },
+  instagramSwiperDot: {
+    backgroundColor: 'rgba(0,0,0,.2)',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 3,
+    marginRight: 3,
+    marginTop: 3,
+    marginBottom: 3,
+  },
+  instagramSwiperActiveDot: {
+    backgroundColor: '#db6470',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 3,
+    marginRight: 3,
+    marginTop: 3,
+    marginBottom: 3,
   },
 });
