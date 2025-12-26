@@ -12,6 +12,12 @@ const SwiperData = [
     photos: [
       'https://randomuser.me/api/portraits/women/1.jpg',
       'https://randomuser.me/api/portraits/women/2.jpg',
+      'https://randomuser.me/api/portraits/women/1.jpg',
+      'https://randomuser.me/api/portraits/women/2.jpg',
+      'https://randomuser.me/api/portraits/women/1.jpg',
+      'https://randomuser.me/api/portraits/women/2.jpg',
+      'https://randomuser.me/api/portraits/women/1.jpg',
+      'https://randomuser.me/api/portraits/women/2.jpg',
     ],
   },
   {

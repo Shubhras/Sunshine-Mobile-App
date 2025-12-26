@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ImageBackground, View } from 'react-native';
 import DeckItemCard from '../../components/cards/DeckItemCard';
 import Colors from '../../constants/Colors';
@@ -10,6 +10,7 @@ import PostUserProfileInfoSheet from '../../components/actionSheets/PostUserProf
 import { SheetManager } from 'react-native-actions-sheet';
 
 const SwipeScreen = ({ navigation }) => {
+  const useSwiper = useRef(null);
   // Local State
   const [showMode, setShowMode] = useState(0);
   const [canUserSwipe, setCanUserSwipe] = useState(true);
@@ -159,10 +160,9 @@ const SwipeScreen = ({ navigation }) => {
       >
         <DeckItemCard
           data={recommendations}
-          setShowMode={setShowMode}
+          // setShowMode={setShowMode}
           onUndoSwipe={undoSwipe}
           onSwipe={onSwipe}
-          showMode={showMode}
           onAllCardsSwiped={onAllCardsSwiped}
           isPlanActive={true}
           setSubscriptionVisible={() => console.log('Show subscription')}
@@ -170,14 +170,13 @@ const SwipeScreen = ({ navigation }) => {
           renderNewMatch={renderNewMatch}
           canUserSwipe={canUserSwipe}
           navigation={navigation}
-          onPressCard={va => {
-            setCardInfo(va);
-            SheetManager.show('PostUserProfileInfoSheet');
-          }}
+          // useSwiper={useSwiper}
+          // onPressCard={va => {
+          //   setCardInfo(va);
+          //   SheetManager.show('PostUserProfileInfoSheet');
+          // }}
         />
       </ImageBackground>
-
-      <PostUserProfileInfoSheet item={cardInfo} />
     </View>
   );
 };

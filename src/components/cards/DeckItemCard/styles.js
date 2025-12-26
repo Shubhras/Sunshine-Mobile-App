@@ -6,6 +6,7 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../constants/Constants';
 export default StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative',
   },
   overlayLabel: {
     justifyContent: 'center',
@@ -59,5 +60,15 @@ export default StyleSheet.create({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     backgroundColor: Colors.white,
+  },
+  controlsWrapper: {
+    position: 'absolute',
+    bottom: 40,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    flexDirection: 'row',
+    paddingHorizontal: 40,
+    zIndex: 999, // ensure it's above everything visually
   },
 });

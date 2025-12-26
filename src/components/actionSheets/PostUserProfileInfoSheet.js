@@ -1,32 +1,32 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ActionSheet, {
-  SheetManager,
   ScrollView,
+  SheetManager,
 } from 'react-native-actions-sheet';
-import CardDetailsView from '../cards/CardDetailsView';
+import { scale } from 'react-native-size-matters';
 import Colors from '../../constants/Colors';
-import { CustomText } from '../global/CustomText';
+import CardDetailsView from '../cards/CardDetailsView';
+import SwipeControls from '../cards/SwipeControls';
 
 const PostUserProfileInfoSheet = props => {
-  const { sheetId, payload, item } = props;
-  const {
-    // item,
-    setShowMode,
-    onSuperLikePressed,
-    onLikePressed,
-    onDislikePressed,
-    bottomTabBar,
-    isDone,
-  } = payload || {};
+  const { item, useSwiper } = props;
 
-  const showActionSheet = () => {
-    SheetManager.show('PostUserProfileInfoSheet');
-  };
-  const closedActionSheet = () => {
+  const handleLike = () => {
     SheetManager.hide('PostUserProfileInfoSheet');
+
+    setTimeout(() => {
+      useSwiper.current?.swipeRight();
+    }, 250);
   };
-  console.log('kjkJKJKJKJKKKJKJKJKJKJKJ', item);
+
+  const handleDislike = () => {
+    SheetManager.hide('PostUserProfileInfoSheet');
+
+    setTimeout(() => {
+      useSwiper.current?.swipeLeft();
+    }, 250);
+  };
 
   return (
     <>
@@ -45,7 +45,7 @@ const PostUserProfileInfoSheet = props => {
           bounces={false}
           overScrollMode="never"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollViewWrapper}
         >
           {item && (
             <CardDetailsView
@@ -63,15 +63,16 @@ const PostUserProfileInfoSheet = props => {
                   ? item.photos
                   : [item?.profilePictureURL]
               }
-              setShowMode={setShowMode}
-              onSwipeTop={onSuperLikePressed}
-              onSwipeRight={onLikePressed}
-              onSwipeLeft={onDislikePressed}
               onPress={() => SheetManager.hide('PostUserProfileInfoSheet')}
-              bottomTabBar={bottomTabBar}
             />
           )}
         </ScrollView>
+        <View style={styles.bottomTabBarContainer}>
+          <SwipeControls
+            onLikePressed={handleLike}
+            onDislikePressed={handleDislike}
+          />
+        </View>
       </ActionSheet>
     </>
   );
@@ -93,6 +94,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: 20,
+  },
+  scrollViewWrapper: {
+    flexGrow: 1,
+    paddingBottom: scale(100),
+  },
+  bottomTabBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignSelf: 'center',
+    backgroundColor: Colors.black,
   },
 });
 

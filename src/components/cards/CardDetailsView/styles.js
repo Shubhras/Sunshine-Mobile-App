@@ -1,4 +1,4 @@
-import { PixelRatio, StyleSheet } from 'react-native';
+import { Dimensions, PixelRatio, StyleSheet } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../../constants/Colors';
 import {
@@ -9,10 +9,12 @@ import {
   POPPINS_REGULAR,
   POPPINS_SEMIBOLD,
   SCREEN_HEIGHT,
+  STANDARD_BORDER_RADIUS,
   STANDARD_SPACING,
 } from '../../../constants/Constants';
 
 const HAIRLINE = 1 / PixelRatio.get();
+const width = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   body: {
@@ -117,10 +119,15 @@ export default StyleSheet.create({
   slide: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  slideActivity: {
+    height: '100%',
+    width: '100%',
   },
   myphotosItemView: {
-    width: 100,
-    height: 100,
+    width: Math.floor(width * 0.27),
+    height: Math.floor(width * 0.27),
     marginHorizontal: 8,
     marginVertical: 8,
     borderRadius: 15,
@@ -128,6 +135,11 @@ export default StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'grey',
     overflow: 'hidden',
+  },
+  myphotosView: {
+    width: '100%',
+    marginTop: scale(10),
+    flexDirection: 'row',
   },
   inlineActionsContainer: {
     flex: 1,
@@ -207,7 +219,7 @@ export default StyleSheet.create({
     margin: 2,
   },
   instagramSwiperDot: {
-    backgroundColor: 'rgba(0,0,0,.2)',
+    backgroundColor: Colors.grey6,
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -217,7 +229,7 @@ export default StyleSheet.create({
     marginBottom: 3,
   },
   instagramSwiperActiveDot: {
-    backgroundColor: '#db6470',
+    backgroundColor: Colors.primary,
     width: 8,
     height: 8,
     borderRadius: 4,

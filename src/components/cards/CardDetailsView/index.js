@@ -251,31 +251,34 @@ const CardDetailsView = props => {
           >
             {instagramPhotos.map((photos, i) => (
               <View key={'photos' + i} style={styles.slide}>
-                <FlatList
-                  horizontal={false}
-                  numColumns={3}
-                  data={photos}
-                  scrollEnabled={false}
-                  renderItem={({ item, index }) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIsImageViewerVisible(true);
-                        setTappedImageIndex(6 * i + index);
-                      }}
-                      key={'item' + index}
-                      style={styles.myphotosItemView}
-                    >
-                      {photosUpdated && item && (
-                        <FastImage
-                          style={styles.photoFullSize}
-                          source={{
-                            uri: item == staticImage ? changeImage : item,
-                          }}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  )}
-                />
+                <View style={styles.slideActivity}>
+                  <FlatList
+                    horizontal={false}
+                    numColumns={3}
+                    data={photos}
+                    scrollEnabled={false}
+                    renderItem={({ item, index }) => (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setIsImageViewerVisible(true);
+                          setTappedImageIndex(6 * i + index);
+                        }}
+                        key={'item' + index}
+                        style={styles.myphotosItemView}
+                      >
+                        {photosUpdated && item && (
+                          <FastImage
+                            style={styles.photoFullSize}
+                            source={{
+                              uri: item == staticImage ? changeImage : item,
+                              priority: FastImage.priority.high,
+                            }}
+                          />
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
               </View>
             ))}
           </Swiper>
