@@ -5,8 +5,10 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../constants/Constants';
 // Exporting style
 export default StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.85,
     position: 'relative',
+    overflow:'hidden',
+    // backgroundColor:'red'
   },
   overlayLabel: {
     justifyContent: 'center',

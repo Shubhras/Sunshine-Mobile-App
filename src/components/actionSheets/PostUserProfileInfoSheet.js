@@ -13,7 +13,7 @@ const PostUserProfileInfoSheet = props => {
   const { item, useSwiper } = props;
 
   const handleLike = () => {
-    SheetManager.hide('PostUserProfileInfoSheet');
+    SheetManager.hide('post-user-profile-info-sheet');
 
     setTimeout(() => {
       useSwiper.current?.swipeRight();
@@ -21,7 +21,7 @@ const PostUserProfileInfoSheet = props => {
   };
 
   const handleDislike = () => {
-    SheetManager.hide('PostUserProfileInfoSheet');
+    SheetManager.hide('post-user-profile-info-sheet');
 
     setTimeout(() => {
       useSwiper.current?.swipeLeft();
@@ -31,15 +31,21 @@ const PostUserProfileInfoSheet = props => {
   return (
     <>
       <ActionSheet
-        id={'PostUserProfileInfoSheet'}
-        defaultOverlayOpacity={0.3}
-        isModal={true}
-        onClose={() => SheetManager.hide(props.sheetId)}
+       id="post-user-profile-info-sheet"
         gestureEnabled={true}
-        keyboardHandlerEnabled={true}
-        enableGesturesInScrollView={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
+        defaultOverlayOpacity={0.3}
+
+        // id={'post-user-profile-info-sheet'}
+        // defaultOverlayOpacity={0.3}
+        // isModal={true}
+        // onClose={() => SheetManager.hide(props.sheetId)}
+        // gestureEnabled={true}
+        // keyboardHandlerEnabled={true}
+        // enableGesturesInScrollView={true}
+        // containerStyle={styles.actionSheetContainer}
+        // indicatorStyle={styles.actionSheetIndicator}
       >
         <ScrollView
           bounces={false}
@@ -63,7 +69,7 @@ const PostUserProfileInfoSheet = props => {
                   ? item.photos
                   : [item?.profilePictureURL]
               }
-              onPress={() => SheetManager.hide('PostUserProfileInfoSheet')}
+              onPress={() => SheetManager.hide('post-user-profile-info-sheet')}
             />
           )}
         </ScrollView>

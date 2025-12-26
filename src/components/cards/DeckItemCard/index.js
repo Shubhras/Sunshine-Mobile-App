@@ -362,7 +362,7 @@ const DeckItemCard = ({
     currentDeckIndex.current = index;
     setCardInfo?.(data[index]);
     setTimeout(() => {
-      SheetManager.show('PostUserProfileInfoSheet');
+      SheetManager.show('post-user-profile-info-sheet');
     }, 250);
   };
 
