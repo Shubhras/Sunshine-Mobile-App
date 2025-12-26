@@ -288,32 +288,64 @@ const DeckItemCard = ({
   canUserSwipe,
   navigation,
 }) => {
+  const useSwiper = useRef(null);
   const hasActivePlan = useRef(false);
   const currentDeckIndex = useRef(0);
-  const useSwiper = useRef(null);
   const [cardInfo, setCardInfo] = useState(null);
 
   useEffect(() => {
     hasActivePlan.current = isPlanActive;
   }, [isPlanActive]);
 
+  const alertDailySwipeExceeded = () => {
+    Alert.alert(
+      'Daily swipes exceeded',
+      'You have exceeded the daily swipes limit. Upgrade your account now to enjoy unlimited swipes',
+      [
+        {
+          text: 'Upgrade Now',
+          onPress: () => setSubscriptionVisible(true),
+        },
+        {
+          text: 'Cancel',
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+
   const handleSwipe = (type, index) => {
-    const item = data[index];
+    const currentDeckItem = data[index];
     currentDeckIndex.current = index;
-
-    if (!item) return;
-
-    if (type === 'like') {
-      onSwipe('like', item);
+    if (type === 'like' && (canUserSwipe || hasActivePlan.current)) {
+      onSwipe(type, currentDeckItem);
+      // Navigate to chat page only when liked
+      // navigation.navigate('Chat', { user: currentDeckItem })
     } else if (type === 'dislike') {
-      onSwipe('dislike', item);
+      // Handle the dislike action, such as showing a message or any other logic
+      console.log('Disliked:', currentDeckItem);
+    } else {
+      // Handle other cases, such as when the user cannot swipe or does not have an active plan
+      useSwiper.current.swipeBack();
+      alertDailySwipeExceeded();
     }
   };
 
-  const onSwipedLeft = index => handleSwipe('dislike', index);
-  const onSwipedTop = index => handleSwipe('like', index);
-  const onSwipedRight = index => handleSwipe('like', index);
-  const onSwipedAll = () => onAllCardsSwiped?.();
+  const onSwipedLeft = index => {
+    handleSwipe('dislike', index);
+  };
+
+  const onSwipedRight = index => {
+    handleSwipe('like', index);
+  };
+
+  const onSwipedTop = index => {
+    handleSwipe('like', index);
+  };
+
+  const onSwipedAll = () => {
+    onAllCardsSwiped();
+  };
 
   const undoSwipe = () => {
     if (!hasActivePlan.current) {
@@ -367,27 +399,16 @@ const DeckItemCard = ({
   };
 
   const onDislikePressed = () => {
-    Alert.alert('onDislikePressed');
-    // useSwiper.current.swipeLeft();
+    useSwiper.current.swipeLeft();
   };
 
   const onLikePressed = () => {
-    Alert.alert('onLikePressed');
-    // useSwiper.current.swipeRight();
+    useSwiper.current.swipeRight();
   };
 
-  const renderBottomTabBar = (containerStyle, buttonContainerStyle) => {
-    return (
-      <View style={styles.bottomTabBarContainer}>
-        <SwipeControls
-          onDislikePressed={onDislikePressed}
-          onLikePressed={onLikePressed}
-          containerStyle={containerStyle}
-          buttonContainerStyle={buttonContainerStyle}
-        />
-      </View>
-    );
-  };
+  if (data.length === 0) {
+    return <View style={styles.noMoreCards}>{renderEmptyState()}</View>;
+  }
 
   return (
     <>
@@ -412,22 +433,32 @@ const DeckItemCard = ({
               },
             },
             right: {
+              title: 'LIKE',
               element: renderOverlayLabel('LIKE', '#4CCC93'),
               style: {
-                wrapper: { ...styles.overlayWrapper, marginLeft: 30 },
+                wrapper: {
+                  ...styles.overlayWrapper,
+                  alignItems: 'flex-start',
+                  marginLeft: 30,
+                },
               },
             },
           }}
           onTapCard={handleTapCard}
-          onSwipedLeft={onSwipedLeft}
           onSwipedRight={onSwipedRight}
           onSwipedTop={onSwipedTop}
+          onSwipedLeft={onSwipedLeft}
           onSwipedAll={onSwipedAll}
           swipeBackCard
           animateCardOpacity
         />
       </View>
-      {renderBottomTabBar()}
+      <View style={styles.bottomTabBarContainer}>
+        <SwipeControls
+          onDislikePressed={onDislikePressed}
+          onLikePressed={onLikePressed}
+        />
+      </View>
       <PostUserProfileInfoSheet item={cardInfo} useSwiper={useSwiper} />
     </>
   );

@@ -104,7 +104,9 @@ export default StyleSheet.create({
     padding: STANDARD_SPACING * 3,
   },
   label: {
-    fontSize: scale(20),
+    fontSize: scale(12),
+    fontFamily: POPPINS_REGULAR,
+    color: Colors.white,
   },
   bioText: {
     fontSize: scale(14),
@@ -151,22 +153,12 @@ export default StyleSheet.create({
     bottom: 0,
   },
   closeButton: {
-    alignSelf: 'flex-end',
-    height: 24,
-    width: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 40,
-    marginRight: 15,
-  },
-  closeButton__text: {
-    backgroundColor: 'transparent',
-    fontSize: 35,
-    lineHeight: 35,
-    color: '#FFF',
-    textAlign: 'center',
+    position: 'absolute',
+    top: SCREEN_HEIGHT * 0.08,
+    right: STANDARD_SPACING * 2,
+    padding: STANDARD_SPACING * 1.5,
+    borderRadius: STANDARD_BORDER_RADIUS * 4,
+    backgroundColor: 'rgba(57, 53, 53, 0.57)',
   },
   // New styles extracted from inline CSS
   rootContainer: {
@@ -237,5 +229,51 @@ export default StyleSheet.create({
     marginRight: 3,
     marginTop: 3,
     marginBottom: 3,
+  },
+  actionSheetContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  actionSheetIndicator: {
+    width: 100,
+    height: 4,
+    backgroundColor: '#D1D1D6',
+  },
+  actionSheetContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    minHeight: 200,
+  },
+  actionSheetHeader: {
+    alignItems: 'center',
+    paddingBottom: STANDARD_SPACING * 2,
+    borderBottomWidth: scale(0.5),
+    borderBottomColor: Colors.hairlineColor,
+    marginBottom: STANDARD_SPACING * 1.5,
+  },
+  actionSheetTitle: {
+    fontSize: scale(14),
+    color: Colors.mainSubtextColor,
+    fontFamily: POPPINS_SEMIBOLD,
+  },
+  actionSheetOption: {
+    paddingVertical: STANDARD_SPACING * 2,
+    alignItems: 'center',
+  },
+  actionSheetOptionText: {
+    fontSize: scale(14),
+    color: Colors.error,
+    fontFamily: POPPINS_SEMIBOLD,
+  },
+  actionSheetOptionTextDanger: {
+    fontSize: scale(14),
+    color: Colors.main,
+    fontFamily: POPPINS_SEMIBOLD,
+  },
+  actionSheetDivider: {
+    height: scale(0.5),
+    backgroundColor: Colors.hairlineColor,
+    marginVertical: STANDARD_SPACING,
   },
 });

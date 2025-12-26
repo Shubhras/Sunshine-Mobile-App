@@ -31,12 +31,11 @@ const PostUserProfileInfoSheet = props => {
   return (
     <>
       <ActionSheet
-       id="post-user-profile-info-sheet"
+        id="post-user-profile-info-sheet"
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
         defaultOverlayOpacity={0.3}
-
         // id={'post-user-profile-info-sheet'}
         // defaultOverlayOpacity={0.3}
         // isModal={true}

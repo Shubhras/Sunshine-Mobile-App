@@ -1,6 +1,6 @@
 const SwiperData = [
   {
-    id: '1',
+    id: 1,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/imagegirl3.jpg?alt=media&token=8adf09aa-42ae-481e-918e-8202083648b7',
     firstName: 'Luna',
@@ -10,7 +10,7 @@ const SwiperData = [
     distance: '5 km away',
     bio: 'Love traveling and photography',
     photos: [
-      'https://randomuser.me/api/portraits/women/1.jpg',
+      'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/imagegirl3.jpg?alt=media&token=8adf09aa-42ae-481e-918e-8202083648b7',
       'https://randomuser.me/api/portraits/women/2.jpg',
       'https://randomuser.me/api/portraits/women/1.jpg',
       'https://randomuser.me/api/portraits/women/2.jpg',
@@ -21,7 +21,7 @@ const SwiperData = [
     ],
   },
   {
-    id: '2',
+    id: 2,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/Add%20these%20pictures%20in%20place%20of%20ones%20there%20%E2%80%A6checking%20to%20get%20others.png?alt=media&token=719214b2-000f-4cc7-8c16-f25b3fe9b60c',
     lastName: 'Sofia',
@@ -35,7 +35,7 @@ const SwiperData = [
     ],
   },
   {
-    id: '3',
+    id: 3,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/imagegirl2.png?alt=media&token=aa98a133-1b03-44ed-940d-32d2d1651d64',
     firstName: 'Maeve',
@@ -47,7 +47,7 @@ const SwiperData = [
     photos: ['https://randomuser.me/api/portraits/women/5.jpg'],
   },
   {
-    id: '4',
+    id: 4,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/imageman2.png?alt=media&token=52022eec-287b-4051-878b-f227000bbce3',
     firstName: 'Sam',
@@ -62,7 +62,7 @@ const SwiperData = [
     ],
   },
   {
-    id: '5',
+    id: 5,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/ayla.png?alt=media&token=8ed37c72-12d1-4e45-96e6-bb4d2c42cfc3',
     firstName: 'Ayla',
@@ -77,7 +77,7 @@ const SwiperData = [
     ],
   },
   {
-    id: '5',
+    id: 6,
     profilePictureURL:
       'https://firebasestorage.googleapis.com/v0/b/test-5b20e.appspot.com/o/Three%20to%20be%20added%20along%20with%20others.png?alt=media&token=c365bd83-45a6-4df2-8edf-ecf64391ff85',
     firstName: 'Jhone',

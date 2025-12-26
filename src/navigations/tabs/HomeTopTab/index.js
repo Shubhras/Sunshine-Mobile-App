@@ -2,13 +2,9 @@ import FastImage from '@d11/react-native-fast-image';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../../constants/Colors';
-import { STANDARD_SPACING } from '../../../constants/Constants';
 import { Images } from '../../../constants/images';
 import ChatStack from '../../stacks/ChatStack';
 import MyProfileStack from '../../stacks/MyProfileStack';
@@ -139,7 +135,7 @@ const HomeTopTab = () => {
           tabBarShowLabel: false,
           tabBarIndicatorStyle: { height: 0 },
         }}
-        initialRouteName='SwipeStack'
+        initialRouteName="SwipeStack"
         tabBar={props => <CustomTabBar {...props} />}
       >
         {TAB_CONFIG.map(tab => (

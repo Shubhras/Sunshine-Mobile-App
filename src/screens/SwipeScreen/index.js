@@ -8,10 +8,13 @@ import SwiperData from '../../data/SwiperData';
 import FastImage from '@d11/react-native-fast-image';
 import PostUserProfileInfoSheet from '../../components/actionSheets/PostUserProfileInfoSheet';
 import { SheetManager } from 'react-native-actions-sheet';
+import NoMoreCard from '../../components/cards/NoMoreCard';
+import { useSelector } from 'react-redux';
+import MatchScreen from '../MatchScreen';
 
 const SwipeScreen = ({ navigation }) => {
-  const useSwiper = useRef(null);
   // Local State
+  const userInfo = useSelector(state => state.users.users);
   const [showMode, setShowMode] = useState(0);
   const [canUserSwipe, setCanUserSwipe] = useState(true);
   const [recommendations, setRecommendations] = useState(SwiperData);
@@ -75,70 +78,17 @@ const SwipeScreen = ({ navigation }) => {
   };
 
   const renderEmptyState = () => {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, color: '#fff' }}>
-          No more profiles to show
-        </Text>
-      </View>
-    );
+    return <NoMoreCard profilePictureURL={userInfo.profilePictureURL} />;
   };
 
   const renderNewMatch = () => {
     if (!currentMatchData) return null;
-
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: '#fff',
-        }}
-      >
-        <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
-          It's a Match! 🎉
-        </Text>
-        <FastImage
-          source={{ uri: currentMatchData.profilePictureURL }}
-          style={{
-            width: 150,
-            height: 150,
-            borderRadius: 75,
-            marginBottom: 20,
-          }}
-        />
-        <Text style={{ fontSize: 20, marginBottom: 30 }}>
-          You and {currentMatchData.firstName} liked each other!
-        </Text>
-        <TouchableOpacity
-          onPress={() => handleNewMatchButtonTap('Conversations')}
-          style={{
-            backgroundColor: '#4CCC93',
-            padding: 15,
-            borderRadius: 25,
-            marginBottom: 10,
-            width: 200,
-          }}
-        >
-          <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>
-            Send Message
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleNewMatchButtonTap(null)}
-          style={{
-            backgroundColor: '#E5566D',
-            padding: 15,
-            borderRadius: 25,
-            width: 200,
-          }}
-        >
-          <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16 }}>
-            Keep Swiping
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <MatchScreen
+        url={currentMatchData.profilePictureURL}
+        onSendMessage={() => handleNewMatchButtonTap('Conversations')}
+        onKeepSwiping={() => handleNewMatchButtonTap(null)}
+      />
     );
   };
 
