@@ -115,8 +115,8 @@ export default StyleSheet.create({
   },
   instagramView: {
     width: '100%',
-    height: 270,
-    paddingHorizontal: 12,
+    height: scale(250),
+    paddingHorizontal: STANDARD_SPACING * 2,
   },
   slide: {
     flex: 1,
@@ -163,6 +163,7 @@ export default StyleSheet.create({
   // New styles extracted from inline CSS
   rootContainer: {
     flex: 1,
+    // backgroundColor: 'red',
   },
   reportButton: {
     alignItems: 'center',
@@ -173,6 +174,7 @@ export default StyleSheet.create({
     borderWidth: scale(0.5),
     borderColor: Colors.orange,
     marginHorizontal: STANDARD_SPACING * 3,
+    marginBottom: STANDARD_SPACING,
   },
   reportButtonText: {
     fontFamily: POPPINS_MEDIUM,
@@ -212,23 +214,23 @@ export default StyleSheet.create({
   },
   instagramSwiperDot: {
     backgroundColor: Colors.grey6,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 3,
-    marginRight: 3,
-    marginTop: 3,
-    marginBottom: 3,
+    width: scale(6),
+    height: scale(6),
+    borderRadius: scale(3),
+    marginLeft: scale(2),
+    marginRight: scale(2),
+    marginTop: 0,
+    marginBottom: scale(30),
   },
   instagramSwiperActiveDot: {
     backgroundColor: Colors.primary,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 3,
-    marginRight: 3,
-    marginTop: 3,
-    marginBottom: 3,
+    width: scale(6),
+    height: scale(6),
+    borderRadius: scale(3),
+    marginLeft: scale(2),
+    marginRight: scale(2),
+    marginTop: 0,
+    marginBottom: scale(30),
   },
   actionSheetContainer: {
     backgroundColor: 'white',

@@ -8,12 +8,16 @@ import {
 import disputeResonsSlice from '../slices/DisputeResonsSlice';
 import locationSlice from '../slices/LocationSlice';
 import usersSlices from '../slices/SessionUser';
+import datingSlices from '../slices/datingSlice';
+import userReportsSlices from '../slices/userReportsSlice';
 import reduxStorage from './storage';
 
 const rootReducer = combineReducers({
   users: usersSlices,
   locations: locationSlice,
   disputeResons: disputeResonsSlice,
+  dating: datingSlices,
+  userReports: userReportsSlices,
   // Add other reducers here
 });
 

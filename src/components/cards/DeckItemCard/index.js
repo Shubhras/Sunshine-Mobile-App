@@ -315,21 +315,22 @@ const DeckItemCard = ({
   };
 
   const handleSwipe = (type, index) => {
-    const currentDeckItem = data[index];
-    currentDeckIndex.current = index;
+    const currentDeckItem = data[index]
+    currentDeckIndex.current = index
     if (type === 'like' && (canUserSwipe || hasActivePlan.current)) {
-      onSwipe(type, currentDeckItem);
+      onSwipe(type, currentDeckItem)
       // Navigate to chat page only when liked
       // navigation.navigate('Chat', { user: currentDeckItem })
     } else if (type === 'dislike') {
       // Handle the dislike action, such as showing a message or any other logic
-      console.log('Disliked:', currentDeckItem);
+       onSwipe(type, currentDeckItem)
+      console.log('Disliked:', currentDeckItem)
     } else {
       // Handle other cases, such as when the user cannot swipe or does not have an active plan
-      useSwiper.current.swipeBack();
-      alertDailySwipeExceeded();
+      useSwiper.current.swipeBack()
+      alertDailySwipeExceeded()
     }
-  };
+  }
 
   const onSwipedLeft = index => {
     handleSwipe('dislike', index);

@@ -1,203 +1,157 @@
-import firestore, {
-  deleteDoc,
-  doc,
-  getDoc,
+import {
   getFirestore,
-  serverTimestamp,
-  setDoc,
+  collection,
+  addDoc,
+  doc,
+  deleteDoc,
+  getDoc,
+  getDocs,
   updateDoc,
+  query,
+  where,
+  writeBatch,
+  serverTimestamp,
+  onSnapshot,
+  setDoc,
 } from '@react-native-firebase/firestore';
 
-const db = firestore()
+/* --------------------------------------------------
+   Firestore References
+--------------------------------------------------- */
 
-const usersRef = firestore().collection('users')
+const db = getFirestore();
 
-const swipesRef = firestore().collection('swipes')
+const usersRef = collection(db, 'users');
+const swipesRef = collection(db, 'swipes');
+const swipeCountRef = collection(db, 'swipe_counts');
 
-const swipeCountRef = firestore().collection('swipe_counts')
+/* --------------------------------------------------
+   Helpers
+--------------------------------------------------- */
 
-const onCollectionUpdate = (querySnapshot, callback) => {
-  const data = []
-  querySnapshot.forEach(doc => {
-    const temp = doc.data()
-    temp.id = doc.id
-    data.push(temp)
-  })
-  return callback(data, usersRef)
-}
+const onCollectionUpdate = (snapshot, callback) => {
+  const data = snapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }));
+  callback(data);
+};
+
+/* --------------------------------------------------
+   Subscriptions
+--------------------------------------------------- */
 
 export const subscribeToInboundSwipes = (userId, callback) => {
-  return swipesRef
-    .where('swipedProfile', '==', userId)
-    .where('otherSwipe', '==', false)
-    .onSnapshot(querySnapshot => onCollectionUpdate(querySnapshot, callback))
-}
+  const q = query(swipesRef, where('swipedProfile', '==', userId), where('otherSwipe', '==', false));
+  return onSnapshot(q, snapshot => onCollectionUpdate(snapshot, callback));
+};
 
 export const subscribeToOutboundSwipes = (userId, callback) => {
-  return swipesRef
-    .where('author', '==', userId)
-    .where('authorSwipe', '==', false)
-    .onSnapshot(querySnapshot => onCollectionUpdate(querySnapshot, callback))
-}
+  const q = query(swipesRef, where('author', '==', userId), where('authorSwipe', '==', false));
+  return onSnapshot(q, snapshot => onCollectionUpdate(snapshot, callback));
+};
 
-export const unmatchUser = (item, user) => {
-  swipesRef
-    .where('swipedProfile', '==', item.id)
-    .where('author', '==', user.id)
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        // doc.data() is never undefined for query doc snapshots
-        swipesRef
-          .doc(doc.id)
-          .update({
-            authorSwipe: true,
-          })
-          .then(function () {
-            return { status: 'success', message: 'successfully removed' }
-          })
-          .catch(function (error) {
-            // The document probably doesn't exist.
-            console.error('Error updating document: ', error)
-          })
-      })
-    })
-}
+/* --------------------------------------------------
+   Swipe Actions
+--------------------------------------------------- */
 
-export const addSwipe = (fromUserID, toUserID, type, callback) => {
-  swipesRef
-    .add({
+export const addSwipe = async (fromUserID, toUserID, type) => {
+  try {
+    await addDoc(swipesRef, {
       author: fromUserID,
       swipedProfile: toUserID,
-      type: type,
+      type,
       hasBeenSeen: false,
-      created_at: serverTimestamp(),
       createdAt: serverTimestamp(),
       authorSwipe: false,
       otherSwipe: false,
-    })
-    .then(() => {
-      callback({ success: true })
-    })
-    .catch(error => {
-      callback({ error: error })
-    })
-}
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Add swipe error:', error);
+    return { error };
+  }
+};
 
-export const removeSwipe = (swipeProfileId, userID) => {
-  const batch = db.batch()
+export const removeSwipe = async (swipeProfileId, userID) => {
+  const q = query(swipesRef, where('swipedProfile', '==', swipeProfileId), where('author', '==', userID));
+  const snapshot = await getDocs(q);
 
-  const query = swipesRef
-    .where('swipedProfile', '==', swipeProfileId)
-    .where('author', '==', userID)
+  const batch = writeBatch(db);
+  snapshot.docs.forEach(docSnap => batch.delete(docSnap.ref));
+  await batch.commit();
+};
 
-  query.get().then(async querySnapshot => {
-    querySnapshot.docs.forEach(doc => {
-      batch.delete(doc.ref)
-    })
-    batch.commit()
-  })
-}
+export const unmatchUser = async (item, user) => {
+  try {
+    const q = query(swipesRef, where('swipedProfile', '==', item.id), where('author', '==', user.id));
+    const snapshot = await getDocs(q);
 
-export const markSwipeAsSeen = (fromUserID, toUserID) => {
-  swipesRef
-    .where('author', '==', fromUserID)
-    .where('swipedProfile', '==', toUserID)
-    .onSnapshot(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        doc.ref.update({
-          hasBeenSeen: true,
-        })
-      })
-    })
-}
+    const batch = writeBatch(db);
+    snapshot.docs.forEach(docSnap => batch.update(docSnap.ref, { authorSwipe: true }));
+    await batch.commit();
+
+    return { status: 'success' };
+  } catch (error) {
+    console.error('Unmatch error:', error);
+    return { status: 'error', error };
+  }
+};
+
+export const markSwipeAsSeen = async (fromUserID, toUserID) => {
+  const q = query(swipesRef, where('author', '==', fromUserID), where('swipedProfile', '==', toUserID));
+  const snapshot = await getDocs(q);
+
+  const batch = writeBatch(db);
+  snapshot.docs.forEach(docSnap => batch.update(docSnap.ref, { hasBeenSeen: true }));
+  await batch.commit();
+};
+
+/* --------------------------------------------------
+   Swipe Count
+--------------------------------------------------- */
 
 export const getUserSwipeCount = async userID => {
   try {
-    const swipeCount = await swipeCountRef.doc(userID).get()
-
-    if (swipeCount.data()) {
-      return swipeCount.data()
-    }
+    const ref = doc(db, 'swipe_counts', userID);
+    const snap = await getDoc(ref);
+    return snap.exists() ? snap.data() : null;
   } catch (error) {
-    return
+    console.error('Get swipe count error:', error);
+    return null;
   }
-}
+};
 
-export const updateUserSwipeCount = (userID, count) => {
-  const data = {
-    authorID: userID,
-    count: count,
-  }
-
-  if (count === 1) {
-    data.createdAt = serverTimestamp()
-  }
+export const updateUserSwipeCount = async (userID, count) => {
+  const ref = doc(db, 'swipe_counts', userID);
+  const data = { authorID: userID, count };
+  if (count === 1) data.createdAt = serverTimestamp();
 
   try {
-    swipeCountRef.doc(userID).set(data, { merge: true })
-  } catch (error) {}
-}
+    await setDoc(ref, data, { merge: true });
+  } catch (error) {
+    console.error('Update swipe count error:', error);
+  }
+};
 
-export const numMatch = (userID, numerologyNumber) => {
- 
-  return new Promise((resolve, reject) => {
-    if (numerologyNumber === undefined || numerologyNumber === null) {
-      reject('Invalid input: numerolog yNumber is undefined or null')
-    }
-    usersRef
-      .where('numerologyNumber', '==', numerologyNumber)
-      .get()
-      .then(async(querySnapshot) => {
-        const matchingUsers = []
+/* --------------------------------------------------
+   Numerology Match
+--------------------------------------------------- */
 
-       await querySnapshot.forEach(doc => {
-       
-          if (doc.data().id != userID) {
-            matchingUsers.push(doc.data())
-          }
-        })
-        resolve({ status: 'success', users: matchingUsers })
-      })
-      .catch(error => {
-        console.error('Error querying documents: ', error)
-        reject({ status: 'error', message: 'Query failed', error })
-      })
+export const numMatch = async (userID, numerologyNumber) => {
+  if (numerologyNumber == null) throw new Error('Invalid numerology number');
 
-    //   usersRef
-    //     .doc(userID)
-    //     .update({ numerologyNumber: numerologyNumber })
-    //     .then(() => {
-    //       resolve({ success: true })
-    //     })
-    //     .catch(error => {
-    //       resolve({ error: error })
-    //     })
-  })
-}
+  try {
+    const q = query(usersRef, where('numerologyNumber', '==', numerologyNumber));
+    const snapshot = await getDocs(q);
 
-// export const numMatch = (userID, num) => {
-//   if (num === undefined || num === null) {
-//     return Promise.reject(new Error('Invalid input: num is undefined or null'))
-//   }
+    const users = snapshot.docs
+      .filter(docSnap => docSnap.id !== userID)
+      .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 
-//   usersRef
-
-//     .where('numerologyNumber', '==', num)
-//     .get()
-//     .then(querySnapshot => {
-//       const matchingUsers = []
-
-//       querySnapshot.forEach(doc => {
-//         if (doc.data.userID != userID) {
-//           matchingUsers.push(doc.data())
-//         }
-//       })
-//       console.log(matchingUsers)
-//       return { status: 'success', users: matchingUsers }
-//     })
-//     .catch(error => {
-//       console.error('Error querying documents: ', error)
-//       return { status: 'error', message: 'Query failed', error }
-//     })
-// }
+    return { status: 'success', users };
+  } catch (error) {
+    console.error('Numerology match error:', error);
+    return { status: 'error', error };
+  }
+};
