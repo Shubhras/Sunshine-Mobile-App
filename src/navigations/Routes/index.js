@@ -22,13 +22,14 @@ import Children from '../../screens/Children';
 import Religion from '../../screens/Religion';
 import Sports from '../../screens/Sports';
 import InitalLoadScreen from '../../screens/InitalLoadScreen';
+import ChatScreen from '../../screens/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
   return (
     <Stack.Navigator initialRouteName="InitalLoadScreen">
-       <Stack.Screen
+      <Stack.Screen
         name="InitalLoadScreen"
         component={InitalLoadScreen}
         options={{ headerShown: false, animation: 'none' }}
@@ -136,6 +137,11 @@ const Routes = () => {
       <Stack.Screen
         name="Sports"
         component={Sports}
+        options={{ headerShown: false, animation: 'none' }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
         options={{ headerShown: false, animation: 'none' }}
       />
     </Stack.Navigator>

@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ChatScreen from '../../../screens/ChatScreen';
+import Conversations from '../../../screens/Conversations';
 
 // Creating stack navigator
 const Stack = createNativeStackNavigator();
@@ -8,10 +8,10 @@ const Stack = createNativeStackNavigator();
 const ChatStack = () => {
   // Returning
   return (
-    <Stack.Navigator initialRouteName="Chat">
+    <Stack.Navigator initialRouteName="Conversations">
       <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
+        name="Conversations"
+        component={Conversations}
         options={{ headerShown: false, animation: 'none' }}
       />
     </Stack.Navigator>

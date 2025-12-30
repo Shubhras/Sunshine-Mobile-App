@@ -34,7 +34,9 @@ const TextInput = ({
   return (
     <>
       {label && (
-        <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
+        <CustomText style={[styles.label, { color: labelColor }]}>
+          {label}
+        </CustomText>
       )}
       <View
         style={[styles.textInputWrapper, { backgroundColor: backgroundColor }]}
@@ -71,7 +73,7 @@ const TextInput = ({
         />
         {secureText && (
           <TouchableOpacity onPress={onPressSecure} style={styles.secureButton}>
-            <Text style={styles.secureText}>{secureText}</Text>
+            <CustomText style={styles.secureText}>{secureText}</CustomText>
           </TouchableOpacity>
         )}
       </View>
