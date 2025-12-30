@@ -1,11 +1,12 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { View, Modal, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { FlatList, Modal, TouchableOpacity, View } from 'react-native';
+import { CustomText } from '../global/CustomText';
 import styles from './styles';
 
 const CountriesModalPicker = props => {
   const modal = useRef(null);
 
-  const onChange = useCallback((item) => {
+  const onChange = useCallback(item => {
     props.onChange(item);
     props.onCancel();
   }, []);
@@ -15,25 +16,28 @@ const CountriesModalPicker = props => {
       <TouchableOpacity onPress={() => onChange(item)}>
         <View style={[styles.optionStyle, props.optionStyle]}>
           <View style={{ flex: 1, alignItems: 'flex-start' }}>
-            <Text style={[styles.optionTextStyle, props.optionTextStyle]}>
+            <CustomText style={[styles.optionTextStyle, props.optionTextStyle]}>
               {item.label}
-            </Text>
+            </CustomText>
           </View>
-          <Text style={[styles.optionTextStyle, props.optionTextStyle]}>
+          <CustomText style={[styles.optionTextStyle, props.optionTextStyle]}>
             {item.dialCode}
-          </Text>
+          </CustomText>
         </View>
       </TouchableOpacity>
     );
   }, []);
 
-  const keyExtractor = useCallback((item) => item.key, []);
+  const keyExtractor = useCallback(item => item.key, []);
 
-  const getItemLayout = useCallback((data, index) => ({
-    length: 50, // Approximate height of each item (adjust according to your design)
-    offset: 50 * index,
-    index,
-  }), []);
+  const getItemLayout = useCallback(
+    (data, index) => ({
+      length: 50, // Approximate height of each item (adjust according to your design)
+      offset: 50 * index,
+      index,
+    }),
+    [],
+  );
 
   if (!props.visible) {
     return null;
@@ -66,9 +70,11 @@ const CountriesModalPicker = props => {
         <View style={styles.cancelContainer}>
           <TouchableOpacity onPress={props.onCancel}>
             <View style={[styles.cancelStyle, props.cancelStyle]}>
-              <Text style={[styles.cancelTextStyle, props.cancelTextStyle]}>
+              <CustomText
+                style={[styles.cancelTextStyle, props.cancelTextStyle]}
+              >
                 {props.cancelText}
-              </Text>
+              </CustomText>
             </View>
           </TouchableOpacity>
         </View>

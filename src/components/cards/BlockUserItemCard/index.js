@@ -1,8 +1,9 @@
 import FastImage from '@d11/react-native-fast-image';
-import { memo } from 'react';
-import { View } from 'react-native';
+import { memo, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { CustomText } from '../../global/CustomText';
 import styles from './styles';
+import { defaultProfilePhotoURL } from '../../../constants/images';
 
 // Functional component
 function BlockUserItemCard({
@@ -14,18 +15,23 @@ function BlockUserItemCard({
   blockUserEmailColor,
   unblock,
   unblockColor,
+  onPressUnblock
 }) {
+  const [imageError, setImageError] = useState(false);
   return (
     <View key={index} style={styles.itemListWrapper}>
       <View style={styles.blockUserImageAndLabelWrapper}>
         <View style={styles.blockUserImageWrapper}>
           <FastImage
-            style={[styles.blockUserImage]}
+            style={styles.blockUserImage}
             source={{
-              uri: blockUserImage,
+              uri: imageError
+                ? defaultProfilePhotoURL
+                : blockUserImage || defaultProfilePhotoURL,
               priority: FastImage.priority.high,
             }}
-            resizeMode="cover"
+            resizeMode={FastImage.resizeMode.cover}
+            onError={() => setImageError(true)}
           />
         </View>
         <View style={styles.blockUserDetails}>
@@ -42,11 +48,11 @@ function BlockUserItemCard({
         </View>
       </View>
       {unblock && (
-        <View style={styles.unblockWrapper}>
+        <Pressable style={styles.unblockWrapper} onPress={onPressUnblock}>
           <CustomText style={[styles.unblock, { color: unblockColor }]}>
-            unblock
+            Unblock
           </CustomText>
-        </View>
+        </Pressable>
       )}
     </View>
   );

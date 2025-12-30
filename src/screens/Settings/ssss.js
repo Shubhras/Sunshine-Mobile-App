@@ -416,6 +416,7 @@ import RailSelected from '../../../Slider/RailSelected';
 import Notch from '../../../Slider/Notch';
 import Label from '../../../Slider/Label';
 import { useIap } from '../../../../Core/inAppPurchase/context';
+import { CustomText } from '../../components/global/CustomText';
 
 function IMFormComponent(props) {
   const {
@@ -486,7 +487,7 @@ function IMFormComponent(props) {
         key={index}
         style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
       >
-        <Text style={styles.text}>{switchField.displayName}</Text>
+        <CustomText style={styles.text}>{switchField.displayName}</CustomText>
         <Switch
           value={computeValue(switchField)}
           onValueChange={value => onFormFieldValueChange(switchField, value)}
@@ -546,7 +547,7 @@ function IMFormComponent(props) {
         key={index}
         style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
       >
-        <Text style={styles.text}>{switchField.displayName}</Text>
+        <CustomText style={styles.text}>{switchField.displayName}</CustomText>
         <Switch
           value={activeSwitch === index}
           onValueChange={() =>
@@ -613,7 +614,9 @@ function IMFormComponent(props) {
             styles.appSettingsTypeContainer,
           ]}
         >
-          <Text style={styles.text}>{formTextField.displayName}</Text>
+          <CustomText style={styles.text}>
+            {formTextField.displayName}
+          </CustomText>
           <TextInput
             underlineColorAndroid="transparent"
             style={[styles.text1, { textAlign: 'right' }]}
@@ -640,7 +643,9 @@ function IMFormComponent(props) {
         onPress={() => onFormButtonPress(buttonField)}
         style={[styles.settingsTypeContainer, styles.appSettingsSaveContainer]}
       >
-        <Text style={styles.settingsType}>{buttonField.displayName}</Text>
+        <CustomText style={styles.settingsType}>
+          {buttonField.displayName}
+        </CustomText>
       </TouchableOpacity>
     );
   };
@@ -652,7 +657,9 @@ function IMFormComponent(props) {
         // onPress={() => onFormButtonPress(buttonField)}
         style={[styles.settingsTypeContainer, styles.appSettingsSaveContainer]}
       >
-        <Text style={styles.settingsType1}>{buttonField.displayName}</Text>
+        <CustomText style={styles.settingsType1}>
+          {buttonField.displayName}
+        </CustomText>
       </View>
     );
   };
@@ -687,10 +694,10 @@ function IMFormComponent(props) {
         onPress={() => onSelectFieldPress(selectField, actionSheetRef)}
         style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
       >
-        <Text style={styles.text}>{selectField.displayName}</Text>
-        <Text style={[styles.text1, { textAlign: 'right' }]}>
+        <CustomText style={styles.text}>{selectField.displayName}</CustomText>
+        <CustomText style={[styles.text1, { textAlign: 'right' }]}>
           {computeValue(selectField)}
-        </Text>
+        </CustomText>
         <ActionSheet
           ref={actionSheetRef}
           title={selectField.displayName}
@@ -715,10 +722,10 @@ function IMFormComponent(props) {
         onPress={() => onSelectFieldPress(selectField, actionSheetRef)}
         style={[styles.settingsTypeContainer, styles.appSettingsTypeContainer]}
       >
-        <Text style={styles.text}>{selectField.displayName}</Text>
-        <Text style={[styles.text1, { textAlign: 'right' }]}>
+        <CustomText style={styles.text}>{selectField.displayName}</CustomText>
+        <CustomText style={[styles.text1, { textAlign: 'right' }]}>
           {computeValue(selectField)}
-        </Text>
+        </CustomText>
         <ActionSheet
           ref={actionSheetRef}
           title={selectField.displayName}
@@ -761,7 +768,7 @@ function IMFormComponent(props) {
     if (selectField.key == 'min') {
       return (
         <View>
-          <Text style={styles.text}>{selectField.displayName}</Text>
+          <CustomText style={styles.text}>{selectField.displayName}</CustomText>
           <View style={{ marginHorizontal: 40, justifyContent: 'center' }}>
             <RangeSlider
               style={styles.slider}
@@ -780,10 +787,10 @@ function IMFormComponent(props) {
             />
             <View style={styles.sliderboxContainer}>
               <View style={styles.sliderbox}>
-                <Text style={styles.text2}>{low}</Text>
+                <CustomText style={styles.text2}>{low}</CustomText>
               </View>
               <View style={styles.sliderbox}>
-                <Text style={styles.text2}>{high}</Text>
+                <CustomText style={styles.text2}>{high}</CustomText>
               </View>
             </View>
           </View>
@@ -844,7 +851,7 @@ function IMFormComponent(props) {
       // }}>
       <View key={section.title}>
         <View style={styles.settingsTitleContainer}>
-          <Text style={styles.settingsTitle}>{section.title}</Text>
+          <CustomText style={styles.settingsTitle}>{section.title}</CustomText>
         </View>
         <View style={styles.contentContainer}>
           {section.fields.map((field, index) =>

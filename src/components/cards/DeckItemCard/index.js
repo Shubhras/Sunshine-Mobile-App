@@ -349,22 +349,22 @@ const DeckItemCard = ({
   };
 
   const undoSwipe = () => {
-    if (!hasActivePlan.current) {
-      Alert.alert(
-        'Upgrade account',
-        'Upgrade your account now to undo a swipe.',
-        [
-          { text: 'Upgrade Now', onPress: () => setSubscriptionVisible(true) },
-          { text: 'Cancel' },
-        ],
-      );
-      return;
-    }
+    // if (!hasActivePlan.current) {
+    //   Alert.alert(
+    //     'Upgrade account',
+    //     'Upgrade your account now to undo a swipe.',
+    //     [
+    //       { text: 'Upgrade Now', onPress: () => setSubscriptionVisible(true) },
+    //       { text: 'Cancel' },
+    //     ],
+    //   );
+    //   return;
+    // }
 
     useSwiper.current?.swipeBack(i => {
       const prev = data[i - 1];
       currentDeckIndex.current = i;
-      onUndoSwipe?.(prev);
+      onUndoSwipe(prev);
     });
   };
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, TouchableOpacity, View } from 'react-native';
+import { CustomText } from '../../components/global/CustomText';
 import styles from './styles';
 
 const MatchScreen = ({ onSendMessage, onKeepSwiping }) => {
@@ -19,17 +20,17 @@ const MatchScreen = ({ onSendMessage, onKeepSwiping }) => {
 
         {/* Content */}
         <View style={styles.content}>
-          <Text style={styles.matchText}>IT’S A MATCH!</Text>
+          <CustomText style={styles.matchText}>IT’S A MATCH!</CustomText>
 
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={onSendMessage}
           >
-            <Text style={styles.primaryText}>SEND A MESSAGE</Text>
+            <CustomText style={styles.primaryText}>SEND A MESSAGE</CustomText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onKeepSwiping}>
-            <Text style={styles.secondaryText}>KEEP SWIPING</Text>
+            <CustomText style={styles.secondaryText}>KEEP SWIPING</CustomText>
           </TouchableOpacity>
         </View>
       </ImageBackground>

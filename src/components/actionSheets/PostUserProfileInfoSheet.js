@@ -69,6 +69,7 @@ const PostUserProfileInfoSheet = props => {
                   : [item?.profilePictureURL]
               }
               onPress={() => SheetManager.hide('post-user-profile-info-sheet')}
+              handleDislike={handleDislike}
             />
           )}
         </ScrollView>

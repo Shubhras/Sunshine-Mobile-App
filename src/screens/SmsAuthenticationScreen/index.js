@@ -144,13 +144,13 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
     }
 
     return (
-      <Text
+      <CustomText
         key={index}
         style={[styles.codeInputCell, isFocused && styles.focusCell]}
         onLayout={getCellOnLayoutHandler(index)}
       >
         {textChild}
-      </Text>
+      </CustomText>
     );
   };
 

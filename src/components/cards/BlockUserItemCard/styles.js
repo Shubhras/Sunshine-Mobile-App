@@ -36,6 +36,7 @@ export default StyleSheet.create({
     height: null,
     width: null,
     aspectRatio: 1,
+    backgroundColor:Colors.inputBgColor
   },
   blockUserDetails: {
     flexDirection: 'column',

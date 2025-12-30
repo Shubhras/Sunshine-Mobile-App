@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
-import { View, Text, ImageBackground, Image } from 'react-native';
-import DatingConfig from '../../data/DatingConfig';
-import { Images } from '../../constants/images';
-import styles from './styles';
+import React from 'react';
+import { Image, ImageBackground, View } from 'react-native';
 import Button from '../../components/buttons/Button';
+import { CustomText } from '../../components/global/CustomText';
 import Colors from '../../constants/Colors';
+import { Images } from '../../constants/images';
+import DatingConfig from '../../data/DatingConfig';
+import styles from './styles';
 
 const WelcomeScreen = ({ navigation, route }) => {
   // const appConfig = route.params.appConfig
@@ -12,8 +13,8 @@ const WelcomeScreen = ({ navigation, route }) => {
   //   ? props?.appConfig
   //   : props.route?.params?.appConfig
 
-    console.log('WelcomeScreen Props', route.params);
-    
+  console.log('WelcomeScreen Props', route.params);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -23,8 +24,12 @@ const WelcomeScreen = ({ navigation, route }) => {
         <View style={styles.logo}>
           <Image style={styles.logoImage} source={Images.Logo} />
         </View>
-        <Text style={styles.title}>{DatingConfig.onboardingConfigwelcomeTitle}</Text>
-        <Text style={styles.caption}>{DatingConfig.onboardingConfig.welcomeCaption}</Text>
+        <CustomText style={styles.title}>
+          {DatingConfig.onboardingConfigwelcomeTitle}
+        </CustomText>
+        <CustomText style={styles.caption}>
+          {DatingConfig.onboardingConfig.welcomeCaption}
+        </CustomText>
         <View style={{ marginHorizontal: 80, gap: 20 }}>
           <Button
             label={'Log In'}

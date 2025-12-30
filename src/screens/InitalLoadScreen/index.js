@@ -90,7 +90,7 @@ const InitalLoadScreen = ({ navigation }) => {
               easing="ease-in-out-sine"
               useNativeDriver={true}
             >
-              SunSign{' '}
+              SunShine{' '}
             </Animatable.Text>
             {/* Title highlighted */}
             <Animatable.Text
