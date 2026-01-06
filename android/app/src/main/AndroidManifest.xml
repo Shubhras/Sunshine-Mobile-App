@@ -27,7 +27,9 @@
       android:usesCleartextTraffic="${usesCleartextTraffic}"
       android:supportsRtl="true"
       android:enableOnBackInvokedCallback="false">
-
+      <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyCVK_VgrYl1dx7qC8fZjF60pFoh3R-pb1E"/>
       <meta-data
         android:name="expo.modules.application.blur.enabled"
         android:value="true" />

@@ -70,6 +70,7 @@ export default StyleSheet.create({
     alignSelf: 'flex-start',
     fontFamily: POPPINS_BOLD,
     fontSize: FONT_SIZE_XXS,
+    color:Colors.white,
     marginBottom: STANDARD_SPACING * 3,
   },
   seenLabel: {
@@ -114,51 +115,14 @@ export default StyleSheet.create({
     justifyContent: 'center',
     marginLeft: STANDARD_SPACING * 3,
   },
+  timeRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: scale(4),
+},
 
-  actionSheetContainer: {
-      backgroundColor: 'white',
-      borderTopLeftRadius: 15,
-      borderTopRightRadius: 15,
-    },
-    actionSheetIndicator: {
-      width: 100,
-      height: 4,
-      backgroundColor: '#D1D1D6',
-    },
-    actionSheetContent: {
-      paddingHorizontal: 20,
-      paddingVertical: 20,
-      minHeight: 200,
-    },
-    actionSheetHeader: {
-      alignItems: 'center',
-      paddingBottom: STANDARD_SPACING * 2,
-      borderBottomWidth: scale(0.5),
-      borderBottomColor: Colors.hairlineColor,
-      marginBottom: STANDARD_SPACING * 1.5,
-    },
-    actionSheetTitle: {
-      fontSize: scale(14),
-      color: Colors.mainSubtextColor,
-      fontFamily: POPPINS_SEMIBOLD,
-    },
-    actionSheetOption: {
-      paddingVertical: STANDARD_SPACING * 2,
-      alignItems: 'center',
-    },
-    actionSheetOptionText: {
-      fontSize: scale(14),
-      color: Colors.error,
-      fontFamily: POPPINS_SEMIBOLD,
-    },
-    actionSheetOptionTextDanger: {
-      fontSize: scale(14),
-      color: Colors.main,
-      fontFamily: POPPINS_SEMIBOLD,
-    },
-    actionSheetDivider: {
-      height: scale(0.5),
-      backgroundColor: Colors.hairlineColor,
-      marginVertical: STANDARD_SPACING,
-    },
+messageTime: {
+  fontSize: scale(10),
+  color: Colors.mainSubtextColor,
+},
 });

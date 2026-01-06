@@ -26,7 +26,11 @@ const usersDBRef = collection(db, 'users');
 --------------------------------------------------- */
 
 export const markAbuse = async (outBoundID, toUserID, abuseType) => {
-  if (outBoundID === toUserID) return;
+    if (outBoundID == toUserID) {
+    return Promise(r => {
+      r()
+    })
+  }
 
   try {
     await addDoc(abuseDBRef, {
@@ -51,9 +55,9 @@ export const unsubscribeAbuseDB = (userID, callback) => {
   const q = query(abuseDBRef, where('source', '==', userID));
 
   return onSnapshot(q, snapshot => {
-    const abuses = snapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data(),
+    const abuses = snapshot?.docs?.map(docSnap => ({
+      id: docSnap?.id,
+      ...docSnap?.data(),
     }));
     callback(abuses);
   });

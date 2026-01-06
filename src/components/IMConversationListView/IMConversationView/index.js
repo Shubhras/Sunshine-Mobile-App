@@ -5,6 +5,7 @@ import { TouchableOpacity, View } from 'react-native';
 import { CustomText } from '../../global/CustomText';
 import IMConversationIconView from '../IMConversationIconView';
 import styles from './styles';
+import { getMessageTime, timeFormat } from '../../../constants/helpers/helperFunction';
 
 function IMConversationView(props) {
   const { onChatItemPress, item, user, onChatLongPress } = props;
@@ -12,7 +13,7 @@ function IMConversationView(props) {
   const userID = user.userID || user.id;
   const lastName = item.lastName || '';
 
-  // console.log('item', item.participants)
+  console.log('item', item)
 
   let title = item.title;
   const getIsRead = () => {
@@ -40,18 +41,7 @@ function IMConversationView(props) {
     return '';
   };
 
-  const timeFormat = timeStamp => {
-    if (timeStamp) {
-      if (moment(timeStamp).isValid()) {
-        return moment.unix(timeStamp).fromNow();
-      }
-      if (moment().diff(moment.unix(timeStamp.seconds), 'days') == 0) {
-        return moment.unix(timeStamp.seconds).format('H:mm');
-      }
-      return moment.unix(timeStamp.seconds).fromNow();
-    }
-    return ' ';
-  };
+
 
   return (
     <TouchableOpacity
@@ -79,7 +69,7 @@ function IMConversationView(props) {
               ellipsizeMode={'middle'}
               style={[styles.message, !getIsRead() && styles.unReadmessage]}
             >
-              {timeFormat(item.createdAt)}
+              {getMessageTime(item.createdAt)}
             </CustomText>
           </CustomText>
         </View>

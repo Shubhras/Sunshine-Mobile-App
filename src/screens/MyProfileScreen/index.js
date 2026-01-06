@@ -33,6 +33,11 @@ import Icons from '../../components/Icons/Icons';
 import PostPictureSelector from '../../components/PostPictureSelector';
 import PostPictureMoreOption from '../../components/PostPictureSelector/PostPictureMoreOption';
 import { Images } from '../../constants/images';
+import { deleteAllLocations } from '../../redux/slices/LocationSlice';
+import { deleteDisputeResons } from '../../redux/slices/DisputeResonsSlice';
+import { resetDating } from '../../redux/slices/datingSlice';
+import { resetUserReports } from '../../redux/slices/userReportsSlice';
+import { logOut, resetAllChat } from '../../redux/slices/chatSlice';
 
 var selectedItemIndex = -1;
 // const myphotoss = [
@@ -244,30 +249,48 @@ const MyProfileScreen = ({ navigation }) => {
     setLoading(true);
     userLogout(userInfo?.userID)
       .then(val => {
-        if (val.success) {
-          dispatch(logoutUser());
+        // if (val.success) {
+        //   dispatch(logoutUser());
+        //   dispatch(deleteAllLocations());
+        //   dispatch(deleteDisputeResons());
+        //   dispatch(resetDating());
+        //   dispatch(resetUserReports());
+        //   dispatch(logOut());
+        //   dispatch(resetAllChat());
+        //   navigation.reset({
+        //     index: 0,
+        //     routes: [{ name: 'AuthStack' }],
+        //   });
+        // } else {
+        //   showToast({
+        //     title: 'Logout Failed',
+        //     text: 'Unable to logout at this time.',
+        //     duration: 3000,
+        //     type: 'error',
+        //   });
+        // }
+     
+      })
+      .catch(() => {
+        // showToast({
+        //   title: 'Logout Failed',
+        //   text: 'Unable to logout at this time.',
+        //   duration: 3000,
+        //   type: 'error',
+        // });
+      })
+      .finally(() => {
+         dispatch(logoutUser());
+          dispatch(deleteAllLocations());
+          dispatch(deleteDisputeResons());
+          dispatch(resetDating());
+          dispatch(resetUserReports());
+          dispatch(logOut());
+          dispatch(resetAllChat());
           navigation.reset({
             index: 0,
             routes: [{ name: 'AuthStack' }],
           });
-        } else {
-          showToast({
-            title: 'Logout Failed',
-            text: 'Unable to logout at this time.',
-            duration: 3000,
-            type: 'error',
-          });
-        }
-      })
-      .catch(() => {
-        showToast({
-          title: 'Logout Failed',
-          text: 'Unable to logout at this time.',
-          duration: 3000,
-          type: 'error',
-        });
-      })
-      .finally(() => {
         setLoading(false);
       });
   };

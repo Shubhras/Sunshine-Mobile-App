@@ -10,6 +10,8 @@ import locationSlice from '../slices/LocationSlice';
 import usersSlices from '../slices/SessionUser';
 import datingSlices from '../slices/datingSlice';
 import userReportsSlices from '../slices/userReportsSlice';
+import inAppPurchaseSlice from '../slices/inAppPurchaseSlice';
+import chatSlice from '../slices/chatSlice';
 import reduxStorage from './storage';
 
 const rootReducer = combineReducers({
@@ -18,6 +20,8 @@ const rootReducer = combineReducers({
   disputeResons: disputeResonsSlice,
   dating: datingSlices,
   userReports: userReportsSlices,
+  inAppPurchase: inAppPurchaseSlice,
+  chat: chatSlice,
   // Add other reducers here
 });
 

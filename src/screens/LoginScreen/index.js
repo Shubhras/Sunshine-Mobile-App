@@ -108,7 +108,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ email: 'li@gmail.com', password: 'Test@123' }}
         validationSchema={LoginSchema}
         onSubmit={handleLogin}
         validateOnBlur={true}

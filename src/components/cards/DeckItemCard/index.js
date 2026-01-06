@@ -1,10 +1,13 @@
-// import React, { useRef, useEffect, memo } from 'react';
-// import { View, Text, StyleSheet, Dimensions, Modal, Alert } from 'react-native';
+
+// import React, { useRef, useEffect, memo, useState } from 'react';
+// import { View, Alert } from 'react-native';
 // import Swiper from 'react-native-deck-swiper';
 // import TinderItemCard from '../TinderItemCard';
 // import styles from './styles';
 // import { CustomText } from '../../global/CustomText';
 // import SwipeControls from '../SwipeControls';
+// import PostUserProfileInfoSheet from '../../actionSheets/PostUserProfileInfoSheet';
+// import { SheetManager } from 'react-native-actions-sheet';
 
 // const DeckItemCard = ({
 //   data,
@@ -15,108 +18,17 @@
 //   isPlanActive,
 //   setSubscriptionVisible,
 //   renderEmptyState,
-//   renderNewMatch,
 //   canUserSwipe,
 //   navigation,
-//   onPressCard,
-//   useSwiper,
 // }) => {
-//   //const isPlanActive = useSelector(state => state.inAppPurchase.isPlanActive)
-
-//   // const useSwiper = useRef(null);
+//   const useSwiper = useRef(null);
 //   const hasActivePlan = useRef(false);
 //   const currentDeckIndex = useRef(0);
+//   const [cardInfo, setCardInfo] = useState(null);
 
 //   useEffect(() => {
 //     hasActivePlan.current = isPlanActive;
 //   }, [isPlanActive]);
-
-//   const onDislikePressed = () => {
-//     console.log('onDislikePressed called from DeckItemCard');
-//     Alert.alert('DeckItemCard', 'Dislike Pressed!');
-//     // if (useSwiper.current) {
-//     //   useSwiper.current.swipeLeft();
-//     // }
-//   };
-
-//   const onLikePressed = () => {
-//     console.log('onLikePressed called from DeckItemCard');
-//     Alert.alert('DeckItemCard', 'Like Pressed!');
-//     // if (useSwiper.current) {
-//     //   useSwiper.current.swipeRight();
-//     // }
-//   };
-
-//   const handleSwipe = (type, index) => {
-//     const currentDeckItem = data[index];
-//     currentDeckIndex.current = index;
-//     if (type === 'like' && (canUserSwipe || hasActivePlan.current)) {
-//       onSwipe(type, currentDeckItem);
-//       // Navigate to chat page only when liked
-//     } else if (type === 'dislike') {
-//       // Handle the dislike action, such as showing a message or any other logic
-//       console.log('Disliked:', currentDeckItem);
-//     } else {
-//       // Handle other cases, such as when the user cannot swipe or does not have an active plan
-//       useSwiper.current.swipeBack();
-//       alertDailySwipeExceeded();
-//     }
-//   };
-
-//   const onSwipedLeft = index => {
-//     handleSwipe('dislike', index);
-//   };
-
-//   const onSwipedRight = index => {
-//     alert('right');
-//     // handleSwipe('like', index);
-//   };
-
-//   const onSwipedTop = index => {
-//     handleSwipe('like', index);
-//   };
-
-//   const onSwipedAll = () => {
-//     onAllCardsSwiped();
-//   };
-
-//   const onTapCard = index => {
-//     // alert('onTapCard', index);
-//     currentDeckIndex.current = index;
-//     setShowMode(1);
-//   };
-
-//   const undoSwipe = () => {
-//     if (!hasActivePlan.current) {
-//       requestUpgrade();
-
-//       return;
-//     }
-
-//     useSwiper.current.swipeBack(index => {
-//       const prevDeckItem = data[index - 1];
-
-//       currentDeckIndex.current = index;
-//       onUndoSwipe(prevDeckItem);
-//     });
-//   };
-
-//   const requestUpgrade = () => {
-//     Alert.alert(
-//       'Upgrade account',
-//       'Upgrade your account now to undo a swipe.',
-//       [
-//         {
-//           text: 'Upgrade Now',
-//           onPress: () => setSubscriptionVisible(true),
-//         },
-//         {
-//           text: 'Cancel',
-//         },
-//       ],
-//       { cancelable: true },
-//     );
-//   };
 
 //   const alertDailySwipeExceeded = () => {
 //     Alert.alert(
@@ -135,136 +47,159 @@
 //     );
 //   };
 
-//   const renderCard = item => {
-//     // console.log('ram...', profilePictureURL)
-//     if (item) {
-//       return (
-//         <TinderItemCard
-//           key={'TinderCard' + item.id}
-//           url={item.profilePictureURL}
-//           name={item.firstName}
-//           lastName={item.lastName}
-//           age={item.age}
-//           school={item.school}
-//           distance={item.distance}
-//           undoSwipe={undoSwipe}
-//         />
-//       );
+//   const handleSwipe = (type, index) => {
+//     const currentDeckItem = data[index]
+//     currentDeckIndex.current = index
+//     if (type === 'like' && (canUserSwipe || hasActivePlan.current)) {
+//       onSwipe(type, currentDeckItem)
+//       // Navigate to chat page only when liked
+//       // navigation.navigate('Chat', { user: currentDeckItem })
+//     } else if (type === 'dislike') {
+//       // Handle the dislike action, such as showing a message or any other logic
+//        onSwipe(type, currentDeckItem)
+//       console.log('Disliked:', currentDeckItem)
+//     } else {
+//       // Handle other cases, such as when the user cannot swipe or does not have an active plan
+//       useSwiper.current.swipeBack()
+//       alertDailySwipeExceeded()
 //     }
+//   }
+
+//   const onSwipedLeft = index => {
+//     handleSwipe('dislike', index);
 //   };
 
-//   const renderOverlayLabel = (label, color) => {
-//     return (
-//       <View style={[styles.overlayLabel, { borderColor: color }]}>
-//         <CustomText style={[styles.overlayLabelText, { color }]}>
-//           {label}
-//         </CustomText>
-//       </View>
+//   const onSwipedRight = index => {
+//     handleSwipe('like', index);
+//   };
+
+//   const onSwipedTop = index => {
+//     handleSwipe('like', index);
+//   };
+
+//   const onSwipedAll = () => {
+//     onAllCardsSwiped();
+//   };
+
+//   const undoSwipe = () => {
+//     // if (!hasActivePlan.current) {
+//     //   Alert.alert(
+//     //     'Upgrade account',
+//     //     'Upgrade your account now to undo a swipe.',
+//     //     [
+//     //       { text: 'Upgrade Now', onPress: () => setSubscriptionVisible(true) },
+//     //       { text: 'Cancel' },
+//     //     ],
+//     //   );
+//     //   return;
+//     // }
+
+//     useSwiper.current?.swipeBack(i => {
+//       const prev = data[i - 1];
+//       currentDeckIndex.current = i;
+//       onUndoSwipe(prev);
+//     });
+//   };
+
+//   const renderCard = item =>
+//     item && (
+//       <TinderItemCard
+//         key={'TinderCard' + item.id}
+//         url={item.profilePictureURL}
+//         name={item.firstName}
+//         lastName={item.lastName}
+//         age={item.age}
+//         school={item.school}
+//         distance={item.distance}
+//         undoSwipe={undoSwipe}
+//       />
 //     );
+
+//   const renderOverlayLabel = (label, color) => (
+//     <View style={[styles.overlayLabel, { borderColor: color }]}>
+//       <CustomText style={[styles.overlayLabelText, { color }]}>
+//         {label}
+//       </CustomText>
+//     </View>
+//   );
+
+//   // 👉 This opens sheet ONLY when card itself is tapped
+//   const handleTapCard = index => {
+//     currentDeckIndex.current = index;
+//     setCardInfo?.(data[index]);
+//     setTimeout(() => {
+//       SheetManager.show('post-user-profile-info-sheet');
+//     }, 250);
 //   };
 
-//   // const RenderBottomTabBar = () => {
-//   //   return (
-//   //     <View style={styles.bottomTabBarContainer}>
-//   //       <SwipeControls
-//   //         onDislikePressed={() => alert('onDislikePressed DeckItemCard')}
-//   //         onLikePressed={() => alert('onLikePressed DeckItemCard')}
-//   //       />
-//   //     </View>
-//   //   );
-//   // };
+//   const onDislikePressed = () => {
+//     useSwiper.current.swipeLeft();
+//   };
+
+//   const onLikePressed = () => {
+//     useSwiper.current.swipeRight();
+//   };
 
 //   if (data.length === 0) {
-//     // return <View style={styles.noMoreCards}>{renderEmptyState()}</View>;
+//     return <View style={styles.noMoreCards}>{renderEmptyState()}</View>;
 //   }
 
 //   return (
-//     <View style={styles.container}>
-//       <Swiper
-//         ref={useSwiper}
-//         animateCardOpacity={true}
-//         containerStyle={styles.swiperContainer}
-//         cards={data}
-//         renderCard={renderCard}
-//         cardIndex={0}
-//         backgroundColor="white"
-//         stackSize={2}
-//         verticalSwipe={true}
-//         infinite={false}
-//         showSecondCard={true}
-//         animateOverlayLabelsOpacity={true}
-//         onTapCard={va => {
-//           console.log('vaLPLPLPLPLPLPLPLPLPLPL', va);
-//           onPressCard(data[va]);
-//         }}
-//         onSwipedRight={onSwipedRight}
-//         onSwipedTop={onSwipedTop}
-//         onSwipedLeft={onSwipedLeft}
-//         onSwipedAll={onSwipedAll}
-//         swipeBackCard={true}
-//         overlayLabels={{
-//           left: {
-//             title: 'NOPE',
-//             element: renderOverlayLabel('NOPE', '#E5566D'),
-//             style: {
-//               wrapper: styles.overlayWrapper,
-//             },
-//           },
-//           right: {
-//             title: 'LIKE',
-//             element: renderOverlayLabel('LIKE', '#4CCC93'),
-//             style: {
-//               wrapper: {
-//                 ...styles.overlayWrapper,
-//                 alignItems: 'flex-start',
-//                 marginLeft: 30,
+//     <>
+//       <View style={styles.container}>
+//         <Swiper
+//           ref={useSwiper}
+//           cards={data}
+//           renderCard={renderCard}
+//           cardIndex={0}
+//           stackSize={2}
+//           verticalSwipe
+//           showSecondCard
+//           infinite={false}
+//           backgroundColor="white"
+//           containerStyle={styles.swiperContainer}
+//           overlayLabels={{
+//             left: {
+//               title: 'NOPE',
+//               element: renderOverlayLabel('NOPE', '#E5566D'),
+//               style: {
+//                 wrapper: styles.overlayWrapper,
 //               },
 //             },
-//           },
-//         }}
-//       />
-//       <View style={styles.bottomTabBarContainer} pointerEvents="box-only">
-//         <SwipeControls
-//           onLikePressed={() => {
-//             console.log('Like button pressed');
-//             Alert.alert('DeckItemCard', 'Like Pressed!');
-//             // optional swipe
-//             // useSwiper.current?.swipeRight();
+//             right: {
+//               title: 'LIKE',
+//               element: renderOverlayLabel('LIKE', '#4CCC93'),
+//               style: {
+//                 wrapper: {
+//                   ...styles.overlayWrapper,
+//                   alignItems: 'flex-start',
+//                   marginLeft: 30,
+//                 },
+//               },
+//             },
 //           }}
-//           onDislikePressed={() => {
-//             console.log('Dislike button pressed');
-//             Alert.alert('DeckItemCard', 'Dislike Pressed!');
-//             useSwiper.current?.swipeLeft();
-//           }}
+//           onTapCard={handleTapCard}
+//           onSwipedRight={onSwipedRight}
+//           onSwipedTop={onSwipedTop}
+//           onSwipedLeft={onSwipedLeft}
+//           onSwipedAll={onSwipedAll}
+//           swipeBackCard
+//           animateCardOpacity
 //         />
 //       </View>
-//     </View>
+//       <View style={styles.bottomTabBarContainer}>
+//         <SwipeControls
+//           onDislikePressed={onDislikePressed}
+//           onLikePressed={onLikePressed}
+//         />
+//       </View>
+//       <PostUserProfileInfoSheet item={cardInfo} useSwiper={useSwiper} />
+//     </>
 //   );
 // };
 
-// // Exporting
 // export default memo(DeckItemCard);
 
-{
-  /* {showMode == 1 && data[currentDeckIndex.current] && (
-        <Modal animationType={'slide'}>
-          <View style={styles.cardDetailContainer}>
-            <View style={styles.cardDetailL}>
-              {renderCardDetail(data[currentDeckIndex.current])}
-            </View>
-          </View>
-        </Modal>
-      )}
-      {showMode == 2 && (
-        <Modal
-          transparent={false}
-          visible={showMode == 2 ? true : false}
-          animationType={'slide'}
-        >
-          <View style={styles.newMatch}>{renderNewMatch()}</View>
-        </Modal>
-      )} */
-}
 
 import React, { useRef, useEffect, memo, useState } from 'react';
 import { View, Alert } from 'react-native';
@@ -278,7 +213,6 @@ import { SheetManager } from 'react-native-actions-sheet';
 
 const DeckItemCard = ({
   data,
-  setShowMode,
   onUndoSwipe,
   onSwipe,
   onAllCardsSwiped,
@@ -286,92 +220,67 @@ const DeckItemCard = ({
   setSubscriptionVisible,
   renderEmptyState,
   canUserSwipe,
-  navigation,
 }) => {
-  const useSwiper = useRef(null);
-  const hasActivePlan = useRef(false);
-  const currentDeckIndex = useRef(0);
+  const swiperRef = useRef(null);
+  const [cardIndex, setCardIndex] = useState(0); // Use state to track current visible card
   const [cardInfo, setCardInfo] = useState(null);
 
+  // Sync cardInfo whenever the index changes
   useEffect(() => {
-    hasActivePlan.current = isPlanActive;
-  }, [isPlanActive]);
+    if (data && data[cardIndex]) {
+      setCardInfo(data[cardIndex]);
+    }
+  }, [cardIndex, data]);
 
   const alertDailySwipeExceeded = () => {
     Alert.alert(
       'Daily swipes exceeded',
       'You have exceeded the daily swipes limit. Upgrade your account now to enjoy unlimited swipes',
       [
-        {
-          text: 'Upgrade Now',
-          onPress: () => setSubscriptionVisible(true),
-        },
-        {
-          text: 'Cancel',
-        },
+        { text: 'Upgrade Now', onPress: () => setSubscriptionVisible(true) },
+        { text: 'Cancel', style: 'cancel' },
       ],
       { cancelable: true },
     );
   };
 
   const handleSwipe = (type, index) => {
-    const currentDeckItem = data[index]
-    currentDeckIndex.current = index
-    if (type === 'like' && (canUserSwipe || hasActivePlan.current)) {
-      onSwipe(type, currentDeckItem)
-      // Navigate to chat page only when liked
-      // navigation.navigate('Chat', { user: currentDeckItem })
-    } else if (type === 'dislike') {
-      // Handle the dislike action, such as showing a message or any other logic
-       onSwipe(type, currentDeckItem)
-      console.log('Disliked:', currentDeckItem)
-    } else {
-      // Handle other cases, such as when the user cannot swipe or does not have an active plan
-      useSwiper.current.swipeBack()
-      alertDailySwipeExceeded()
+    const currentDeckItem = data[index];
+    
+    // Check limits for 'like'
+    if (type === 'like' && !(canUserSwipe || isPlanActive)) {
+      swiperRef.current?.swipeBack();
+      alertDailySwipeExceeded();
+      return;
     }
-  }
 
-  const onSwipedLeft = index => {
-    handleSwipe('dislike', index);
-  };
-
-  const onSwipedRight = index => {
-    handleSwipe('like', index);
-  };
-
-  const onSwipedTop = index => {
-    handleSwipe('like', index);
-  };
-
-  const onSwipedAll = () => {
-    onAllCardsSwiped();
+    // Move to next index state
+    setCardIndex(index + 1);
+    onSwipe(type, currentDeckItem);
   };
 
   const undoSwipe = () => {
-    // if (!hasActivePlan.current) {
-    //   Alert.alert(
-    //     'Upgrade account',
-    //     'Upgrade your account now to undo a swipe.',
-    //     [
-    //       { text: 'Upgrade Now', onPress: () => setSubscriptionVisible(true) },
-    //       { text: 'Cancel' },
-    //     ],
-    //   );
-    //   return;
-    // }
+    // If you want to restrict undo to premium users, uncomment this:
+    /*
+    if (!isPlanActive) {
+       setSubscriptionVisible(true);
+       return;
+    }
+    */
 
-    useSwiper.current?.swipeBack(i => {
-      const prev = data[i - 1];
-      currentDeckIndex.current = i;
-      onUndoSwipe(prev);
-    });
+    if (cardIndex > 0) {
+      swiperRef.current?.swipeBack();
+      const prevIndex = cardIndex - 1;
+      setCardIndex(prevIndex);
+      onUndoSwipe(data[prevIndex]);
+    }
   };
 
-  const renderCard = item =>
-    item && (
+  const renderCard = (item) => {
+    if (!item) return null;
+    return (
       <TinderItemCard
-        key={'TinderCard' + item.id}
+        key={item.id}
         url={item.profilePictureURL}
         name={item.firstName}
         lastName={item.lastName}
@@ -381,6 +290,7 @@ const DeckItemCard = ({
         undoSwipe={undoSwipe}
       />
     );
+  };
 
   const renderOverlayLabel = (label, color) => (
     <View style={[styles.overlayLabel, { borderColor: color }]}>
@@ -390,24 +300,14 @@ const DeckItemCard = ({
     </View>
   );
 
-  // 👉 This opens sheet ONLY when card itself is tapped
-  const handleTapCard = index => {
-    currentDeckIndex.current = index;
-    setCardInfo?.(data[index]);
+  const handleTapCard = (index) => {
+    setCardInfo(data[index]);
     setTimeout(() => {
       SheetManager.show('post-user-profile-info-sheet');
-    }, 250);
+    }, 100);
   };
 
-  const onDislikePressed = () => {
-    useSwiper.current.swipeLeft();
-  };
-
-  const onLikePressed = () => {
-    useSwiper.current.swipeRight();
-  };
-
-  if (data.length === 0) {
+  if (!data || data.length === 0 || cardIndex >= data.length) {
     return <View style={styles.noMoreCards}>{renderEmptyState()}</View>;
   }
 
@@ -415,23 +315,22 @@ const DeckItemCard = ({
     <>
       <View style={styles.container}>
         <Swiper
-          ref={useSwiper}
+          ref={swiperRef}
           cards={data}
           renderCard={renderCard}
-          cardIndex={0}
+          cardIndex={cardIndex} // Controlled index
           stackSize={2}
-          verticalSwipe
-          showSecondCard
+          verticalSwipe={true}
+          showSecondCard={true}
           infinite={false}
-          backgroundColor="white"
+          disableBottomSwipe
+          backgroundColor="transparent"
           containerStyle={styles.swiperContainer}
           overlayLabels={{
             left: {
               title: 'NOPE',
               element: renderOverlayLabel('NOPE', '#E5566D'),
-              style: {
-                wrapper: styles.overlayWrapper,
-              },
+              style: { wrapper: styles.overlayWrapper },
             },
             right: {
               title: 'LIKE',
@@ -446,21 +345,21 @@ const DeckItemCard = ({
             },
           }}
           onTapCard={handleTapCard}
-          onSwipedRight={onSwipedRight}
-          onSwipedTop={onSwipedTop}
-          onSwipedLeft={onSwipedLeft}
-          onSwipedAll={onSwipedAll}
-          swipeBackCard
+          onSwipedLeft={(index) => handleSwipe('dislike', index)}
+          onSwipedRight={(index) => handleSwipe('like', index)}
+          onSwipedTop={(index) => handleSwipe('like', index)}
+          onSwipedAll={onAllCardsSwiped}
           animateCardOpacity
         />
       </View>
       <View style={styles.bottomTabBarContainer}>
         <SwipeControls
-          onDislikePressed={onDislikePressed}
-          onLikePressed={onLikePressed}
+          onDislikePressed={() => swiperRef.current?.swipeLeft()}
+          onLikePressed={() => swiperRef.current?.swipeRight()}
+          onUndoPressed={undoSwipe} // Added undo to controls if available
         />
       </View>
-      <PostUserProfileInfoSheet item={cardInfo} useSwiper={useSwiper} />
+      <PostUserProfileInfoSheet item={cardInfo} useSwiper={swiperRef} />
     </>
   );
 };

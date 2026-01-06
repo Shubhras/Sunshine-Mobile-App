@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ImageBackground, View } from 'react-native';
+import { AppState, ImageBackground, Platform, View } from 'react-native';
 import DeckItemCard from '../../components/cards/DeckItemCard';
 import Colors from '../../constants/Colors';
 import { Images } from '../../constants/images';
@@ -13,19 +13,31 @@ import MatchScreen from '../MatchScreen';
 import firestore from '@react-native-firebase/firestore';
 import SwipeTracker from '../../api/firebase/tracker';
 import { useSelector, useDispatch, ReactReduxContext } from 'react-redux'
+import { getUserSubscription, updateUserSubscription } from '../../api/firebase/firebase';
+import { mySubscribedPlan, setIsPlanActive } from '../../redux/slices/inAppPurchaseSlice';
+import Geolocation from '@react-native-community/geolocation';
+import { updateUser } from '../../redux/slices/SessionUser';
 
 const SwipeScreen = ({ navigation }) => {
   // Local State
   const userInfo = useSelector(state => state.users.users);
+    const swipes = useSelector(state => state.dating.swipes)
+  const bannedUserIDs = useSelector(state => state.userReports.bannedUserIDs)
+  const matches = useSelector(state => state.dating.matches)
+  const isPlanActive = useSelector(state => state.inAppPurchase.isPlanActive)
+    console.log("matchesmatchesmatchesmatchesmatches",matches);
+     const dispatch = useDispatch() 
   const [showMode, setShowMode] = useState(0);
   const [canUserSwipe, setCanUserSwipe] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
   const [currentMatchData, setCurrentMatchData] = useState(null);
   const [cardInfo, setCardInfo] = useState(null);
-  const [user, setUser] = useState({
-    id: 'current_user_id',
-    userID: 'current_user_id',
-  });
+  const user =userInfo
+
+  const [appState, setAppState] = useState(AppState.currentState)
+  const [positionWatchID, setPositionWatchID] = useState(null)
+  const [userSettingsDidChange, setUserSettingsDidChange] = useState(false)
+
 
   // // Swipe tracker object simulation
   // const swipeTracker = React.useRef({
@@ -48,7 +60,11 @@ const SwipeScreen = ({ navigation }) => {
  const isLoadingRecommendations = useRef(false)
    const recommendationBatchLimit = 75
   const swipeThreshold = 5
-  const usersRef = firestore().collection('users')
+   const usersRef = firestore().collection('users')
+  var userRef = null
+  if (user) {
+      userRef = usersRef.doc(user.id)
+    }
  const swipeCountDetail = useRef({})
 
  const [
@@ -62,11 +78,222 @@ const SwipeScreen = ({ navigation }) => {
     .limit(recommendationBatchLimit)
 );
 
-useEffect(()=>{
-  getUserSwipeCount()
-getMoreRecommendationsIfNeeded()
-},[])
 
+  const [subscription, setSubscription] = useState(null)
+  const loadSubscription = async () => {
+    const userID = userInfo.id || userInfo.userID
+
+    const { subscription } = await getUserSubscription(userID)
+
+    setSubscription(subscription)
+    //console.log("bahi..4..",subscription )
+    // validateIOSPlan(subscription)
+  }
+  const validateIOSReceipt = async receipt => {
+    const isTestEnvironment = __DEV__
+
+    const receiptBody = {
+      'receipt-data': receipt,
+      password: '0e204fa5b8e54c6aabfcf404747f5c44',
+    }
+    //console.log("bahi..3...")
+    try {
+      // const validatedReceipt = await validateReceiptIos(
+      //   receiptBody,
+      //   isTestEnvironment,
+      // )
+      // //console.log("bahi..3...")
+      // return validatedReceipt
+      return true
+    } catch (error) {
+      //console.log("bahi..3...",error)
+      return {}
+    }
+  }
+  const validateIOSPlan = async subscription => {
+    //console.log("bahi..2.....",subscription)
+    const { transactionDate, subscriptionPeriod, receipt, productId, active } =
+      subscription
+    //console.log("bahi..21", receipt)
+    const userID = userInfo.id || userInfo?.userID
+
+    const { status, latest_receipt } = await validateIOSReceipt(receipt)
+    console.log('status..1', status)
+    const updatedReceipt = { receipt: latest_receipt, active: true }
+
+    if (status === receiptValidationStatus.SUCCESS) {
+      dispatch(setIsPlanActive(true))
+      dispatch(mySubscribedPlan(subscription))
+      if (userID) {
+        updateUserSubscription(userID, updatedReceipt)
+        // updateUser(userID, { isVIP: true })
+      }
+
+      return
+    }
+  }
+
+    const handleAppStateChange = nextAppState => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      userRef
+        .update({
+          isOnline: true,
+        })
+        .then(() => {
+          dispatch(updateUser({  isOnline: true  }))
+        })
+        .then(() => {
+          setAppState(nextAppState)
+        })
+        .catch(error => {})
+    } else {
+      userRef
+        .update({
+          isOnline: false,
+        })
+        .then(() => {
+            dispatch(updateUser({  isOnline: false  }))
+        })
+        .then(() => {
+          setAppState(nextAppState)
+        })
+        .catch(error => {})
+    }
+  }
+
+  const watchPositionChange = async () => {
+    if (Platform.OS === 'ios') {
+      setPositionWatchID(watchPosition())
+    } else {
+      handleAndroidLocationPermission()
+    }
+  }
+
+  const handleAndroidLocationPermission = async () => {
+    try {
+      // const { status } = await Location.requestForegroundPermissionsAsync()
+      // if (status === 'granted') {
+        setPositionWatchID(watchPosition())
+      // } else {
+      //   alert(
+      //     IMLocalized(
+      //       'Location permission denied. Turn on location to use the app.',
+      //     ),
+      //   )
+      // }
+    } catch (err) {}
+  }
+
+  const watchPosition = () => {
+    return Geolocation.watchPosition(position => {
+      const locationDict = {
+        position: {
+          // for legacy reasons
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        },
+        location: {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        },
+      }
+      userRef
+        .update(locationDict)
+        .then(() => {
+          dispatch(updateUser({ ...user, ...locationDict } ))
+        })
+        .catch(error => {})
+    })
+  }
+
+// useEffect(()=>{
+//   getUserSwipeCount()
+// getMoreRecommendationsIfNeeded()
+// },[])
+
+  useEffect(() => {
+    if (!isPlanActive && Platform.OS === 'ios') {
+      loadSubscription()
+    }
+  }, [])
+
+  //
+  useEffect(() => {
+    // StatusBar.setHidden(false)
+    swipeTracker.current.subscribeIfNeeded()
+
+    // let didFocusSubscription = navigation.addListener('focus', payload =>
+    //   handleComponentDidFocus(),
+    // )
+
+    // AppState.addEventListener('change', handleAppStateChange)
+
+    if (user) {
+      userRef = usersRef.doc(user.id)
+    }
+
+    // if (!isDatingProfileCompleteForUser(user)) {
+    //   handleIncompleteUserData();
+    // } else {
+    //   setHasValidatedCurrentProfile(true);
+    // }
+
+    getUserSwipeCount()
+
+    watchPositionChange()
+
+    handleAppStateChange()
+    return () => {
+      // didFocusSubscription && didFocusSubscription()
+      // AppState.removeEventListener('change', handleAppStateChange)
+      positionWatchID != null && Geolocation.clearWatch(positionWatchID)
+      swipeTracker.current.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (matches != null) {
+      // We retrieve all new matches and notify the user
+      const unseenMatches = matches.filter(match => !match.matchHasBeenSeen)
+      if (unseenMatches.length > 0 && !currentMatchData) {
+        // Send push notification
+        // notificationManager.sendPushNotification(
+        //   unseenMatches[0],
+        //   IMLocalized('New match!'),
+        //   IMLocalized('You just got a new match!'),
+        //   'dating_match',
+        //   { fromUser: user },
+        // )
+        setCurrentMatchData(unseenMatches[0])
+      }
+    }
+  }, [matches, currentMatchData])
+
+  useEffect(() => {
+    if (currentMatchData) {
+      swipeTracker.current.markSwipeAsSeen(currentMatchData, user)
+      renderNewMatch()
+    }
+  }, [currentMatchData])
+
+  useEffect(() => {
+    if (recommendations.length === 0 && swipes) {
+      getMoreRecommendationsIfNeeded()
+    }
+  }, [swipes, recommendations])
+
+  useEffect(() => {
+    setRecommendations([])
+    isLoadingRecommendations.current = false
+    setHasConsumedRecommendationsStream(false)
+    recommendationRef.current = usersRef
+      .orderBy('id', 'desc')
+      .limit(recommendationBatchLimit)
+  }, [
+    user?.settings?.distance_radius,
+    user?.settings?.gender_preference,
+    user?.settings?.gender,
+  ])
 
 
 
@@ -148,6 +375,7 @@ getMoreRecommendationsIfNeeded()
     return hydratedRecommendations.filter(
       recommendation => recommendation != null,
     )
+  
   }
     const hydratedValidRecommendation = otherUser => {
       return otherUser
@@ -384,7 +612,7 @@ getMoreRecommendationsIfNeeded()
   };
 
   const renderNewMatch = () => {
-    if (!currentMatchData) return null;
+    // if (!currentMatchData) return null;
     return (
       <MatchScreen
         url={currentMatchData.profilePictureURL}

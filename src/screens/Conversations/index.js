@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ImageBackground, View } from 'react-native';
 import IMConversationListView from '../../components/IMConversationListView/IMConversationListView';
 import TNStoriesTray from '../../components/TNStoriesTray';
 import Colors from '../../constants/Colors';
 import { Images } from '../../constants/images';
 import styles from './styles';
+import { ReactReduxContext, useSelector } from 'react-redux';
+import FirebaseChannelsTracker from '../../api/firebase/channelsTracker';
 
 const INITIAL_MATCHES_DATA = [
   {
@@ -205,36 +207,40 @@ const SAMPLE_CONVERSATIONS = [
   },
 ];
 
-const Conversations = ({ navigation, currentUser = { id: 'currentUser' } }) => {
-  const [matches, setMatches] = useState(INITIAL_MATCHES_DATA);
-  const [conversations, setConversations] = useState(SAMPLE_CONVERSATIONS);
-
-  const onMatchUserItemPress = otherUser => {
-    const id1 = currentUser?.id || currentUser?.userID || 'currentUser';
-    const id2 = otherUser.id || otherUser.userID;
+const Conversations = ({ navigation}) => {
+ const matches = useSelector(state => state.dating.matches)
+  const userInfo = useSelector(state => state.users.users);
+  const likeMessages = useSelector(state => state.dating.matches)
+  // const [matches, setMatches] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  useEffect(() => {}, [userInfo, matches, likeMessages])
+ const onMatchUserItemPress = otherUser => {
+    const id1 = userInfo.id || userInfo.userID
+    const id2 = otherUser.id || otherUser.userID
     const channel = {
       id: id1 < id2 ? id1 + id2 : id2 + id1,
       participants: [otherUser],
-    };
-    console.log('channel-------', channel);
-    navigation.navigate('PersonalChat', {
+    }
+    navigation.navigate('Chat', {
       channel,
+      otherUser,
     });
-  };
+  }
+
 
   // Handle removing a user from the matches list
   const handleRemoveUser = userToRemove => {
-    setMatches(prevMatches =>
-      prevMatches.filter(
-        user =>
-          user.id !== userToRemove.id && user.userID !== userToRemove.userID,
-      ),
-    );
+    // setMatches(prevMatches =>
+    //   prevMatches.filter(
+    //     user =>
+    //       user.id !== userToRemove.id && user.userID !== userToRemove.userID,
+    //   ),
+    // );
     console.log('User removed from matches:', userToRemove);
   };
 
   const onEmptyStatePress = () => {
-    // navigation.navigate('Swipe')
+    navigation.navigate('SwipeStack')
   };
 
   const emptyStateConfig = {
@@ -264,9 +270,9 @@ const Conversations = ({ navigation, currentUser = { id: 'currentUser' } }) => {
           navigation={navigation}
           emptyStateConfig={emptyStateConfig}
           messageType="liked"
-          localConversations={conversations}
+          // localConversations={channels}
           setConversations={setConversations}
-          currentUser={currentUser}
+          // currentUser={userInfo}
         />
       </ImageBackground>
     </View>

@@ -4,6 +4,8 @@ import { CustomText } from '../../components/global/CustomText';
 import styles from './styles';
 
 const MatchScreen = ({ onSendMessage, onKeepSwiping }) => {
+  console.log("renderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatchrenderNewMatch");
+  
   return (
     <View style={styles.root}>
       {/* <StatusBar translucent backgroundColor="transparent" /> */}
