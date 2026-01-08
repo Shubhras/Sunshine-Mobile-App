@@ -5,8 +5,11 @@ import RNFS from 'react-native-fs';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { v4 as uuidv4 } from 'uuid';
 
-const BASE_DIR = `${RNFS.CachesDirectoryPath}/media-cache/`;
-
+// const BASE_DIR = `${RNFS.CachesDirectoryPath}/media-cache/`;
+const BASE_DIR =
+  Platform.OS === 'android'
+    ? RNFS.CachesDirectoryPath
+    : `${RNFS.CachesDirectoryPath}/media-cache/`;
 // Ensure directory exists
 function ensureDirExists(dir) {
   return RNFS.exists(dir).then(exists => {
@@ -57,31 +60,66 @@ const createThumbnailFromVideo = videoUri => {
 // -------------------------
 // 📌 IMAGE RESIZE
 // -------------------------
-const resizeImage = (image, callback) => {
-  const imagePath = image?.path || image?.uri;
-  const processedUri = `${BASE_DIR}${uuidv4()}.jpg`;
+// const resizeImage = (image, callback) => {
+//   const imagePath = image?.path || image?.uri;
+//   const processedUri = `${BASE_DIR}${uuidv4()}.jpg`;
 
-  if (image?.height < 1100) {
-    callback(processedUri); // keep UUID even if no resize
-    return;
+//   if (image?.height < 1100) {
+//     callback(processedUri); // keep UUID even if no resize
+//     return;
+//   }
+
+//   ImageResizer.createResizedImage(
+//     imagePath,
+//     1100,
+//     1100,
+//     'JPEG',
+//     100,
+//     0,
+//     BASE_DIR,
+//     false,
+//     { name: uuidv4() },
+//   )
+//     .then(newSource => callback(newSource.uri))
+//     .catch(err => {
+//       console.log('Image resize error:', err);
+//       callback(processedUri);
+//     });
+// };
+
+const normalizePath = path =>
+  Platform.OS === 'android' && !path.startsWith('file://')
+    ? `file://${path}`
+    : path;
+
+const resizeImage = async (image, callback) => {
+  try {
+    const imagePath = normalizePath(image?.path || image?.uri);
+    const fileName = `${uuidv4()}.jpg`;
+
+    // If height < 1100 → return original
+    if (image?.height < 1100) {
+      callback(imagePath);
+      return;
+    }
+
+    const resizedImage = await ImageResizer.createResizedImage(
+      imagePath,
+      1100,
+      1100,
+      'JPEG',
+      100,
+      0,
+      BASE_DIR,
+      false,
+      { name: fileName },
+    );
+
+    callback(resizedImage.uri);
+  } catch (error) {
+    console.log('Image resize error:', error);
+    callback(image?.path || image?.uri);
   }
-
-  ImageResizer.createResizedImage(
-    imagePath,
-    1100,
-    1100,
-    'JPEG',
-    100,
-    0,
-    BASE_DIR,
-    false,
-    { name: uuidv4() },
-  )
-    .then(newSource => callback(newSource.uri))
-    .catch(err => {
-      console.log('Image resize error:', err);
-      callback(processedUri);
-    });
 };
 
 // -------------------------

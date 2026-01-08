@@ -1094,10 +1094,9 @@ const Settings = ({ route, navigation }) => {
     console.log('✅ FINAL SETTINGS PAYLOAD', finalData);
 
     // dispatch(updateUserSettings(finalData));
-    const payload = {
-      settings: finalData,
-    };
-    handleSubmit(payload);
+   
+    console.log('StatesUS Payload 👉', finalData);
+    handleSubmit({ settings: { ...reduxSettings, ...finalData } });
   };
 
   const handleSubmit = values => {
@@ -1312,6 +1311,89 @@ const Settings = ({ route, navigation }) => {
     );
   };
 
+  const renderSelectField = (field, index) => {
+    if (!actionSheetRefs.current[field.key]) {
+      actionSheetRefs.current[field.key] = React.createRef();
+    }
+    const ref = actionSheetRefs.current[field.key];
+
+    return (
+      <View key={`select-${field.key}-${index}`}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => ref.current?.show()}
+          style={[
+            styles.settingsTypeContainer,
+            styles.appSettingsTypeContainer,
+          ]}
+        >
+          <CustomText style={styles.inputTitle}>{field.displayName}</CustomText>
+          <View style={styles.textinputWrapper}>
+            <CustomText style={styles.selectValueText}>
+              {computeValue(field)}
+            </CustomText>
+          </View>
+        </TouchableOpacity>
+
+        <ActionSheet
+          ref={ref}
+          gestureEnabled
+          headerAlwaysVisible
+          containerStyle={styles.sheetContainer}
+          indicatorStyle={styles.indicator}
+          closeOnTouchBackdrop
+        >
+          <View style={styles.sheetContent}>
+            <View style={styles.sheetHeader}>
+              <CustomText style={styles.sheetTitle}>
+                {field.displayName}
+              </CustomText>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.optionsList}
+            >
+              {field.displayOptions.map((item, idx) => {
+                const value = field.options[idx];
+                const isSelected =
+                  (selectStates[field.key] ?? field.value) === value;
+
+                return (
+                  <View
+                    key={`${field.key}-option-${idx}`}
+                    style={[
+                      idx === 0 && styles.languageComponentWrapperWithMarginTop,
+                      styles.languageComponentWrapper,
+                    ]}
+                  >
+                    <SelectionList
+                      backgroundColor={Colors.secondary}
+                      label={item}
+                      labelColor={Colors.black}
+                      uncheckedRadioBackgroundColor={Colors.white}
+                      checkedRadioBackgroundColor={Colors.onlineMarkColor}
+                      checkIconColor={Colors.white}
+                      isSelected={isSelected}
+                      onPress={() => onSelectOption(field, value)}
+                    />
+                  </View>
+                );
+              })}
+            </ScrollView>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => ref.current?.hide()}
+              style={styles.cancelButton}
+            >
+              <CustomText style={styles.cancelButtonText}>Cancel</CustomText>
+            </TouchableOpacity>
+          </View>
+        </ActionSheet>
+      </View>
+    );
+  };
   // const renderGenderSwitches = (field, index) => {
   //   const activeIndex = genderStates[field.key] ?? 0;
 
@@ -1429,8 +1511,8 @@ const Settings = ({ route, navigation }) => {
             min={18}
             max={100}
             step={1}
-            initialLowValue={low}
-            initialHighValue={high}
+            initialLowValue={Number(low ?? 0)}
+            initialHighValue={Number(high ?? 0)}
             thumbRadius={scale(10)}
             thumbBorderWidth={scale(2)}
             thumbColor={Colors.white}
@@ -1472,6 +1554,9 @@ const Settings = ({ route, navigation }) => {
   );
 
   const renderField = (field, index) => {
+    if (field.type === 'select') {
+      return renderSelectField(field, index);
+    }
     if (field.type === 'switch') return renderSwitchField(field, index);
     if (field.type === 'signSelect') return renderSelectSignField(field, index);
     if (field.type === 'switchGender')
@@ -1480,7 +1565,7 @@ const Settings = ({ route, navigation }) => {
     if (field.type === 'button') return renderButtonField(field, index);
     return null;
   };
-
+  
   return (
     <CustomSafeAreaView
       style={[styles.mainWrapper, { backgroundColor: Colors.black }]}

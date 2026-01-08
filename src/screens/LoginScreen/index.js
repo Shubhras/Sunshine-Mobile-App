@@ -18,6 +18,7 @@ import { STANDARD_SPACING } from '../../constants/Constants';
 import { localizedErrorMessage } from '../../utils/ErrorCode';
 import styles from './styles';
 import { updateUser } from '../../redux/slices/SessionUser';
+import { normalizeTimestamp } from '../../constants/helpers/helperFunction';
 
 // Validation Schema
 const LoginSchema = Yup.object().shape({
@@ -51,12 +52,8 @@ const LoginScreen = ({ navigation }) => {
             updateUser({
               ...res.user,
               isLogin: true,
-              createdAt: res.user?.createdAt
-                ? JSON.stringify(res.user?.createdAt)
-                : new Date().toISOString(),
-              lastOnlineTimestamp: res.user?.lastOnlineTimestamp
-                ? JSON.stringify(res.user?.lastOnlineTimestamp)
-                : '',
+              createdAt: normalizeTimestamp(res.user?.createdAt),
+              lastOnlineTimestamp: normalizeTimestamp(res.user?.lastOnlineTimestamp)
             }),
           );
           setLoading(false);
@@ -108,7 +105,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <Formik
-        initialValues={{ email: 'li@gmail.com', password: 'Test@123' }}
+        initialValues={{ email: 'sam@gmail.com', password: 'Test@123' }}
         validationSchema={LoginSchema}
         onSubmit={handleLogin}
         validateOnBlur={true}

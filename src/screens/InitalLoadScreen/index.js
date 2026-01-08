@@ -17,7 +17,7 @@ const InitalLoadScreen = ({ navigation }) => {
   const handleNavigationScreen = () => {
     const { isLogin = false, isOnbording = false } = userInfo || {};
 
-    console.log('jsdhjfhhdsjkfhjdhsjkfhjkdhf', userInfo);
+    console.log('userInfouserInfouserInfouserInfouserInfouserInfouserInfo', userInfo);
     if (!isLogin && isOnbording) {
       // ✅ Logged in + Business chosen but no review setup yet
       navigation.reset({

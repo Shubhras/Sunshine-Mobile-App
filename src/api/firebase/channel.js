@@ -1,32 +1,575 @@
-import { get } from 'lodash'
+// import { v4 as uuidv4 } from 'uuid';
+// import firestore, {
+//   deleteDoc,
+//   doc,
+//   getDoc,
+//   getFirestore,
+//   serverTimestamp,
+//   setDoc,
+//   updateDoc,
+// } from '@react-native-firebase/firestore'
+// import { formatMessage } from '../../constants/helpers/helperFunction';
+
+// const channelsRef = firestore().collection('channels')
+// const socialFeedsRef = firestore().collection('social_feeds')
+// const swipeRefs = firestore().collection('swipes')
+
+// export const subscribeChannels = (userID, callback) => {
+//   return socialFeedsRef
+//     .doc(userID)
+//     .collection('chat_feed')
+//     .orderBy('createdAt', 'desc')
+//     .onSnapshot({ includeMetadataChanges: true }, snapshot =>
+//       callback(snapshot.docs.map(doc => doc.data())),
+//     )
+// }
+
+// export const subscribeSingleChannel = (channelID, callback) => {
+//   return channelsRef.doc(channelID).onSnapshot(doc => callback(doc?.data()))
+// }
+
+// export const subscribeThreadSnapshot = (channel, callback, userID) => {
+//   let a
+//   channelsRef
+//     .doc(channel.id)
+//     .get()
+//     .then(documentSnapshot => {
+//       if (documentSnapshot.exists == true) {
+//         let b = documentSnapshot.data()?.creatorID
+//         if (b == userID) {
+//           a = 'participant1'
+//         } else {
+//           a = 'participant2'
+//         }
+//         return channelsRef
+//           .doc(channel.id)
+//           .collection('thread')
+//           .where(a, '==', true)
+//           .orderBy('createdAt', 'desc')
+//           .onSnapshot(querySnapshot => {
+//             const data = []
+//             querySnapshot.docs.forEach(doc => {
+//               const message = doc.data()
+//               if (
+//                 !message.content ||
+//                 message.content.length == 0 ||
+//                 !message.content.startsWith('XARQEGWE13SD')
+//               ) {
+//                 data.push({ ...message, id: doc.id })
+//               }
+//             })
+//             callback(data)
+//           })
+//       } else {
+//         return channelsRef
+//           .doc(channel.id)
+//           .collection('thread')
+//           .orderBy('createdAt', 'desc')
+//           .onSnapshot(querySnapshot => {
+//             const data = []
+//             querySnapshot.docs.forEach(doc => {
+//               const message = doc.data()
+//               if (
+//                 !message.content ||
+//                 message.content.length == 0 ||
+//                 !message.content.startsWith('XARQEGWE13SD')
+//               ) {
+//                 data.push({ ...message, id: doc.id })
+//               }
+//             })
+//             callback(data)
+//           })
+//       }
+//     })
+// }
+
+// export const hydrateSocialChatFeedItem = async (
+//   sender,
+//   channel,
+//   message,
+//   createdAt,
+// ) => {
+//   const otherParticipants =
+//     channel &&
+//     channel.participants &&
+//     channel.participants.filter(
+//       participant => participant && participant.id != sender.id,
+//     )
+//   const timestamp = currentTimestamp()
+//   const feedItemTitleForSender =
+//     otherParticipants?.length == 1
+//       ? otherParticipants[0].firstName + ' ' + otherParticipants[0].lastName
+//       : channel.name
+//   const feedItemTitleForRecipients =
+//     otherParticipants?.length == 1
+//       ? sender.firstName + ' ' + sender.lastName
+//       : channel.name
+
+//   // We update the chat feed for the sender user
+//   socialFeedsRef
+//     .doc(sender.id)
+//     .collection('chat_feed')
+//     .doc(channel.id)
+//     .set(
+//       {
+//         id: channel.id,
+//         title: feedItemTitleForSender,
+//         content: message,
+//         markedAsRead: true,
+//         createdAt: createdAt || timestamp,
+//         participants: otherParticipants,
+//       },
+//       { merge: true },
+//     )
+
+//   // We update the chat feed for all the other participants
+//   otherParticipants.forEach(recipient => {
+//     const allParticipants = [...channel.participants]
+//     const otherParticipants =
+//       allParticipants &&
+//       allParticipants.filter(
+//         participant => participant && participant.id != recipient.id,
+//       )
+
+//     socialFeedsRef
+//       .doc(recipient.id)
+//       .collection('chat_feed')
+//       .doc(channel.id)
+//       .set(
+//         {
+//           id: channel.id,
+//           title: feedItemTitleForRecipients,
+//           content: message,
+//           markedAsRead: false,
+//           createdAt: timestamp,
+//           participants: otherParticipants,
+//         },
+//         { merge: true },
+//       )
+//   })
+// }
+
+// export const sendMessage = (
+//   sender,
+//   channel,
+//   message,
+//   downloadURL,
+//   inReplyToItem,
+//   participantProfilePictureURLs,
+//   isNumrology
+// ) => {
+//   return new Promise(resolve => {
+//     const { profilePictureURL } = sender
+//     const userID = sender.id || sender.userID
+//     const timestamp = currentTimestamp()
+//     const data = {
+//       content: message,
+//       createdAt: timestamp,
+//       recipientFirstName: '',
+//       recipientID: '',
+//       recipientLastName: '',
+//       recipientProfilePictureURL: '',
+//       senderFirstName: sender.firstName || sender.fullname,
+//       senderID: userID,
+//       senderLastName: '',
+//       senderProfilePictureURL: profilePictureURL,
+//       url: downloadURL,
+//       inReplyToItem: inReplyToItem,
+//       readUserIDs: [userID],
+//       participantProfilePictureURLs,
+//       participant1: true,
+//       participant2: true,
+//     }
+    
+//     const channelID = channel.id
+//     console.log(isNumrology,"datadatadatadatadatadata",data);
+   
+//     if (isNumrology == true) {
+//       channelsRef
+//                 .doc(channelID)
+//                 .collection('thread')
+//                 .add({ ...data })
+//                 .then(doc => {
+//                   const lastMessage =
+//                     message && message.length > 0 ? message : downloadURL
+//                   channelsRef
+//                     .doc(channelID)
+//                     .update({
+//                       lastMessage: lastMessage,
+//                       lastThreadMessageId: doc.id,
+//                       lastMessageSenderId: userID,
+//                       readUserIDs: [userID],
+//                       participantProfilePictureURLs,
+//                     })
+//                     .then(response => {
+//                       hydrateSocialChatFeedItem(sender, channel, lastMessage)
+//                       resolve({ success: true })
+//                     })
+//                     .catch(error => {
+//                       resolve({ success: false, error: error })
+//                     })
+//                 })
+//                 .catch(error => {
+//                   resolve({ success: false, error: error })
+//                 })
+//       return
+//     }
+//     swipeRefs
+//       .where(
+//         'author',
+//         '==',
+//         data?.participantProfilePictureURLs[0]?.participantId,
+//       )
+//       .where('swipedProfile', '==', userID)
+//       .get()
+//       .then(querySnapshot => {
+//          console.log('channelID..', channelID,isNumrology)
+//         querySnapshot.forEach(docs => {
+//           docs.ref
+//             .update({
+//               authorSwipe: false,
+//             })
+//             .then(() => {
+//               console.log('cchannelsRefhannelID..');
+              
+//               channelsRef
+//                 .doc(channelID)
+//                 .collection('thread')
+//                 .add({ ...data })
+//                 .then(doc => {
+//                   const lastMessage =
+//                     message && message.length > 0 ? message : downloadURL
+//                   channelsRef
+//                     .doc(channelID)
+//                     .update({
+//                       lastMessage: lastMessage,
+//                       lastThreadMessageId: doc.id,
+//                       lastMessageSenderId: userID,
+//                       readUserIDs: [userID],
+//                       participantProfilePictureURLs,
+//                     })
+//                     .then(response => {
+//                       hydrateSocialChatFeedItem(sender, channel, lastMessage)
+//                       resolve({ success: true })
+//                     })
+//                     .catch(error => {
+//                       resolve({ success: false, error: error })
+//                     })
+//                 })
+//                 .catch(error => {
+//                   resolve({ success: false, error: error })
+//                 })
+//             })
+//         })
+//       })
+//       .catch(error => {
+//         resolve({ success: false, error: error })
+//       })
+//   })
+// }
+
+// export const deleteMessage = ({
+//   sender,
+//   channel,
+//   threadItemID,
+//   isLastCreatedThreadItem,
+//   newLastCreatedThreadItem,
+// }) => {
+//   if (!channel?.id || !threadItemID) {
+//     return
+//   }
+
+//   channelsRef.doc(channel?.id).collection('thread').doc(threadItemID).delete()
+
+//   if (isLastCreatedThreadItem && newLastCreatedThreadItem) {
+//     const {
+//       content,
+//       url,
+//       id,
+//       senderID,
+//       readUserIDs,
+//       participantProfilePictureURLs,
+//       createdAt,
+//     } = newLastCreatedThreadItem
+//     const lastMessage = content?.length > 0 ? content : url
+
+//     channelsRef
+//       .doc(channel?.id)
+//       .update({
+//         lastMessage: lastMessage,
+//         lastThreadMessageId: id,
+//         lastMessageSenderId: senderID,
+//         readUserIDs: readUserIDs,
+//         participantProfilePictureURLs: participantProfilePictureURLs,
+//       })
+//       .then(() => {
+//         hydrateSocialChatFeedItem(
+//           sender,
+//           channel,
+//           formatMessage(lastMessage),
+//           createdAt,
+//         )
+//       })
+//   }
+// }
+
+// export const markChannelTypingUsers = async (channelID, typingUsers) => {
+//   channelsRef.doc(channelID).update({
+//     typingUsers,
+//   })
+// }
+
+// export const markChannelThreadItemAsRead = async (
+//   channelID,
+//   userID,
+//   threadMessageID,
+//   readUserIDs,
+//   participants,
+// ) => {
+//   try {
+//     if (threadMessageID) {
+//       const channelThreadRef = channelsRef
+//         .doc(channelID)
+//         .collection('thread')
+//         .doc(threadMessageID)
+
+//       // mark thread item as read
+//       channelThreadRef.update({
+//         readUserIDs,
+//       })
+//     }
+
+//     // mark last message as read
+//     channelsRef.doc(channelID).update({
+//       readUserIDs,
+//       participants,
+//     })
+
+//     socialFeedsRef.doc(userID).collection('chat_feed').doc(channelID).update({
+//       markedAsRead: true,
+//     })
+
+//     return { success: true }
+//   } catch (error) {
+//     return { success: false, error }
+//   }
+// }
+
+// export const createChannel = (
+//   creator,
+//   otherParticipants,
+//   name,
+//   isNumrology,
+// ) => {
+//   return new Promise(resolve => {
+//     var channelID = uuidv4()
+//     const id1 = creator.id || creator.userID
+//     if (otherParticipants.length == 1) {
+//       const id2 = otherParticipants[0].id || otherParticipants[0].userID
+//       if (id1 == id2) {
+//         // We should never create a self chat
+//         resolve({ success: false })
+//         return
+//       }
+//       channelID = id1 < id2 ? id1 + id2 : id2 + id1
+//     }
+//     const channelData = {
+//       creatorID: id1,
+//       id: channelID,
+//       channelID,
+//       name: name || '',
+//       participants: [...otherParticipants, creator],
+//     }
+//     console.log("createChannelchannelData",channelData);
+//     if (isNumrology) {
+//       channelsRef
+//         .doc(channelID)
+//         .set({
+//           ...channelData,
+//         })
+//         .then(channelRef => {
+//           hydrateSocialChatFeedItem(creator, channelData, '')
+//           resolve({ success: true, channel: channelData })
+//         })
+//         .catch(() => {
+//           resolve({ success: false })
+//         })
+//       return
+//     }
+//     swipeRefs
+//       .where(
+//         'author',
+//         '==',
+//         otherParticipants[0].id || otherParticipants[0].userID,
+//       )
+//       .where('swipedProfile', '==', creator.id || creator.userID)
+//       .get()
+//       .then(querySnapshot => {
+//         querySnapshot.forEach(doc => {
+//           doc.ref
+//             .update({
+//               authorSwipe: false,
+//             })
+//             .then(() => {
+//               channelsRef
+//                 .doc(channelID)
+//                 .set({
+//                   ...channelData,
+//                 })
+//                 .then(channelRef => {
+//                   hydrateSocialChatFeedItem(creator, channelData, '')
+//                   resolve({ success: true, channel: channelData })
+//                 })
+//                 .catch(() => {
+//                   resolve({ success: false })
+//                 })
+//             })
+//         })
+//       })
+//   })
+// }
+
+// export const onLeaveGroup = async (channelId, userId, callback) => {
+//   try {
+//     const dbChannelDoc = await channelsRef.doc(channelId).get()
+//     const dbChannel = dbChannelDoc?.data()
+//     const dbParticipants = dbChannel?.participants
+
+//     var newParticipants = dbParticipants?.filter(user => user.id != userId)
+//     await channelsRef
+//       .doc(channelId)
+//       .set({ ...dbChannel, participants: newParticipants })
+
+//     await socialFeedsRef
+//       .doc(userId)
+//       .collection('chat_feed')
+//       .doc(channelId)
+//       .delete()
+//     callback({ success: true })
+//   } catch (error) {
+//     callback({
+//       success: false,
+//       error: error,
+//     })
+//   }
+// }
+
+// export const onRenameGroup = (text, channel, callback) => {
+//   channelsRef
+//     .doc(channel.id)
+//     .set(channel)
+//     .then(() => {
+//       const newChannel = channel
+//       newChannel.name = text
+//       callback({ success: true, newChannel })
+//     })
+//     .catch(error => {
+//       callback({
+//         success: false,
+//         error: 'An error occurred, please try again.',
+//       })
+//     })
+// }
+
+// export const currentTimestamp = () => {
+//   return serverTimestamp()
+// }
+
+// export const deleteConversation = (itemToDelete, user) => {
+//   socialFeedsRef
+//     .doc(user.id)
+//     .collection('chat_feed')
+//     .doc(itemToDelete.id)
+//     .delete()
+//     .then(() => {
+//       channelsRef
+//         .doc(itemToDelete.id)
+//         .get()
+//         .then(documentSnapshot => {
+//           if (documentSnapshot.exists == true) {
+//             let b = documentSnapshot.data()?.creatorID
+//             channelsRef
+//               .doc(itemToDelete.id)
+//               .collection('thread')
+//               .get()
+//               .then(querySnapshot => {
+//                 if (b == user.id) {
+//                   querySnapshot.forEach(function (doc) {
+//                     doc.ref.update({
+//                       participant1: false,
+//                     })
+//                   })
+//                 } else {
+//                   querySnapshot.forEach(function (doc) {
+//                     doc.ref.update({
+//                       participant2: false,
+//                     })
+//                   })
+//                 }
+//               })
+//           } else {
+//             return
+//           }
+//         })
+//     })
+//     .catch(error => {})
+// }
+
+
+
+
 import { v4 as uuidv4 } from 'uuid';
 import firestore, {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  onSnapshot,
+  orderBy,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
 } from '@react-native-firebase/firestore'
 import { formatMessage } from '../../constants/helpers/helperFunction';
+import { getApp } from '@react-native-firebase/app';
 
-const channelsRef = firestore().collection('channels')
-const socialFeedsRef = firestore().collection('social_feeds')
-const swipeRefs = firestore().collection('swipes')
+const app = getApp()
+const db = getFirestore(app)
+
+const channelsRef = collection(db, 'channels')
+const socialFeedsRef = collection(db, 'social_feeds')
+const swipeRefs = collection(db, 'swipes')
 
 export const subscribeChannels = (userID, callback) => {
-  return socialFeedsRef
-    .doc(userID)
-    .collection('chat_feed')
-    .orderBy('createdAt', 'desc')
-    .onSnapshot({ includeMetadataChanges: true }, snapshot =>
-      callback(snapshot.docs.map(doc => doc.data())),
-    )
+  const chatFeedRef = collection(
+    doc(socialFeedsRef, userID),
+    'chat_feed'
+  )
+
+  const q = query(
+    chatFeedRef,
+    orderBy('createdAt', 'desc')
+  )
+
+  return onSnapshot(
+    q,
+    { includeMetadataChanges: true },
+    snapshot => {
+      callback(
+        snapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      )
+    }
+  )
 }
 
 export const subscribeSingleChannel = (channelID, callback) => {
-  return channelsRef.doc(channelID).onSnapshot(doc => callback(doc?.data()))
+  return doc(channelsRef, channelID).onSnapshot(doc => callback(doc?.data()))
 }
 
 export const subscribeThreadSnapshot = (channel, callback, userID) => {
@@ -215,19 +758,18 @@ export const sendMessage = (
                 })
       return
     }
-    swipeRefs
-      .where(
-        'author',
-        '==',
-        data?.participantProfilePictureURLs[0]?.participantId,
-      )
-      .where('swipedProfile', '==', userID)
-      .get()
-      .then(querySnapshot => {
-         console.log('channelID..', channelID,isNumrology)
-        querySnapshot.forEach(docs => {
-          docs.ref
-            .update({
+    getDocs(
+    query(
+      swipeRefs,
+      where('author', '==', data?.participantProfilePictureURLs[0]?.participantId),
+      where('swipedProfile', '==', userID)
+    )
+  )
+    .then(querySnapshot => {
+       console.log('channelID..', channelID,isNumrology)
+      querySnapshot.forEach(docs => {
+        docs.ref
+          .update({
               authorSwipe: false,
             })
             .then(() => {
@@ -279,8 +821,7 @@ export const deleteMessage = ({
   if (!channel?.id || !threadItemID) {
     return
   }
-
-  channelsRef.doc(channel?.id).collection('thread').doc(threadItemID).delete()
+  collection(doc(channelsRef, channel?.id), 'thread').doc(threadItemID).delete()
 
   if (isLastCreatedThreadItem && newLastCreatedThreadItem) {
     const {
@@ -293,12 +834,9 @@ export const deleteMessage = ({
       createdAt,
     } = newLastCreatedThreadItem
     const lastMessage = content?.length > 0 ? content : url
-
-    channelsRef
-      .doc(channel?.id)
-      .update({
-        lastMessage: lastMessage,
-        lastThreadMessageId: id,
+    doc(channelsRef, channel?.id).update({
+      lastMessage: lastMessage,
+      lastThreadMessageId: id,
         lastMessageSenderId: senderID,
         readUserIDs: readUserIDs,
         participantProfilePictureURLs: participantProfilePictureURLs,
@@ -315,7 +853,7 @@ export const deleteMessage = ({
 }
 
 export const markChannelTypingUsers = async (channelID, typingUsers) => {
-  channelsRef.doc(channelID).update({
+  doc(channelsRef, channelID).update({
     typingUsers,
   })
 }
@@ -341,12 +879,12 @@ export const markChannelThreadItemAsRead = async (
     }
 
     // mark last message as read
-    channelsRef.doc(channelID).update({
+    doc(channelsRef, channelID).update({
       readUserIDs,
       participants,
     })
 
-    socialFeedsRef.doc(userID).collection('chat_feed').doc(channelID).update({
+    doc(socialFeedsRef, userID).collection('chat_feed').doc(channelID).update({
       markedAsRead: true,
     })
 
@@ -397,14 +935,14 @@ export const createChannel = (
         })
       return
     }
-    swipeRefs
-      .where(
-        'author',
-        '==',
-        otherParticipants[0].id || otherParticipants[0].userID,
-      )
-      .where('swipedProfile', '==', creator.id || creator.userID)
-      .get()
+    getDocs(
+    query(
+      swipeRefs,
+      where('author', '==', otherParticipants[0].id || otherParticipants[0].userID),
+      where('swipedProfile', '==', creator.id || creator.userID)
+    )
+)
+    
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           doc.ref
@@ -432,12 +970,12 @@ export const createChannel = (
 
 export const onLeaveGroup = async (channelId, userId, callback) => {
   try {
-    const dbChannelDoc = await channelsRef.doc(channelId).get()
+    const dbChannelDoc = await  doc(channelsRef, channelId).get()
     const dbChannel = dbChannelDoc?.data()
     const dbParticipants = dbChannel?.participants
 
     var newParticipants = dbParticipants?.filter(user => user.id != userId)
-    await channelsRef
+    await doc(channelsRef, channelId).set({ ...dbChannel, participants: newParticipants })
       .doc(channelId)
       .set({ ...dbChannel, participants: newParticipants })
 
@@ -473,10 +1011,11 @@ export const onRenameGroup = (text, channel, callback) => {
 }
 
 export const currentTimestamp = () => {
-  return firestore.FieldValue.serverTimestamp()
+  return serverTimestamp()
 }
 
 export const deleteConversation = (itemToDelete, user) => {
+
   socialFeedsRef
     .doc(user.id)
     .collection('chat_feed')

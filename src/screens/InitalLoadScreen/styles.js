@@ -18,7 +18,7 @@ export default StyleSheet.create({
   imageBackground: {
     position: 'relative',
     flex: STANDARD_FLEX,
-    backgroundColor: '#D61313',
+    backgroundColor: Colors.black,
   },
   imageBackgroundOverlay: {
     position: 'absolute',

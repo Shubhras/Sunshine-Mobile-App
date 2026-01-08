@@ -67,10 +67,11 @@ export default StyleSheet.create({
     color: Colors.mainTextColor,
   },
   textinputWrapper: {
-    overflow: 'hidden',
-    height: scale(32),
-    width: '70%',
-    gap: STANDARD_SPACING,
+    // overflow: 'hidden',
+    // height: scale(32),
+    // width: '70%',
+    // gap: STANDARD_SPACING,
+    // backgroundColor:'red'
   },
   textInput: {
     flex: 1,

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
+import { SCREEN_HEIGHT, STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
 
 // Exporting style
 export default StyleSheet.create({
@@ -17,4 +17,7 @@ export default StyleSheet.create({
   blockUserComponentWrapperWithMarginTop: {
     marginTop: STANDARD_SPACING * 3,
   },
+  emptyViewContainer: {
+      marginTop: SCREEN_HEIGHT * 0.35,
+    },
 });

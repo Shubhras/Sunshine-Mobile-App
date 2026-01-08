@@ -13,8 +13,6 @@ function IMConversationView(props) {
   const userID = user.userID || user.id;
   const lastName = item.lastName || '';
 
-  console.log('item', item)
-
   let title = item.title;
   const getIsRead = () => {
     return item.markedAsRead;

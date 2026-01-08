@@ -268,6 +268,7 @@ const DatingConfig = {
           {
             displayName: 'Distance Radius',
             type: 'select',
+            // type: 'signSelect',
             options: ['5', '10', '15', '25', '50', '100', 'unlimited'],
             displayOptions: [
               '5 miles',
@@ -363,6 +364,12 @@ const DatingConfig = {
             type: 'signSelect',
             title: 'Sports',
             navigation: 'Sports',
+          },
+           {
+            displayName: 'US States',
+            type: 'signSelect',
+            title: 'US States',
+            navigation: 'StatesUS',
           },
         ],
       },

@@ -7,54 +7,63 @@ import ProfileHeader from '../../components/ProfileHeader';
 import Colors from '../../constants/Colors';
 import BlockedUsersData from '../../data/BlockedUsersData';
 import styles from './styles';
-import { hydrateAllReportedUsers, unblockUser } from '../../api/firebase/reportingManager';
+import {
+  hydrateAllReportedUsers,
+  unblockUser,
+} from '../../api/firebase/reportingManager';
 import { useSelector } from 'react-redux';
 import TNActivityIndicator from '../../components/TNActivityIndicator';
+import TNEmptyStateView from '../../components/IMConversationListView/TNEmptyStateView';
+
+const emptyStateConfig = {
+  title: 'No Blocked Users',
+  description:
+    "You haven't blocked nor reported anyone yet. The users that you block or report will show up here.",
+};
 
 const BlockedUsers = ({ route }) => {
   const { title } = route.params;
   const userInfo = useSelector(state => state.users.users);
-const [blockedUsers, setBlockedUsers] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-useEffect(() => {
-  const unsubscribe = getList()
+  const [blockedUsers, setBlockedUsers] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const unsubscribe = getList();
 
-  return () => {
-    unsubscribe && unsubscribe()
-  }
-}, [userInfo.id])
+    return () => {
+      unsubscribe && unsubscribe();
+    };
+  }, [userInfo.id]);
 
-const getList = () => {
-  setIsLoading(true)
+  const getList = () => {
+    setIsLoading(true);
 
-  return hydrateAllReportedUsers(userInfo.id, promise => {
-    Promise.resolve(promise)
-      .then(values => {
-        setBlockedUsers(values || [])
-        setIsLoading(false)
-      })
-      .catch(error => {
-        console.error(error)
-        setIsLoading(false)
-      })
-  })
-}
+    return hydrateAllReportedUsers(userInfo.id, promise => {
+      Promise.resolve(promise)
+        .then(values => {
+          setBlockedUsers(values || []);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error(error);
+          setIsLoading(false);
+        });
+    });
+  };
 
-const onUserUnblock = async userID => {
-  try {
-    setIsLoading(true)
+  const onUserUnblock = async userID => {
+    try {
+      setIsLoading(true);
 
-    const response = await unblockUser(userInfo.id, userID)
-    console.log('blockedUsers:', response)
-    getList()
-  } catch (error) {
-    console.error(error)
-  } finally {
-    setIsLoading(false)
-  }
-}
+      const response = await unblockUser(userInfo.id, userID);
+      console.log('blockedUsers:', response);
+      getList();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  
   const renderItemView = ({ item, index }) => {
     return (
       <View
@@ -67,13 +76,13 @@ const onUserUnblock = async userID => {
         <BlockUserItemCard
           index={index}
           blockUserImage={item.profilePictureURL}
-          blockUserName={item.firstName+' '+item?.lastName}
+          blockUserName={item.firstName + ' ' + item?.lastName}
           blockUserNameColor={Colors.mainTextColor}
           blockUserEmail={item.email}
           blockUserEmailColor={Colors.mainTextColor}
           unblock={true}
           unblockColor={Colors.primary}
-          onPressUnblock={()=>onUserUnblock(item.id)}
+          onPressUnblock={() => onUserUnblock(item.id)}
         />
       </View>
     );
@@ -97,10 +106,17 @@ const onUserUnblock = async userID => {
         overScrollMode="never"
         data={blockedUsers}
         renderItem={renderItemView}
-        keyExtractor={(item, index) => item.email+index}
+        keyExtractor={(item, index) => item.email + index}
         contentContainerStyle={styles.flatlistScrollWrapper}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyViewContainer}>
+            {blockedUsers && blockedUsers.length <= 0 && (
+              <TNEmptyStateView emptyStateConfig={emptyStateConfig} />
+            )}
+          </View>
+        )}
       />
-         {isLoading && <TNActivityIndicator />}
+      {isLoading && <TNActivityIndicator />}
     </CustomSafeAreaView>
   );
 };

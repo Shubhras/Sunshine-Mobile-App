@@ -61,7 +61,6 @@ var selectedItemIndex = -1;
 
 const MyProfileScreen = ({ navigation }) => {
   const userInfo = useSelector(state => state.users.users);
-  console.log('userInfouserInfouserInfo', userInfo);
   const dispatch = useDispatch();
   const photoDialogActionSheetRef = useRef(null);
   const photoUploadDialogActionSheetRef = useRef(null);
@@ -69,7 +68,6 @@ const MyProfileScreen = ({ navigation }) => {
   // const [myphotos, setMyphotos] = useState(myphotoss)
   const [myphotos, setMyphotos] = useState([]);
   const updatePhotos = photos => {
-    console.log('photosphotos', photos);
 
     let myUpdatePhotos = [];
     let pphotos = photos ? [...photos] : [];
@@ -87,8 +85,6 @@ const MyProfileScreen = ({ navigation }) => {
         temp = [];
       }
     });
-    console.log('myUpdatePhotos', myUpdatePhotos);
-
     setMyphotos(myUpdatePhotos);
     selectedItemIndex = -1;
   };
@@ -112,9 +108,12 @@ const MyProfileScreen = ({ navigation }) => {
       });
       return;
     }
+console.log("source",source);
 
     processAndUploadMediaFile(source)
       .then(({ downloadURL }) => {
+        console.log("downloadURL", downloadURL);
+        
         if (downloadURL) {
           updateUserPhotos(downloadURL);
         } else {

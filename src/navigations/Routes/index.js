@@ -23,6 +23,7 @@ import Religion from '../../screens/Religion';
 import Sports from '../../screens/Sports';
 import InitalLoadScreen from '../../screens/InitalLoadScreen';
 import ChatScreen from '../../screens/ChatScreen';
+import StatesUS from '../../screens/StatesUS';
 
 const Stack = createNativeStackNavigator();
 
@@ -82,6 +83,11 @@ const Routes = () => {
       <Stack.Screen
         name="Dietary"
         component={Dietary}
+        options={{ headerShown: false, animation: 'none' }}
+      />
+      <Stack.Screen
+        name="StatesUS"
+        component={StatesUS}
         options={{ headerShown: false, animation: 'none' }}
       />
       <Stack.Screen

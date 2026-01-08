@@ -136,8 +136,6 @@ function TNStoriesTray(props) {
   const threadItemActionSheetRef = useRef();
   const [unmatchingUser, setUnmatchingUser] = useState(null);
 
-  console.log('data........', data);
-
   const converLongPress = item => {
     setUnmatchingUser(item);
     threadItemActionSheetRef.current?.show();

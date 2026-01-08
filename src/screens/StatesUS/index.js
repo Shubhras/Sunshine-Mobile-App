@@ -15,23 +15,34 @@ import TNActivityIndicator from '../../components/TNActivityIndicator';
 
 const sectionHeadings = ['You', 'Seeking'];
 
-const SPIRITUAL_CONCEPTS = [
-  { label: 'God’s Unity', type: 'gods_unity', key: 'gods_unity' },
-  { label: 'Witness or Partnership', type: 'witness_or_partnership', key: 'witness_or_partnership' },
-  { label: 'Divine Perfection – Trinity', type: 'divine_perfection_trinity', key: 'divine_perfection_trinity' },
-  { label: 'Creation', type: 'creation', key: 'creation' },
-  { label: 'Divine Grace – Redemption', type: 'divine_grace_redemption', key: 'divine_grace_redemption' },
-  { label: 'Humanity, Imperfection', type: 'humanity_imperfection', key: 'humanity_imperfection' },
-  { label: 'Spiritual Perfection, Completeness', type: 'spiritual_perfection_completeness', key: 'spiritual_perfection_completeness' },
-  { label: 'Earthly Completion', type: 'earthly_completion', key: 'earthly_completion' },
-  { label: 'Governmental Perfection', type: 'governmental_perfection', key: 'governmental_perfection' },
-  { label: 'Probation, Testing, Preparation', type: 'probation_testing_preparation', key: 'probation_testing_preparation' },
-  { label: 'Other', type: 'other', key: 'other' },
+const STATE_OPTIONS = [
+  { label: 'Alabama', type: 'alabama', key: 'alabama' },
+  { label: 'Alaska', type: 'alaska', key: 'alaska' },
+  { label: 'Arizona', type: 'arizona', key: 'arizona' },
+  { label: 'Arkansas', type: 'arkansas', key: 'arkansas' },
+  { label: 'California', type: 'california', key: 'california' },
+  { label: 'Colorado', type: 'colorado', key: 'colorado' },
+  { label: 'Connecticut', type: 'connecticut', key: 'connecticut' },
+  { label: 'Delaware', type: 'delaware', key: 'delaware' },
+  { label: 'Florida', type: 'florida', key: 'florida' },
+  { label: 'Georgia', type: 'georgia', key: 'georgia' },
+  { label: 'Hawaii', type: 'hawaii', key: 'hawaii' },
+  { label: 'Idaho', type: 'idaho', key: 'idaho' },
+  { label: 'Illinois', type: 'illinois', key: 'illinois' },
+  { label: 'Indiana', type: 'indiana', key: 'indiana' },
+  { label: 'Iowa', type: 'iowa', key: 'iowa' },
+  { label: 'Kansas', type: 'kansas', key: 'kansas' },
+  { label: 'Kentucky', type: 'kentucky', key: 'kentucky' },
+  { label: 'Louisiana', type: 'louisiana', key: 'louisiana' },
+  { label: 'Maine', type: 'maine', key: 'maine' },
+  { label: 'Montana', type: 'montana', key: 'montana' },
+  { label: 'Nebraska', type: 'nebraska', key: 'nebraska' },
+  { label: 'Nevada', type: 'nevada', key: 'nevada' }
 ];
 
 
 
-const NumerogogyNumberMatch = ({ route, navigation }) => {
+const StatesUS = ({ route, navigation }) => {
   const { title } = route.params;
   const dispatch = useDispatch();
 
@@ -39,15 +50,15 @@ const NumerogogyNumberMatch = ({ route, navigation }) => {
   const reduxSettings = userInfo?.settings || {};
   const [loading, setLoading] = useState(false);
   const [switchStates, setSwitchStates] = useState([
-    SPIRITUAL_CONCEPTS.map(() => false),
-    SPIRITUAL_CONCEPTS.map(() => false),
+    STATE_OPTIONS.map(() => false),
+    STATE_OPTIONS.map(() => false),
   ]);
   const mapReduxValueToSwitches = reduxValue =>
-    SPIRITUAL_CONCEPTS.map(item => item.type === reduxValue);
+    STATE_OPTIONS.map(item => item.type === reduxValue);
   // ✅ PRESELECT FROM REDUX
   useEffect(() => {
-    const you = reduxSettings?.spiritual_scripture_you || null;
-    const seeking = reduxSettings?.spiritual_scripture_seeking || null;
+    const you = reduxSettings?.states_us_you || null;
+    const seeking = reduxSettings?.states_us_seeking || null;
 
     setSwitchStates([
       mapReduxValueToSwitches(you),
@@ -85,16 +96,16 @@ const NumerogogyNumberMatch = ({ route, navigation }) => {
 
   const saveData = () => {
     const you =
-      SPIRITUAL_CONCEPTS.find((_, i) => switchStates[0][i])?.type || null;
+      STATE_OPTIONS.find((_, i) => switchStates[0][i])?.type || null;
     const seeking =
-      SPIRITUAL_CONCEPTS.find((_, i) => switchStates[1][i])?.type || null;
+      STATE_OPTIONS.find((_, i) => switchStates[1][i])?.type || null;
 
     const payload = {
-      spiritual_scripture_you: you,
-      spiritual_scripture_seeking: seeking,
+      states_us_you: you,
+      states_us_seeking: seeking,
     };
 
-    console.log('NumerogogyNumberMatch Payload 👉', payload);
+    console.log('StatesUS Payload 👉', payload);
     handleSubmit({ settings: { ...reduxSettings, ...payload } });
     // dispatch(updateSettings(payload))
   };
@@ -150,7 +161,7 @@ const NumerogogyNumberMatch = ({ route, navigation }) => {
           {/* YOU */}
           <View style={styles.myNumerologyWrapper}>
             <CustomText style={styles.title}>{sectionHeadings[0]}</CustomText>
-            {SPIRITUAL_CONCEPTS.map((item, index) => (
+            {STATE_OPTIONS.map((item, index) => (
               <View key={item.key} style={styles.switchContainer}>
                 <CustomText style={styles.switchLabel}>{item.label}</CustomText>
                 <Switch
@@ -173,7 +184,7 @@ const NumerogogyNumberMatch = ({ route, navigation }) => {
           {/* SEEKING */}
           <View style={styles.searchNumerogogyWrapper}>
             <CustomText style={styles.title}>{sectionHeadings[1]}</CustomText>
-            {SPIRITUAL_CONCEPTS.map((item, index) => (
+            {STATE_OPTIONS.map((item, index) => (
               <View key={item.key} style={styles.switchContainer}>
                 <CustomText style={styles.switchLabel}>{item.label}</CustomText>
                 <Switch
@@ -201,4 +212,4 @@ const NumerogogyNumberMatch = ({ route, navigation }) => {
   );
 };
 
-export default NumerogogyNumberMatch;
+export default StatesUS;

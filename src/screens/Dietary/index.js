@@ -1,70 +1,139 @@
-import React, { useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, View, Alert } from 'react-native';
 import { scale } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
+
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import ProfileHeader from '../../components/ProfileHeader';
+import { CustomText } from '../../components/global/CustomText';
 import Colors from '../../constants/Colors';
 import styles from './styles';
-import { CustomText } from '../../components/global/CustomText';
 import { Switch } from 'react-native-switch';
+import { updateUser } from '../../redux/slices/SessionUser';
+import { updateUserInfo } from '../../api/firebase/auth';
+import { showToast } from '../../components/alerts/Toast/ToastManager';
+import TNActivityIndicator from '../../components/TNActivityIndicator';
 
-const generateSwitchArray = () => {
-  const baseArray = [
-    'Keto Diet',
-    'Vegan Diet',
-    'Gluten-Free Diet',
-    'Mediterranean Diet',
-    'Paleo Diet',
-    'Intermittent Fasting',
-    'Blood Type Diet',
-    'Vegetarian Diet',
-    'Pescatarian Diet',
-    'Flexitarian Diet',
-    'Raw Food Diet',
-  ];
-  return [baseArray, baseArray];
-};
+const DIETARY_OPTIONS = [
+  { label: 'Keto Diet', type: 'keto', key: 'keto' },
+  { label: 'Vegan Diet', type: 'vegan', key: 'vegan' },
+  { label: 'Gluten-Free Diet', type: 'gluten_free', key: 'gluten_free' },
+  { label: 'Mediterranean Diet', type: 'mediterranean', key: 'mediterranean' },
+  { label: 'Paleo Diet', type: 'paleo', key: 'paleo' },
+  {
+    label: 'Intermittent Fasting',
+    type: 'intermittent_fasting',
+    key: 'intermittent_fasting',
+  },
+  { label: 'Blood Type Diet', type: 'blood_type', key: 'blood_type' },
+  { label: 'Vegetarian Diet', type: 'vegetarian', key: 'vegetarian' },
+  { label: 'Pescatarian Diet', type: 'pescatarian', key: 'pescatarian' },
+  { label: 'Flexitarian Diet', type: 'flexitarian', key: 'flexitarian' },
+  { label: 'Raw Food Diet', type: 'raw_food', key: 'raw_food' },
+];
+const MAX_SELECTION = 3;
 
-const sectionHeadings = ['You', 'Seeking']; // Headings for the two lines
-const switchArrays = generateSwitchArray();
-
-const Dietary = ({ route }) => {
+const Dietary = ({ route, navigation }) => {
   const { title } = route.params;
-  const [switchStates, setSwitchStates] = useState(
-    switchArrays.map(array => array.map(() => false)),
-  );
+  const dispatch = useDispatch();
+  const userInfo = useSelector(state => state.users.users);
+  const reduxSettings = userInfo?.settings || {};
+  const [loading, setLoading] = useState(false);
+  const [youSelected, setYouSelected] = useState([]);
+  const [seekingSelected, setSeekingSelected] = useState([]);
 
-  const toggleSwitch = (lineIndex, switchIndex) => {
-    const newSwitchStates = [...switchStates];
-    const switchStatus = !newSwitchStates[lineIndex][switchIndex];
+  /* ---------- PREFILL FROM REDUX ---------- */
+  useEffect(() => {
+    if (reduxSettings?.dietary_you) {
+      setYouSelected(reduxSettings.dietary_you);
+    }
+    if (reduxSettings?.dietary_seeking) {
+      setSeekingSelected(reduxSettings.dietary_seeking);
+    }
+  }, [reduxSettings]);
 
-    if (lineIndex === 0) {
-      newSwitchStates[lineIndex] = newSwitchStates[lineIndex].map(
-        (state, index) => (index === switchIndex ? switchStatus : false),
-      );
+  /* ---------- TOGGLE LOGIC ---------- */
+  const toggleOption = (key, type) => {
+    const state = type === 'you' ? youSelected : seekingSelected;
+    const setState = type === 'you' ? setYouSelected : setSeekingSelected;
 
-      if (switchStatus) {
-        const numerologyNumber = switchArrays[0][switchIndex];
-        handleSwitch(numerologyNumber);
-      }
-    } else {
-      newSwitchStates[lineIndex] = newSwitchStates[lineIndex].map(
-        (state, index) => (index === switchIndex ? switchStatus : false),
-      );
+    if (state.includes(key)) {
+      setState(state.filter(item => item !== key));
+      return;
     }
 
-    setSwitchStates(newSwitchStates);
+    if (state.length >= MAX_SELECTION) {
+      Alert.alert('Limit Reached', 'You can select maximum 3 options.');
+      return;
+    }
+
+    setState([...state, key]);
   };
 
-  const handleSwitch = numerologyNumber => {
-    // Implement your logic here
-    console.log('Selected numerology number:', numerologyNumber);
-  };
-
+  /* ---------- SEARCH BUTTON ---------- */
   const saveData = () => {
-    // Implement your save logic here
-    console.log('Saving data...');
+    const payload = {
+      dietary_you: youSelected,
+      dietary_seeking: seekingSelected,
+    };
+    handleSubmit({ settings: { ...reduxSettings, ...payload } });
+   
   };
+  
+    const handleSubmit = values => {
+      console.log('Submitted Form Data:', values);
+      // Add your API call here
+      setLoading(true);
+      updateUserInfo(userInfo?.userID, values)
+        .then(res => {
+          dispatch(updateUser({ ...userInfo, ...values }));
+          console.log('resrsrrrrrsrrsrsrsrsrsrrs', res);
+  
+          setLoading(false);
+          navigation.goBack();
+        })
+        .catch(error => {
+          // const { message } = error;
+          setLoading(false);
+          dispatch(updateUser({ ...userInfo }));
+          showToast({
+            title: 'Update Failed',
+            text: 'Unable to update user information. Please try again.',
+            duration: 2000,
+            type: 'error',
+          });
+        });
+  
+      //
+    };
+  console.log('Selected Dietary Preferences:', reduxSettings);
+  /* ---------- RENDER SWITCH LIST ---------- */
+  const renderSection = (title, type, selectedArray) => (
+    <View style={styles.myNumerologyWrapper}>
+      <CustomText style={styles.title}>{title}</CustomText>
+
+      {DIETARY_OPTIONS.map(item => (
+        <View key={item.key} style={styles.switchContainer}>
+          <CustomText style={styles.switchLabel}>{item.label}</CustomText>
+
+          <Switch
+            value={selectedArray.includes(item.key)}
+            onValueChange={() => toggleOption(item.key, type)}
+            circleSize={scale(16)}
+            barHeight={scale(20)}
+            backgroundActive={'#77cc5c'}
+            backgroundInactive={'#3e3e3e'}
+            circleActiveColor={'#f5dd4b'}
+            circleInActiveColor={'#f4f3f4'}
+            renderActiveText={false}
+            renderInActiveText={false}
+            switchWidthMultiplier={2.15}
+            switchBorderRadius={scale(20)}
+          />
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <CustomSafeAreaView
@@ -78,79 +147,22 @@ const Dietary = ({ route }) => {
         titleFontSize={scale(16)}
         headerBg={Colors.black}
       />
+
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
-        overScrollMode="never"
         contentContainerStyle={styles.ScrollViewWrapper}
       >
         <View style={styles.numerologyWrapper}>
-          <View style={styles.myNumerologyWrapper}>
-            <CustomText style={styles.title}>{sectionHeadings[0]}</CustomText>
-            {switchArrays[0].map((value, switchIndex) => (
-              <View key={switchIndex} style={styles.switchContainer}>
-                <CustomText style={styles.switchLabel}>{value}</CustomText>
-                <Switch
-                  value={switchStates[0][switchIndex]}
-                  onValueChange={() => toggleSwitch(0, switchIndex)}
-                  circleSize={scale(16)}
-                  barHeight={scale(20)}
-                  circleBorderWidth={0}
-                  backgroundActive={'#77cc5c'}
-                  backgroundInactive={'#3e3e3e'}
-                  circleActiveColor={'#f5dd4b'}
-                  circleInActiveColor={'#f4f3f4'}
-                  changeValueImmediately={true}
-                  innerCircleStyle={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  renderActiveText={false}
-                  renderInActiveText={false}
-                  switchLeftPx={2.2}
-                  switchRightPx={2.2}
-                  switchWidthMultiplier={2.15}
-                  switchBorderRadius={scale(20)}
-                />
-              </View>
-            ))}
-          </View>
+          {renderSection('You', 'you', youSelected)}
           <View style={styles.horizontalDivider} />
-          <View style={styles.searchNumerogogyWrapper}>
-            <CustomText style={styles.title}>{sectionHeadings[1]}</CustomText>
-            {switchArrays[1].map((value, switchIndex) => (
-              <View key={switchIndex} style={styles.switchContainer}>
-                <CustomText style={styles.switchLabel}>{value}</CustomText>
-                <Switch
-                  value={switchStates[1][switchIndex]}
-                  onValueChange={() => toggleSwitch(1, switchIndex)}
-                  circleSize={scale(16)}
-                  barHeight={scale(20)}
-                  circleBorderWidth={0}
-                  backgroundActive={'#77cc5c'}
-                  backgroundInactive={'#3e3e3e'}
-                  circleActiveColor={'#f5dd4b'}
-                  circleInActiveColor={'#f4f3f4'}
-                  changeValueImmediately={true}
-                  innerCircleStyle={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  renderActiveText={false}
-                  renderInActiveText={false}
-                  switchLeftPx={2.2}
-                  switchRightPx={2.2}
-                  switchWidthMultiplier={2.15}
-                  switchBorderRadius={scale(20)}
-                />
-              </View>
-            ))}
-          </View>
+          {renderSection('Seeking', 'seeking', seekingSelected)}
         </View>
         <TouchableOpacity style={styles.buttonWrapper} onPress={saveData}>
           <CustomText style={styles.buttonLabel}>Search</CustomText>
         </TouchableOpacity>
       </ScrollView>
+         {loading && <TNActivityIndicator />}
     </CustomSafeAreaView>
   );
 };
