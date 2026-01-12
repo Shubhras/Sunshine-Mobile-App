@@ -86,8 +86,8 @@ const Travel = ({ route }) => {
                   circleBorderWidth={0}
                   backgroundActive={'#77cc5c'}
                   backgroundInactive={'#3e3e3e'}
-                  circleActiveColor={'#f5dd4b'}
-                  circleInActiveColor={'#f4f3f4'}
+                  // circleActiveColor={'#f5dd4b'}
+                  // circleInActiveColor={'#f4f3f4'}
                   changeValueImmediately={true}
                   innerCircleStyle={{
                     alignItems: 'center',
@@ -117,8 +117,8 @@ const Travel = ({ route }) => {
                   circleBorderWidth={0}
                   backgroundActive={'#77cc5c'}
                   backgroundInactive={'#3e3e3e'}
-                  circleActiveColor={'#f5dd4b'}
-                  circleInActiveColor={'#f4f3f4'}
+                  // circleActiveColor={'#f5dd4b'}
+                  // circleInActiveColor={'#f4f3f4'}
                   changeValueImmediately={true}
                   innerCircleStyle={{
                     alignItems: 'center',

@@ -12,6 +12,7 @@ import datingSlices from '../slices/datingSlice';
 import userReportsSlices from '../slices/userReportsSlice';
 import inAppPurchaseSlice from '../slices/inAppPurchaseSlice';
 import chatSlice from '../slices/chatSlice';
+import usersTrackerSlice from '../slices/usersTrackerSlice';
 import reduxStorage from './storage';
 
 const rootReducer = combineReducers({
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   userReports: userReportsSlices,
   inAppPurchase: inAppPurchaseSlice,
   chat: chatSlice,
+  usersTracker: usersTrackerSlice,
   // Add other reducers here
 });
 

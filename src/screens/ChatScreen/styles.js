@@ -6,6 +6,7 @@ import {
   POPPINS_BOLD,
   POPPINS_MEDIUM,
   POPPINS_SEMIBOLD,
+  SCREEN_WIDTH,
   STANDARD_BORDER_RADIUS,
   STANDARD_BUTTON_HEIGHT,
   STANDARD_FLEX,
@@ -88,13 +89,18 @@ export default StyleSheet.create({
     flex: STANDARD_FLEX,
     borderRadius: STANDARD_BORDER_RADIUS * 5,
     position: 'relative',
+    justifyContent: 'center',
+    // alignItems:'center'
   },
   chatTextInput: {
-    flex: STANDARD_FLEX,
+    // flex: STANDARD_FLEX,
     borderRadius: STANDARD_BORDER_RADIUS * 10,
     paddingLeft: STANDARD_SPACING * 3,
     fontFamily: POPPINS_MEDIUM,
     fontSize: FONT_SIZE_XS,
+    color: Colors.textHighContrast,
+    width:SCREEN_WIDTH * 0.63,
+
   },
   emojiIconContainer: {
     width: STANDARD_TEXT_INPUT_HEIGHT - scale(15),
@@ -160,5 +166,11 @@ export default StyleSheet.create({
       height: scale(0.5),
       backgroundColor: Colors.hairlineColor,
       marginVertical: STANDARD_SPACING,
+    },
+     progressBar: {
+      backgroundColor: 'red',
+      height: 3,
+      shadowColor: '#000',
+      width: 0,
     },
 });

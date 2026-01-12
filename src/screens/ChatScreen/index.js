@@ -220,12 +220,15 @@ import ThreadItem from '../../components/ThreadItem';
 import ChatHeader from '../../components/ChatHeader';
 import ActionSheet from 'react-native-actions-sheet';
 import * as reportingManager from '../../api/firebase/reportingManager';
+import { getImagesForUsers } from '../../constants/helpers/helperFunction';
+import { processAndUploadMediaFileWithProgressTracking } from '../../api/firebase/storage';
 
 const ChatScreen = ({ navigation, route }) => {
   const openedFromPushNotification = route?.params?.openedFromPushNotification;
   const otherUserInfo = route?.params?.otherUser;
   const flatListRef = useRef(null);
   const chatSettingsActionSheetRef = useRef(null);
+  const chatImageSendActionSheetRef = useRef(null);
   const chatMsgActionSheetRef = useRef(null);
   const threadUnsubscribe = useRef(null);
   const singleChannelTracker = useRef(null);
@@ -238,6 +241,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [thread, setThread] = useState(null);
   const [downloadObject, setDownloadObject] = useState(null);
   const [deleteMsg, setDeleteMsg] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   useEffect(() => {
     const hydratedChannel = channelWithHydratedOtherParticipants(
       route.params?.channel,
@@ -307,20 +311,16 @@ const ChatScreen = ({ navigation, route }) => {
 
   /* ================= SEND MESSAGE ================= */
   const onSend = () => {
-    if (!message.trim()) {
-      Alert.alert('Message required', 'Please type a message');
+    // allow send if either message OR image available
+    if (!message.trim() && !downloadObject) {
+      Alert.alert('Message required', 'Please type a message or select image');
       return;
     }
 
-    const newMessage = {
-      align: 'right',
-      // seen: 'Seen',
-      messages: [{ text: message }],
-    };
-
-    setChatList(prev => [...prev, newMessage]);
+    onSendInput(); // send
     setMessage('');
-    onSendInput();
+    setDownloadObject(null);
+    setUploadProgress(0);
     Keyboard.dismiss();
 
     setTimeout(() => {
@@ -447,7 +447,7 @@ const ChatScreen = ({ navigation, route }) => {
   };
 
   const sendMessage = newChannel => {
-    const tempInputValue = message;
+    const tempInputValue = message || '';
     const tempInReplyToItem = null;
     const participantProfilePictureURLs = getParticipantPictures();
     const channel = route.params?.channel;
@@ -458,7 +458,7 @@ const ChatScreen = ({ navigation, route }) => {
         userInfo,
         newChannel || channel,
         tempInputValue,
-        downloadObject,
+        downloadObject?.uri ? downloadObject?.uri : null,
         tempInReplyToItem,
         participantProfilePictureURLs,
         isNumrology == true && thread?.length == 0
@@ -582,12 +582,65 @@ const ChatScreen = ({ navigation, route }) => {
       sender: currentUser,
       threadItemID: threadItem?.id,
     };
-console.log("paramsparamsparamsparams",params);
 
     channelManager.deleteMessage(params);
     setDeleteMsg(null);
   };
-  console.log('thread', otherUserInfo);
+
+  // image send in chat
+  const handleImage = async type => {
+    const asset = await getImagesForUsers(type);
+
+    if (!asset) return;
+
+    console.log('image asset =>', asset);
+    chatImageSendActionSheetRef.current?.hide();
+    startUpload(asset);
+
+    // Example
+    // setDownloadObject(asset)
+    // sendMessageWithImage(asset)
+  };
+
+  const startUpload = uploadData => {
+    const mime = uploadData?.type;
+
+    processAndUploadMediaFileWithProgressTracking(
+      uploadData,
+      async snapshot => {
+        const uploadProgress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('uploadProgress', uploadProgress);
+
+        setUploadProgress(uploadProgress);
+      },
+      async url => {
+        if (url) {
+          const fileObj = {
+            ...uploadData,
+            source: url,
+            uri: url,
+            url,
+            mime,
+          };
+          console.log('fileObjfileObjfileObjfileObj', fileObj);
+
+          setDownloadObject(fileObj);
+          setTimeout(() => {
+            setUploadProgress(0);
+          }, 3000);
+
+          // ✅ auto send image after upload
+          // sendMessage(channel); // or
+          // onSendInput()
+        }
+      },
+      error => {
+        setUploadProgress(0);
+        Alert.alert('Error', 'Oops! upload failed, try again.');
+      },
+    );
+  };
 
   /* ================= RENDER MESSAGE ================= */
   const renderItem = ({ item, index }) => {
@@ -625,7 +678,8 @@ console.log("paramsparamsparamsparams",params);
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={scale(70)}
+        // keyboardVerticalOffset={scale(70)}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? scale(40) : 0}
       >
         {/* CHAT LIST */}
         <FlatList
@@ -641,6 +695,50 @@ console.log("paramsparamsparamsparams",params);
         />
 
         {/* FOOTER */}
+        {uploadProgress > 0 || downloadObject?.uri ? (
+          <View style={{ padding: 10 }}>
+            {/* ✅ Loader while upload is going OR URL not received */}
+            {uploadProgress > 0 && !downloadObject?.uri ? (
+              <View
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 10,
+                  backgroundColor: Colors.grayBgColor,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CustomText style={{ color: Colors.white, fontSize: 12 }}>
+                  Uploading...
+                </CustomText>
+
+                <CustomText
+                  style={{ color: Colors.white, marginTop: 4, fontSize: 12 }}
+                >
+                  {Math.round(uploadProgress)}%
+                </CustomText>
+              </View>
+            ) : downloadObject?.uri ? (
+              <Image
+                source={{ uri: downloadObject.uri }}
+                style={{ width: 80, height: 80, borderRadius: 10 }}
+              />
+            ) : null}
+
+            {/* ✅ Remove */}
+            <TouchableOpacity
+              onPress={() => {
+                setDownloadObject(null);
+                setUploadProgress(0);
+              }}
+              style={{ marginTop: 6 }}
+            >
+              <CustomText style={{ color: Colors.white }}>Remove</CustomText>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
         <View style={[styles.footerWrapper, { backgroundColor: Colors.black }]}>
           <View
             style={[
@@ -657,12 +755,22 @@ console.log("paramsparamsparamsparams",params);
               allowFontScaling={false}
               multiline
             />
-
+            {/* <View
+              style={[styles.progressBar, { width: `${uploadProgress}%` }]}
+            /> */}
             <TouchableOpacity
               style={[
                 styles.emojiIconContainer,
                 { backgroundColor: Colors.white },
               ]}
+              onPress={() => {
+                console.log('Opening ActionSheet...');
+                if (chatImageSendActionSheetRef.current) {
+                  chatImageSendActionSheetRef.current.show();
+                } else {
+                  console.log('ActionSheet ref is null');
+                }
+              }}
             >
               <IonIcons
                 name="camera-outline"
@@ -674,7 +782,10 @@ console.log("paramsparamsparamsparams",params);
 
           <TouchableOpacity
             style={[styles.sendButton, { backgroundColor: Colors.primary }]}
-            onPress={onSend}
+            disabled={uploadProgress > 0}
+            onPress={() => {
+              onSend();
+            }}
           >
             <IonIcons name="send" size={scale(20)} color={Colors.white} />
           </TouchableOpacity>
@@ -767,6 +878,51 @@ console.log("paramsparamsparamsparams",params);
             >
               Cancel
             </CustomText>
+          </TouchableOpacity>
+        </View>
+      </ActionSheet>
+      {/* Send Image ActionSheet */}
+      <ActionSheet
+        ref={chatImageSendActionSheetRef}
+        gestureEnabled={true}
+        closeOnTouchBackdrop={true}
+        containerStyle={styles.actionSheetContainer}
+        indicatorStyle={styles.actionSheetIndicator}
+      >
+        <View style={styles.actionSheetContent}>
+          <View style={styles.actionSheetHeader}>
+            <CustomText style={styles.actionSheetTitle}>Actions</CustomText>
+          </View>
+          <TouchableOpacity
+            style={styles.actionSheetOption}
+            onPress={() => {
+              handleImage('camera');
+            }}
+          >
+            <CustomText style={styles.actionSheetOptionTextDanger}>
+              Launch Camera
+            </CustomText>
+          </TouchableOpacity>
+
+          <View style={styles.actionSheetDivider} />
+          <TouchableOpacity
+            style={styles.actionSheetOption}
+            onPress={() => {
+              handleImage('gallery');
+            }}
+          >
+            <CustomText style={styles.actionSheetOptionTextDanger}>
+              Open Photo Gallery
+            </CustomText>
+          </TouchableOpacity>
+
+          <View style={styles.actionSheetDivider} />
+
+          <TouchableOpacity
+            style={styles.actionSheetOption}
+            onPress={() => chatImageSendActionSheetRef.current?.hide()}
+          >
+            <CustomText style={styles.actionSheetOptionText}>Cancel</CustomText>
           </TouchableOpacity>
         </View>
       </ActionSheet>

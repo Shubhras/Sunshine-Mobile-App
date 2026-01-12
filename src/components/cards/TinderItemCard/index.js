@@ -37,12 +37,14 @@ const TinderItemCard = props => {
             <CustomText style={styles.name_style}>
               {name ? name : ' '} {lastName ? lastName : ' '}, {age ? age : ' '}
             </CustomText>
+            {school &&
             <View style={styles.txtBox}>
               <Image style={styles.icon} source={Images.schoolIcon} />
               <CustomText style={styles.label}>
                 {school ? school : ' '}
               </CustomText>
-            </View>
+            </View>            
+            }
             {distance && (
               <View style={styles.txtBox}>
                 <Image style={styles.icon} source={Images.markerIcon} />

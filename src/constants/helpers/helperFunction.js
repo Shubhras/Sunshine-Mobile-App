@@ -1,4 +1,12 @@
 import moment from 'moment';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import {
+ 
+  Alert,
+  Platform,
+  PermissionsAndroid,
+  Linking,
+} from 'react-native';
 
 const formatMessage = message => {
   const mime = message?.url?.mime || message?.mime;
@@ -67,8 +75,8 @@ const normalizeTimestamp = value => {
 
   if (typeof value === 'number') return value;
 
-  if (value.seconds) return value.seconds * 1000;
-  if (value._seconds) return value._seconds * 1000;
+  if (value?.seconds != null) return value.seconds * 1000;
+  if (value?._seconds != null) return value._seconds * 1000;
 
   return value;
 };
@@ -480,6 +488,105 @@ function filterUsers(users, myProfile, blockedUserIDs = []) {
 
 // filter users based on my profile settings end
 
+
+export const getImagesForUsers = async type => {
+  if (type === 'camera') {
+    return await onPressTakePhoto();
+  } else if (type === 'gallery') {
+    return await onPressAddPhotoBtn();
+  }
+  return null;
+};
+
+export const onPressAddPhotoBtn = () => {
+  const options = {
+    mediaType: 'photo',
+    maxWidth: 2000,
+    maxHeight: 2000,
+    quality: 0.8,
+  };
+
+  return new Promise(resolve => {
+    launchImageLibrary(options, response => {
+      if (response?.didCancel) return resolve(null);
+
+      if (response?.errorCode) {
+        Alert.alert('Error', response?.errorMessage || 'Something went wrong');
+        return resolve(null);
+      }
+
+      const asset = response?.assets?.[0];
+      resolve(asset || null);
+    });
+  });
+};
+
+export const onPressTakePhoto = async () => {
+  if (Platform.OS === 'android') {
+    const checkPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+    );
+
+    if (!checkPermission) {
+      const grantedCamera = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'App Camera Permission',
+          message: 'App needs access to your camera',
+          buttonNeutral: 'Ask me later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      if (grantedCamera === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+        Alert.alert(
+          'Permission Required',
+          'Camera permission is permanently denied. Please enable it from Settings.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ],
+        );
+        return null;
+      }
+
+      if (grantedCamera !== PermissionsAndroid.RESULTS.GRANTED) {
+        Alert.alert('Permission Denied', 'Camera permission is required.');
+        return null;
+      }
+    }
+  }
+
+  return await launchCameraWithOptions();
+};
+
+export const launchCameraWithOptions = () => {
+  const options = {
+    mediaType: 'photo',
+    maxWidth: 2000,
+    maxHeight: 2000,
+    quality: 0.5,
+    saveToPhotos: true,
+    cameraType: 'front',
+  };
+
+  return new Promise(resolve => {
+    launchCamera(options, response => {
+      if (response?.didCancel) return resolve(null);
+
+      if (response?.errorCode) {
+        Alert.alert('Error', response?.errorMessage || 'Something went wrong');
+        return resolve(null);
+      }
+
+      const asset = response?.assets?.[0];
+      resolve(asset || null);
+    });
+  });
+};
+
+
 export {
   formatMessage,
   getMessageTime,
@@ -488,5 +595,5 @@ export {
   normalizeObjectTimestamps,
   filterUsersByMyProfile,
   deepNormalize,
-  filterUsers
+  filterUsers,
 };

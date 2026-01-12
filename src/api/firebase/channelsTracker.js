@@ -66,24 +66,24 @@ export default class FirebaseChannelsTracker {
     this.updateChannelsIfNeeded();
   };
 
-  onChannelCollectionUpdate = channels => {
-    this.channels = channels;
+  onChannelCollectionUpdate = channels => {    
+    this.channels = channels;   
     this.updateChannelsIfNeeded();
   };
 
   channelsWithNoBannedUsers = (channels, bannedUserIDs) => {
     const channelsWithNoBannedUsers = [];
     channels.forEach(channel => {
-      if (
+   if (
         channel.participants &&
         channel.participants.length > 0 &&
         (!bannedUserIDs ||
           channel.participants.length != 1 ||
           !bannedUserIDs.includes(channel.participants[0].id))
       ) {
-        channelsWithNoBannedUsers.push(channel);
+        channelsWithNoBannedUsers.push(channel);        
       }
-    });
+    });    
     return channelsWithNoBannedUsers;
   };
 

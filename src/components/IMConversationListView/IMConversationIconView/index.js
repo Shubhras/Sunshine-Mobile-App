@@ -3,18 +3,18 @@ import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from '@d11/react-native-fast-image';
 import styles from './styles';
+import { defaultProfilePhotoURL } from '../../../constants/images';
 
 const Image = FastImage;
 
-const defaultAvatar =
-  'https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg';
+const defaultAvatar = defaultProfilePhotoURL
 
 const IMConversationIconView = memo(props => {
   const { participants, imageStyle, style } = props;
 
   const [profileImage, setProfileImage] = useState('');
   const [profileImage1, setProfileImage1] = useState('');
-  // console.log("ghar...", participants[1].profilePictureURL )
+
 
   useEffect(() => {
     if (
@@ -69,7 +69,8 @@ const IMConversationIconView = memo(props => {
           <Image
             style={[styles.singleChatItemIcon, imageStyle]}
             onError={onImageError}
-            source={imgErr ? { uri: defaultAvatar } : { uri: firstUri }}
+            source={{uri:  profileImage }}
+            // source={imgErr ? { uri: defaultAvatar } : { uri: profileImage }}
           />
           {participants[0].isOnline && <View style={styles.onlineMark} />}
         </View>

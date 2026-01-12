@@ -52,10 +52,6 @@ const SwipeScreen = ({ navigation }) => {
   const [currentMatchData, setCurrentMatchData] = useState(null);
   const [cardInfo, setCardInfo] = useState(null);
   const user = userInfo;
-  console.log(
-    'bannedUserIDsbannedUserIDsbannedUserIDsbannedUserIDs',
-    bannedUserIDs,
-  );
 
   const [appState, setAppState] = useState(AppState.currentState);
   const [positionWatchID, setPositionWatchID] = useState(null);
@@ -239,7 +235,7 @@ const SwipeScreen = ({ navigation }) => {
   //
   useEffect(() => {
     // StatusBar.setHidden(false)
-    // swipeTracker.current.subscribeIfNeeded();
+    swipeTracker.current.subscribeIfNeeded();
 
     // let didFocusSubscription = navigation.addListener('focus', payload =>
     //   handleComponentDidFocus(),

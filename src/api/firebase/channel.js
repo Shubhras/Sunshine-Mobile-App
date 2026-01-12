@@ -532,6 +532,7 @@ import firestore, {
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from '@react-native-firebase/firestore'
 import { formatMessage } from '../../constants/helpers/helperFunction';
 import { getApp } from '@react-native-firebase/app';
@@ -627,71 +628,249 @@ export const subscribeThreadSnapshot = (channel, callback, userID) => {
     })
 }
 
+// export const hydrateSocialChatFeedItem = async (
+//   sender,
+//   channel,
+//   message,
+//   createdAt,
+// ) => {
+//   const otherParticipants =
+//     channel &&
+//     channel.participants &&
+//     channel.participants.filter(
+//       participant => participant && participant.id != sender.id,
+//     )
+//   const timestamp = currentTimestamp()
+//   const feedItemTitleForSender =
+//     otherParticipants?.length == 1
+//       ? otherParticipants[0].firstName + ' ' + otherParticipants[0].lastName
+//       : channel.name
+//   const feedItemTitleForRecipients =
+//     otherParticipants?.length == 1
+//       ? sender.firstName + ' ' + sender.lastName
+//       : channel.name
+
+//   // We update the chat feed for the sender user
+//   socialFeedsRef
+//     .doc(sender.id)
+//     .collection('chat_feed')
+//     .doc(channel.id)
+//     .set(
+//       {
+//         id: channel.id,
+//         title: feedItemTitleForSender,
+//         content: message,
+//         markedAsRead: true,
+//         createdAt: createdAt || timestamp,
+//         participants: otherParticipants,
+//       },
+//       { merge: true },
+//     )
+
+//   // We update the chat feed for all the other participants
+//   otherParticipants.forEach(recipient => {
+//     const allParticipants = [...channel.participants]
+//     const otherParticipants =
+//       allParticipants &&
+//       allParticipants.filter(
+//         participant => participant && participant.id != recipient.id,
+//       )
+
+//     socialFeedsRef
+//       .doc(recipient.id)
+//       .collection('chat_feed')
+//       .doc(channel.id)
+//       .set(
+//         {
+//           id: channel.id,
+//           title: feedItemTitleForRecipients,
+//           content: message,
+//           markedAsRead: false,
+//           createdAt: timestamp,
+//           participants: otherParticipants,
+//         },
+//         { merge: true },
+//       )
+//   })
+// }
+
+// export const sendMessage = (
+//   sender,
+//   channel,
+//   message,
+//   downloadURL,
+//   inReplyToItem,
+//   participantProfilePictureURLs,
+//   isNumrology
+// ) => {
+//   return new Promise(resolve => {
+//     const { profilePictureURL } = sender
+//     const userID = sender.id || sender.userID
+//     const timestamp = currentTimestamp()
+//     const data = {
+//       content: message,
+//       createdAt: timestamp,
+//       recipientFirstName: '',
+//       recipientID: '',
+//       recipientLastName: '',
+//       recipientProfilePictureURL: '',
+//       senderFirstName: sender.firstName || sender.fullname,
+//       senderID: userID,
+//       senderLastName: '',
+//       senderProfilePictureURL: profilePictureURL,
+//       url: downloadURL,
+//       inReplyToItem: inReplyToItem,
+//       readUserIDs: [userID],
+//       participantProfilePictureURLs,
+//       participant1: true,
+//       participant2: true,
+//     }
+    
+//     const channelID = channel.id
+//     console.log(isNumrology,"datadatadatadatadatadata",data);
+   
+//     if (isNumrology == true) {
+//       channelsRef
+//                 .doc(channelID)
+//                 .collection('thread')
+//                 .add({ ...data })
+//                 .then(doc => {
+//                   const lastMessage =
+//                     message && message.length > 0 ? message : downloadURL
+//                   channelsRef
+//                     .doc(channelID)
+//                     .update({
+//                       lastMessage: lastMessage,
+//                       lastThreadMessageId: doc.id,
+//                       lastMessageSenderId: userID,
+//                       readUserIDs: [userID],
+//                       participantProfilePictureURLs,
+//                     })
+//                     .then(response => {
+//                       hydrateSocialChatFeedItem(sender, channel, lastMessage)
+//                       resolve({ success: true })
+//                     })
+//                     .catch(error => {
+//                       resolve({ success: false, error: error })
+//                     })
+//                 })
+//                 .catch(error => {
+//                   resolve({ success: false, error: error })
+//                 })
+//       return
+//     }
+//     getDocs(
+//     query(
+//       swipeRefs,
+//       where('author', '==', data?.participantProfilePictureURLs[0]?.participantId),
+//       where('swipedProfile', '==', userID)
+//     )
+//   )
+//     .then(querySnapshot => {
+//        console.log('channelID..', channelID,isNumrology)
+//       querySnapshot.forEach(docs => {
+//         docs.ref
+//           .update({
+//               authorSwipe: false,
+//             })
+//             .then(() => {
+//               console.log('cchannelsRefhannelID..');
+              
+//               channelsRef
+//                 .doc(channelID)
+//                 .collection('thread')
+//                 .add({ ...data })
+//                 .then(doc => {
+//                   const lastMessage =
+//                     message && message.length > 0 ? message : downloadURL
+//                   channelsRef
+//                     .doc(channelID)
+//                     .update({
+//                       lastMessage: lastMessage,
+//                       lastThreadMessageId: doc.id,
+//                       lastMessageSenderId: userID,
+//                       readUserIDs: [userID],
+//                       participantProfilePictureURLs,
+//                     })
+//                     .then(response => {
+//                       hydrateSocialChatFeedItem(sender, channel, lastMessage)
+//                       resolve({ success: true })
+//                     })
+//                     .catch(error => {
+//                       resolve({ success: false, error: error })
+//                     })
+//                 })
+//                 .catch(error => {
+//                   resolve({ success: false, error: error })
+//                 })
+//             })
+//         })
+//       })
+//       .catch(error => {
+//         resolve({ success: false, error: error })
+//       })
+//   })
+// }
+
 export const hydrateSocialChatFeedItem = async (
   sender,
   channel,
   message,
   createdAt,
 ) => {
-  const otherParticipants =
-    channel &&
-    channel.participants &&
-    channel.participants.filter(
-      participant => participant && participant.id != sender.id,
-    )
-  const timestamp = currentTimestamp()
-  const feedItemTitleForSender =
-    otherParticipants?.length == 1
-      ? otherParticipants[0].firstName + ' ' + otherParticipants[0].lastName
-      : channel.name
-  const feedItemTitleForRecipients =
-    otherParticipants?.length == 1
-      ? sender.firstName + ' ' + sender.lastName
-      : channel.name
+  const timestamp = currentTimestamp();
 
-  // We update the chat feed for the sender user
-  socialFeedsRef
+  // channel.participants = [lisa]
+  const channelParticipants = Array.isArray(channel?.participants)
+    ? channel.participants
+    : [];
+
+  // 🔹 OTHER USER (lisa)
+  const otherUser = channelParticipants.find(
+    p => p && p.id !== sender.id,
+  );
+
+  if (!otherUser) {
+    console.warn('No other participant found for chat feed');
+    return;
+  }
+
+  /* ---------------- SENDER (Sam) FEED ---------------- */
+
+  await socialFeedsRef
     .doc(sender.id)
     .collection('chat_feed')
     .doc(channel.id)
     .set(
       {
         id: channel.id,
-        title: feedItemTitleForSender,
+        title: `${otherUser.firstName || ''} ${otherUser.lastName || ''}`,
         content: message,
         markedAsRead: true,
         createdAt: createdAt || timestamp,
-        participants: otherParticipants,
+        participants: [otherUser], // ✅ Lisa
       },
       { merge: true },
-    )
+    );
 
-  // We update the chat feed for all the other participants
-  otherParticipants.forEach(recipient => {
-    const allParticipants = [...channel.participants]
-    const otherParticipants =
-      allParticipants &&
-      allParticipants.filter(
-        participant => participant && participant.id != recipient.id,
-      )
+  /* ---------------- RECEIVER (Lisa) FEED ---------------- */
 
-    socialFeedsRef
-      .doc(recipient.id)
-      .collection('chat_feed')
-      .doc(channel.id)
-      .set(
-        {
-          id: channel.id,
-          title: feedItemTitleForRecipients,
-          content: message,
-          markedAsRead: false,
-          createdAt: timestamp,
-          participants: otherParticipants,
-        },
-        { merge: true },
-      )
-  })
-}
+  await socialFeedsRef
+    .doc(otherUser.id)
+    .collection('chat_feed')
+    .doc(channel.id)
+    .set(
+      {
+        id: channel.id,
+        title: `${sender.firstName || ''} ${sender.lastName || ''}`,
+        content: message,
+        markedAsRead: false,
+        createdAt: timestamp,
+        participants: [sender], // ✅ Sam
+      },
+      { merge: true },
+    );
+};
 
 export const sendMessage = (
   sender,
@@ -724,10 +903,8 @@ export const sendMessage = (
       participant1: true,
       participant2: true,
     }
-    
     const channelID = channel.id
-    console.log(isNumrology,"datadatadatadatadatadata",data);
-   
+    console.log('channelID..', channelID)
     if (isNumrology == true) {
       channelsRef
                 .doc(channelID)
@@ -758,23 +935,21 @@ export const sendMessage = (
                 })
       return
     }
-    getDocs(
-    query(
-      swipeRefs,
-      where('author', '==', data?.participantProfilePictureURLs[0]?.participantId),
-      where('swipedProfile', '==', userID)
-    )
-  )
-    .then(querySnapshot => {
-       console.log('channelID..', channelID,isNumrology)
-      querySnapshot.forEach(docs => {
-        docs.ref
-          .update({
+    swipeRefs
+      .where(
+        'author',
+        '==',
+        data?.participantProfilePictureURLs[0]?.participantId,
+      )
+      .where('swipedProfile', '==', userID)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(docs => {
+          docs.ref
+            .update({
               authorSwipe: false,
             })
             .then(() => {
-              console.log('cchannelsRefhannelID..');
-              
               channelsRef
                 .doc(channelID)
                 .collection('thread')

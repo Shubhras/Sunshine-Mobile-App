@@ -114,8 +114,8 @@ const LoveLanguage = ({ route, navigation }) => {
             barHeight={scale(20)}
             backgroundActive={'#77cc5c'}
             backgroundInactive={'#3e3e3e'}
-            circleActiveColor={'#f5dd4b'}
-            circleInActiveColor={'#f4f3f4'}
+            // circleActiveColor={'#f5dd4b'}
+            // circleInActiveColor={'#f4f3f4'}
             renderActiveText={false}
             renderInActiveText={false}
             switchWidthMultiplier={2.15}

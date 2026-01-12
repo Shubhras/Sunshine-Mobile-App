@@ -9,7 +9,8 @@ import {
   setSwipesListenerDidSubscribe,
 } from '../../redux/slices/datingSlice';
 import { setBannedUserIDs } from '../../redux/slices/userReportsSlice';
-import { normalizeObjectTimestamps } from '../../constants/helpers/helperFunction';
+import { deepNormalize, normalizeObjectTimestamps } from '../../constants/helpers/helperFunction';
+import { setUsers } from '../../redux/slices/usersTrackerSlice';
 
 export default class SwipeTracker {
   constructor(reduxStore, userID) {
@@ -22,7 +23,8 @@ export default class SwipeTracker {
 
   syncTrackerToStore = () => {
     this.state = this.reduxStore.getState();
-    this.users = this.state.users.users;
+    this.users = this.state.usersTracker.users || [];
+    
   };
 
   unMatchUser = (item, user) => {
@@ -115,20 +117,21 @@ export default class SwipeTracker {
   };
 
   updateUsers = users => {
-    // We remove all friends and friendships from banned users
-    const state = this.reduxStore.getState();
-    const bannedUserIDs = state.userReports.bannedUserIDs;
+  const state = this.reduxStore.getState();
+  const bannedUserIDs = state.userReports.bannedUserIDs;
 
-    if (bannedUserIDs) {
-      this.users = users.filter(user => !bannedUserIDs.includes(user.id));
-    } else {
-      this.users = users;
-    }
-    this.reduxStore.dispatch(loginUser(normalizeObjectTimestamps(this.users)));
-    console.log('hydrateSwipes called from updateUsers');
+  const filteredUsers = bannedUserIDs
+    ? users.filter(user => !bannedUserIDs.includes(user.id))
+    : users;
 
-    this.hydrateSwipes();
-  };
+  const serializedUsers = filteredUsers.map(deepNormalize);
+
+  this.users = serializedUsers;
+
+  this.reduxStore.dispatch(setUsers(serializedUsers));
+
+  this.hydrateSwipes();
+};
 
   onUsersCollection = data => {
     this.updateUsers(data);
@@ -199,9 +202,9 @@ export default class SwipeTracker {
             matchHasBeenSeen: inboundUserIDsSeenStatus[user.id],
           };
         });
-      this.reduxStore.dispatch(setMatches(finalMatches));
-      this.reduxStore.dispatch(setIncomingSwipes(incomingSwipes));
-      this.reduxStore.dispatch(setSwipes(swipes));
+      this.reduxStore.dispatch(setMatches(finalMatches.map(deepNormalize)));
+      this.reduxStore.dispatch(setIncomingSwipes(incomingSwipes.map(deepNormalize)));
+      this.reduxStore.dispatch(setSwipes(swipes.map(deepNormalize)));
     }
   }
 
