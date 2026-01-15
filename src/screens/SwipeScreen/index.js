@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { AppState, ImageBackground, Platform, View } from 'react-native';
+import {
+  AppState,
+  Image,
+  ImageBackground,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import DeckItemCard from '../../components/cards/DeckItemCard';
 import Colors from '../../constants/Colors';
 import { Images } from '../../constants/images';
@@ -37,6 +44,8 @@ import {
   filterUsersByMyProfile,
 } from '../../constants/helpers/helperFunction';
 import TNActivityIndicator from '../../components/TNActivityIndicator';
+import { SCREEN_WIDTH } from '../../constants/Constants';
+import { CustomText } from '../../components/global/CustomText';
 
 const SwipeScreen = ({ navigation }) => {
   // Local State
@@ -648,27 +657,58 @@ const SwipeScreen = ({ navigation }) => {
         style={{ flex: 1 }}
         resizeMode="cover"
       >
-        {!hasConsumedRecommendationsStream && recommendations.length === 0 ? (
-          <TNActivityIndicator />
+        {isPlanActive ? (
+          <>
+            {!hasConsumedRecommendationsStream &&
+            recommendations.length === 0 ? (
+              <TNActivityIndicator />
+            ) : (
+              <DeckItemCard
+                data={recommendations}
+                // setShowMode={setShowMode}
+                onUndoSwipe={undoSwipe}
+                onSwipe={onSwipe}
+                onAllCardsSwiped={onAllCardsSwiped}
+                isPlanActive={true}
+                setSubscriptionVisible={() => console.log('Show subscription')}
+                renderEmptyState={renderEmptyState}
+                renderNewMatch={renderNewMatch}
+                canUserSwipe={canUserSwipe}
+                navigation={navigation}
+                // useSwiper={useSwiper}
+                // onPressCard={va => {
+                //   setCardInfo(va);
+                //   SheetManager.show('PostUserProfileInfoSheet');
+                // }}
+              />
+            )}
+          </>
         ) : (
-          <DeckItemCard
-            data={recommendations}
-            // setShowMode={setShowMode}
-            onUndoSwipe={undoSwipe}
-            onSwipe={onSwipe}
-            onAllCardsSwiped={onAllCardsSwiped}
-            isPlanActive={true}
-            setSubscriptionVisible={() => console.log('Show subscription')}
-            renderEmptyState={renderEmptyState}
-            renderNewMatch={renderNewMatch}
-            canUserSwipe={canUserSwipe}
-            navigation={navigation}
-            // useSwiper={useSwiper}
-            // onPressCard={va => {
-            //   setCardInfo(va);
-            //   SheetManager.show('PostUserProfileInfoSheet');
-            // }}
-          />
+          <>
+            <Image
+              source={require('../../assets/images/subscribe.png')}
+              style={styles.imageBackground}
+            />
+            <View style={styles.button}>
+              <CustomText style={styles.textsize}>
+                Explore the experince of matching
+              </CustomText>
+              <CustomText style={styles.textsize}>
+                 Dietary option, Exercise option, Personality traits, Love language
+              </CustomText>
+              <CustomText style={styles.textsize}>
+                and for general searches for all in one price .
+              </CustomText>
+              <CustomText style={styles.textsize}>Subscribe to Explore!</CustomText>
+              
+              <TouchableOpacity
+                onPress={() => {navigation.navigate('UpgradeAccount', {title: 'Upgrade Account'})}}
+                style={styles.buttoncontainer}
+              >
+                <CustomText style={styles.text}>Subscribe</CustomText>
+              </TouchableOpacity>
+            </View>
+          </>
         )}
       </ImageBackground>
     </View>

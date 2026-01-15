@@ -247,7 +247,7 @@ console.log("source",source);
 
   const handleLogout = () => {
     setLoading(true);
-    // userLogout(userInfo?.userID)
+    userLogout(userInfo?.userID)
     //   .then(val => {
     //     // if (val.success) {
     //     //   dispatch(logoutUser());

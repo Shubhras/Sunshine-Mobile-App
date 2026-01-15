@@ -12,14 +12,15 @@ export const SubscriptionSlideData = [
     image: require('../assets/images/vip_1.png'),
     title: '1 Month Plan',
     description:
-      'Matching based on any one of the signs, sun, moon or Venus sign for 1 month.',
+      'Matching based on Dietary option, Exercise option, Personality traits, Love language for 1 month.',
     item_bg_color: '#000000',
   },
   {
     id: '3',
     image: require('../assets/images/vip_2.png'),
     title: '1 Year Plan',
-    description: 'Unlock all signs - sun, moon or Venus sign for 1 year.',
+    description:
+      'Unlock all options - Dietary option, Exercise option, Personality traits, Love language for 1 year.',
     item_bg_color: '#000000',
   },
 ];

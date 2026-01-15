@@ -204,19 +204,25 @@
 // };
 
 import firestore, {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from '@react-native-firebase/firestore';
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   deleteUser,
+  sendPasswordResetEmail,
+  signInWithPhoneNumber,
 } from '@react-native-firebase/auth';
 import { ErrorCode } from '../../utils/ErrorCode';
 import { Images } from '../../constants/images';
@@ -467,4 +473,132 @@ export const removeUser = userID => {
         });
       });
   });
+};
+
+export const forgotPassword = async (email) => {
+  try {
+    if (!email?.trim()) {
+      return { success: false, message: 'Email is required' };
+    }
+
+    await sendPasswordResetEmail(auth, email.trim());
+
+    return {
+      success: true,
+      message: 'Password reset email sent. Check your inbox.',
+    };
+  } catch (e) {
+    console.log('forgotPassword error:', e);
+
+    if (e?.code === 'auth/user-not-found') {
+      return { success: false, message: 'No user found with this email' };
+    }
+
+    if (e?.code === 'auth/invalid-email') {
+      return { success: false, message: 'Invalid email format' };
+    }
+
+    return { success: false, message: e?.message || 'Something went wrong' };
+  }
+};
+
+export const sendSMSToPhoneNumber = (phoneNumber) => {
+  return new Promise(async function (resolve, _reject) {
+    console.log('Sending SMS to phone number:', phoneNumber);
+    
+    await signInWithPhoneNumber(auth, phoneNumber)
+      .then(function (confirmationResult) {
+        // SMS sent. Prompt user to type the code from the message, then sign the
+        // user in with confirmationResult.confirm(code).
+        resolve({ confirmationResult })
+      })
+      .catch(function (_error) {
+        console.warn(_error)
+        resolve({ error: ErrorCode.smsNotSent })
+      })
+  })
+}
+
+export const fetchUserProfileViaUUID = async (uid) => {
+  
+  try {
+    // Reference the specific user document
+    const userRef = doc(db, 'users', uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      console.log('User Profile Data:', userData);
+      return {...userData,  success: true,};
+    } else {
+      console.log('No profile found for this UID. Redirecting to onboarding...');
+       return  { success: false, message:  'No profile found for this UID. Redirecting to onboarding....' }
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error.message);
+      return  { success: false, message: error.message || 'No user found with this phone number.' }
+   
+  }
+};
+
+export const getUserDataByPhone = async (phoneNumber) => {
+  const usersRef = collection(db, 'users');
+
+  try {
+    // Create a query for the document where the 'phone' field matches
+    const q = query(usersRef, where('phone', '==', phoneNumber));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      // Assuming phone numbers are unique, take the first result
+      const userDoc = querySnapshot.docs[0];
+      console.log('User found:', userDoc.id, userDoc.data());
+      return { id: userDoc.id, ...userDoc.data(), success: true, };
+    } else {
+      console.log('No user found with this phone number.');
+      return  { success: false, message:'No user found with this phone number.' }
+    }
+  } catch (error) {
+    console.error('Error querying user by phone:', error?.message);
+     return  { success: false, message:error?.message || 'No user found with this phone number.' }
+  }
+};
+
+export const setUserInfo = async (userID, data) => {
+  try {
+    const userDocRef = doc(db, 'users', userID);
+  const dataa = {
+          id: userID,
+          userID: userID, // legacy reasons
+          email: '',
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          username: data.username.toLowerCase() || '',
+          phone: data?.phoneNumber || '',
+          age: data?.age || '',
+          profilePictureURL : '',
+          location:  '',
+          signUpLocation:  '',
+          appIdentifier: DatingConfig.appIdentifier,
+          signUpPlatform: Platform.OS,
+          settings: {
+            show_me: true,
+            min: age,
+            max: 100,
+            distance_radius: 'Unlimited',
+          },
+          createdAt: serverTimestamp(), // Modular timestamp
+          updatedAt: serverTimestamp(), // Modular timestamp
+        };
+    await setDoc(
+      userDocRef,
+      dataa,
+      { merge: true }, // ✅ create if not exist + update if exist
+    );
+
+    return { success: true, user: dataa };
+  } catch (error) {
+    console.log('Update error:', error);
+    return { success: false, message: error?.message || 'Update failed', error };
+  }
 };

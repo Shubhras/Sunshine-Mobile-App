@@ -1,322 +1,153 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { scale } from 'react-native-size-matters';
-import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
-import ProfileHeader from '../../components/ProfileHeader';
-import Colors from '../../constants/Colors';
-import styles from './styles';
-import { SubscriptionSlideData } from '../../data/SubscriptionSlideData';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedScrollHandler,
-  interpolate,
-  Extrapolation,
-  withSpring,
-} from 'react-native-reanimated';
-import { View } from 'react-native';
-import { SCREEN_WIDTH } from '../../constants/Constants';
-import { CustomText } from '../../components/global/CustomText';
-
-const UpgradeAccount = ({ route }) => {
-  const { title } = route.params;
-
-  // Declaring shared value
-  const scrollX = useSharedValue(0);
-
-  // Declaring current index of the slide
-  const currentIndex = useRef(0);
-
-  // Defining reference for the Flatlist
-  const flatListRef = useRef(null);
-
-  // Handling scroll of the flat list
-  const scrollHandler = useAnimatedScrollHandler(event => {
-    // Storing scrolled offset value of the x direction
-    scrollX.value = withSpring(event.contentOffset.x);
-  });
-
-  //
-  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
-    if (viewableItems.length === 0) {
-      return;
-    }
-
-    currentIndex.current = viewableItems[0].index;
-  }, []);
-
-  // Declaring viewability config for the Flatlist
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 100,
-  };
-
-  // Declaring viewability config callback pairs for the Flatlist
-  const viewabilityConfigCallbackPairs = useRef([
-    { viewabilityConfig, onViewableItemsChanged },
-  ]);
-
-  return (
-    <CustomSafeAreaView
-      style={[styles.mainWrapper, { backgroundColor: Colors.black }]}
-    >
-      <ProfileHeader
-        back={true}
-        iconColor={Colors.white}
-        title={title}
-        titleAlight={'center'}
-        titleFontSize={scale(16)}
-        headerBg={Colors.black}
-      />
-      {Array.isArray(SubscriptionSlideData) &&
-      SubscriptionSlideData.length > 0 ? (
-        <View style={styles.carouselWrapper}>
-          {/* Animated flatlist */}
-          <Animated.FlatList
-            ref={flatListRef}
-            data={SubscriptionSlideData}
-            renderItem={({ item, index }) => (
-              <ProductSliderItem
-                index={index}
-                scrollX={scrollX}
-                image={item.image}
-                SubscriptionTitle={item.title}
-                SubscriptionDescription={item.description}
-                itemImageBgColor={item.item_bg_color}
-                totalSlides={SubscriptionSlideData.length}
-              />
-            )}
-            keyExtractor={item => item.id}
-            style={styles.flatlist}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            bounces={false}
-            onScroll={scrollHandler}
-            scrollEventThrottle={16}
-            viewabilityConfigCallbackPairs={
-              viewabilityConfigCallbackPairs.current
-            }
-            scrollEnabled={true}
-          />
-        </View>
-      ) : null}
-    </CustomSafeAreaView>
-  );
-};
-
-// Functional component
-const ProductSliderItem = ({
-  index,
-  scrollX,
-  image,
-  itemImageBgColor,
-  totalSlides,
-  SubscriptionTitle,
-  SubscriptionDescription,
-}) => {
-  // Defining
-  const itemImageWrapperSize = SCREEN_WIDTH * 0.45;
-
-  // Declaring input range to avoid its duplication
-  const inputRange = [
-    (index - 1) * SCREEN_WIDTH,
-    index * SCREEN_WIDTH,
-    (index + 1) * SCREEN_WIDTH,
-  ];
-  const scaleAndOpacityOutputRange = [0, 1, 0];
-
-  // Defining item wrapper animated styles using useAnimatedStyle hook
-  const itemImageWrapperAnimatedStyle = useAnimatedStyle(() => {
-    // Scale
-    const scale = interpolate(
-      scrollX.value,
-      inputRange,
-      scaleAndOpacityOutputRange,
-      Extrapolation.CLAMP,
-    );
-
-    // Opacity
-    const opacity = interpolate(
-      scrollX.value,
-      inputRange,
-      scaleAndOpacityOutputRange,
-      Extrapolation.CLAMP,
-    );
-
-    // Border radius
-    const borderRadius = interpolate(
-      scrollX.value,
-      inputRange,
-      [0, itemImageWrapperSize * 0.5, 0],
-      Extrapolation.CLAMP,
-    );
-
-    // Returning animated styles
-    return {
-      transform: [
-        {
-          scale,
-        },
-      ],
-      opacity,
-      borderRadius,
-    };
-  });
-
-  // Defining item image animated styles using useAnimatedStyle hook
-  const itemImageAnimatedStyle = useAnimatedStyle(() => {
-    // Translate Y
-    const translateY = interpolate(
-      scrollX.value,
-      inputRange,
-      [SCREEN_WIDTH, 0, -SCREEN_WIDTH],
-      Extrapolation.CLAMP,
-    );
-
-    // Opacity
-    const opacity = interpolate(
-      scrollX.value,
-      inputRange,
-      [-2, 1, -2],
-      Extrapolation.CLAMP,
-    );
-
-    // Returning animated styles
-    return {
-      transform: [
-        {
-          translateY,
-        },
-      ],
-      opacity,
-    };
-  });
-
-  // Returning
-  return (
-    <View style={[styles.carouselItemWrapper, { width: SCREEN_WIDTH }]}>
-      <Animated.View
-        style={[
-          styles.carouselItemImageWrapper,
-          {
-            height: itemImageWrapperSize,
-            backgroundColor: itemImageBgColor,
-          },
-          itemImageWrapperAnimatedStyle,
-        ]}
-      >
-        <Animated.Image
-          style={[
-            {
-              flex: 1,
-              width: null,
-              height: null,
-              aspectRatio: 1,
-              resizeMode: 'contain',
-            },
-            itemImageAnimatedStyle,
-          ]}
-          source={image}
-        />
-      </Animated.View>
-
-      {/* PAGINATION */}
-      <View style={styles.indicatorContainer}>
-        {Array.from({ length: totalSlides }).map((_, i) => (
-          <PaginationDot key={i} index={i} scrollX={scrollX} />
-        ))}
-      </View>
-
-      {/* TITLE + DESCRIPTION */}
-      <View style={styles.textContainer}>
-        <CustomText style={styles.titleText}>{SubscriptionTitle}</CustomText>
-        <CustomText style={styles.descriptionText}>
-          {SubscriptionDescription}
-        </CustomText>
-      </View>
-    </View>
-  );
-};
-
-const PaginationDot = ({ index, scrollX }) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    const inputRange = [
-      (index - 1) * SCREEN_WIDTH,
-      index * SCREEN_WIDTH,
-      (index + 1) * SCREEN_WIDTH,
-    ];
-
-    return {
-      width: interpolate(
-        scrollX.value,
-        inputRange,
-        [8, 24, 8],
-        Extrapolation.CLAMP,
-      ),
-      opacity: interpolate(
-        scrollX.value,
-        inputRange,
-        [0.3, 1, 0.3],
-        Extrapolation.CLAMP,
-      ),
-    };
-  });
-
-  return <Animated.View style={[styles.indicator, animatedStyle]} />;
-};
-
-export default UpgradeAccount;
-
-// import React, { useCallback, useRef, useState } from 'react';
-// import { View } from 'react-native';
-// import Animated, {
-//   Extrapolation,
-//   interpolate,
-//   useAnimatedScrollHandler,
-//   useAnimatedStyle,
-//   useSharedValue,
-// } from 'react-native-reanimated';
+// import React from 'react';
+// import {
+//   Image,
+//   Linking,
+//   Platform,
+//   ScrollView,
+//   TouchableOpacity,
+//   View,
+// } from 'react-native';
+// import { useIAP } from 'react-native-iap';
 // import { scale } from 'react-native-size-matters';
+
 // import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
-// import { CustomText } from '../../components/global/CustomText';
 // import ProfileHeader from '../../components/ProfileHeader';
 // import Colors from '../../constants/Colors';
-// import { SCREEN_WIDTH } from '../../constants/Constants';
-// import { SubscriptionSlideData } from '../../data/subscriptionSlideData';
 // import styles from './styles';
+// import SubscriptionSliders from './SubscriptionSliders';
+// import { FONT_SIZE_XXS } from '../../constants/Constants';
+// import { CustomText } from '../../components/global/CustomText';
+// import { useDispatch } from 'react-redux';
+// import { setFirstTimeSubscribe } from '../../redux/slices/inAppPurchaseSlice';
 
-// const UpgradeAccount = ({ route }) => {
+// const productIds = [
+//   'vip_access_099_1m',
+//   'vip_access_099_03m',
+//   'vip_access_099_06m',
+//   'vip_access_0999_1m', // ⚠️ if this is not created in store, remove
+// ];
+
+// const UpgradeAccount = ({ route, navigation }) => {
 //   const { title } = route.params;
+//   const dispatch = useDispatch();
+//   const [selectedSubscriptionIndex, setSelectedSubscriptionIndex] =
+//     React.useState(0);
+//   const [processing, setProcessing] = React.useState(false);
 
-//   // Declaring shared value
-//   const scrollX = useSharedValue(0);
+//   const {
+//     connected,
+//     subscriptions,
+//     fetchProducts,
+//     requestPurchase,
+//     validateReceipt,
+//     finishTransaction,
+//   } = useIAP({
+//     onPurchaseSuccess: async purchase => {
+//       console.log('✅ Purchase successful:', purchase);
 
-//   // Declaring current index of the slide
-//   const [currentIndex, setCurrentIndex] = useState(0);
+//       const valid = await validatePurchase(purchase);
 
-//   // Defining reference for the Flatlist
-//   const flatListRef = useRef(null);
+//       if (valid) {
+//         console.log('✅ Receipt Valid - Unlock Premium');
 
-//   // Handling scroll of the flat list
-//   const scrollHandler = useAnimatedScrollHandler(event => {
-//     scrollX.value = event.contentOffset.x;
+//         await finishTransaction({
+//           purchase,
+//           isConsumable: false,
+//         });
+//          dispatch(setFirstTimeSubscribe(true))
+//          setProcessing(false);
+//       } else {
+//         console.log('❌ Invalid purchase receipt');
+//       }
+//     },
+//     onPurchaseError: error => {
+//       console.log('❌ Purchase failed:', error);
+//       setProcessing(false);
+//     },
 //   });
 
-//   // Handle viewable items changed
-//   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
-//     if (viewableItems.length > 0) {
-//       setCurrentIndex(viewableItems[0].index);
+//   // ✅ Fetch subscription products
+//   React.useEffect(() => {
+//     if (connected) {
+//       fetchProducts({ skus: productIds, type: 'subs' });
 //     }
-//   }, []);
+//   }, [connected]);
 
-//   // Declaring viewability config for the Flatlist
-//   const viewabilityConfig = useRef({
-//     itemVisiblePercentThreshold: 50,
-//   }).current;
+//   const validatePurchase = async purchase => {
+//     try {
+//       if (Platform.OS === 'ios') {
+//         if (!purchase?.transactionReceipt) return false;
 
-//   // Declaring viewability config callback pairs for the Flatlist
-//   const viewabilityConfigCallbackPairs = useRef([
-//     { viewabilityConfig, onViewableItemsChanged },
-//   ]);
+//         const result = await validateReceipt({
+//           ios: {
+//             receiptBody: {
+//               'receipt-data': purchase.transactionReceipt,
+//               password: 'YOUR_SHARED_SECRET', // Only for subscription
+//             },
+//           },
+//         });
+
+//         return result?.isValid === true;
+//       }
+
+//       if (Platform.OS === 'android') {
+//         return !!purchase?.purchaseToken;
+//       }
+
+//       return false;
+//     } catch (e) {
+//       console.log('❌ Validation failed:', e);
+//       return false;
+//     }
+//   };
+
+//   // ✅ Select Plan
+//   const onSubscriptioinPlanPress = (item, index) => {
+//     setSelectedSubscriptionIndex(index);
+//   };
+
+//   // ✅ Purchase selected plan
+//  const handleSubscription = async () => {
+//   if (!subscriptions?.length || processing) return;
+
+//   const selectedPlan = subscriptions[selectedSubscriptionIndex];
+//   if (!selectedPlan?.id) return;
+
+//   setProcessing(true);
+//  try {
+//     if (!subscriptions?.length) return;
+
+//     const subscription = subscriptions[selectedSubscriptionIndex];
+
+//     await requestPurchase({
+//       type: 'subs',
+//       request: {
+//         apple: {
+//           sku: subscription.id, // ✅ iOS SKU
+//         },
+//         google: {
+//           skus: [subscription.id], // ✅ Android SKU
+//           subscriptionOffers:
+//             subscription.subscriptionOfferDetailsAndroid?.map(offer => ({
+//               sku: subscription.id,
+//               offerToken: offer.offerToken,
+//             })) || [],
+//         },
+//       },
+//     });
+//   } catch (e) {
+//     setProcessing(false);
+//     console.log('buySubscription error =>', e);
+//   }
+// };
+
+//   const redeemOffer = () => {
+//     console.log('Redeem offer pressed');
+//   };
+
+//   const onClose = () => {
+//     navigation.goBack();
+//   };
 
 //   return (
 //     <CustomSafeAreaView
@@ -330,209 +161,652 @@ export default UpgradeAccount;
 //         titleFontSize={scale(16)}
 //         headerBg={Colors.black}
 //       />
-//       {Array.isArray(SubscriptionSlideData) &&
-//       SubscriptionSlideData.length > 0 ? (
-//         <View style={styles.carouselWrapper}>
-//           {/* Slider */}
-//           <Animated.FlatList
-//             ref={flatListRef}
-//             data={SubscriptionSlideData}
-//             renderItem={({ item, index }) => (
-//               <ProductSliderItem
-//                 index={index}
-//                 scrollX={scrollX}
-//                 image={item.image}
-//                 title={item.title}
-//                 description={item.description}
-//                 itemImageBgColor={item.item_bg_color}
-//               />
-//             )}
-//             keyExtractor={item => item.id.toString()}
-//             horizontal
-//             pagingEnabled
-//             showsHorizontalScrollIndicator={false}
-//             bounces={false}
-//             onScroll={scrollHandler}
-//             scrollEventThrottle={16}
-//             viewabilityConfigCallbackPairs={
-//               viewabilityConfigCallbackPairs.current
-//             }
-//           />
 
-//           {/* Pagination – image ke NEECH */}
-//           <View style={styles.paginationWrapper}>
-//             {SubscriptionSlideData.map((_, idx) => (
-//               <PaginationDot key={idx} index={idx} scrollX={scrollX} />
-//             ))}
+//       <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+//         <SubscriptionSliders />
+
+//         <View style={{ flexDirection: 'row' }}>
+//           <View
+//             style={{
+//               flexDirection: 'row',
+//               justifyContent: 'space-between',
+//               marginVertical: 5,
+//               // flex: 1,
+//             }}
+//           >
+//             <CustomText style={styles.featureTextStyle}>
+//               Dietary option, Exercise option, Personality traits, Love language
+//               included in search
+//             </CustomText>
 //           </View>
 //         </View>
-//       ) : null}
+//         {/* Subscription Plans */}
+//         <View style={styles.subscriptionPlansContainer}>
+//           {Array.isArray(subscriptions) &&
+//             subscriptions.map((item, index) => {
+//               const monthText = `${item?.subscriptionPeriodNumberIOS || ''} ${
+//                 item?.subscriptionPeriodUnitIOS || ''
+//               }`.trim();
+
+//               return (
+//                 <View
+//                   key={item.id || index}
+//                   style={styles.subscriptionContainer}
+//                 >
+//                   {/* Feature row */}
+
+//                   <TouchableOpacity
+//                     activeOpacity={0.7}
+//                     onPress={() => onSubscriptioinPlanPress(item, index)}
+//                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+//                   >
+//                     {/* Tick */}
+//                     <View style={{flexDirection:'row'}}>
+
+//                     <View style={styles.selectContainer}>
+//                       <View
+//                         style={[
+//                           styles.tickIconContainer,
+//                           selectedSubscriptionIndex === index &&
+//                             styles.selectedSubscription,
+//                         ]}
+//                       >
+//                         {selectedSubscriptionIndex === index && (
+//                           <Image
+//                             style={styles.tick}
+//                             source={require('../../assets/icons/png/tick.png')}
+//                           />
+//                         )}
+//                       </View>
+//                     </View>
+
+//                     {/* Price */}
+//                     <View style={styles.rateContainer}>
+//                       <CustomText style={styles.rateText}>
+//                         {item?.displayPrice || ''}
+//                         <CustomText style={styles.monthText}>
+//                           {'  / '}
+//                           {monthText}
+//                         </CustomText>
+//                       </CustomText>
+//                     </View>
+//                     </View>
+
+//                     {/* Button */}
+//                     <View style={styles.trialOptionContainer}>
+//                       <View style={styles.trialContainer}>
+//                         <CustomText style={styles.trialText}>{'Select Plan'}</CustomText>
+//                       </View>
+//                     </View>
+//                   </TouchableOpacity>
+//                 </View>
+//               );
+//             })}
+//         </View>
+
+//         {/* Bottom */}
+//         <View style={styles.bottomContainer}>
+//           <CustomText style={styles.bottomHeaderTitle}>
+//             {'Recurring billing, cancel anytime'}
+//           </CustomText>
+
+//           <CustomText style={styles.titleDescription}>
+//             {`By tapping Continue, your payment will be charged to your ${
+//               Platform.OS === 'ios' ? 'Apple account' : 'Play Account'
+//             }, and your subscription will automatically renew for the same package length at the same price until you cancel in settings in the ${
+//               Platform.OS === 'ios' ? 'Apple Store' : 'Play Store'
+//             } at least 24 hours prior to the end of the current period. By tapping Continue, you agree to our `}
+//             <CustomText
+//               style={{ color: Colors.primary, fontSize: FONT_SIZE_XXS, textDecorationLine:'underline' }}
+//               onPress={() =>
+//                 Linking.openURL('https://sunsigninc.com/terms-conditions/')
+//               }
+//             >
+//               {'Terms '}
+//             </CustomText>
+//             {' and '}
+//             <CustomText
+//               style={{ color: Colors.primary, fontSize: FONT_SIZE_XXS, textDecorationLine:'underline' }}
+//               onPress={() =>
+//                 Linking.openURL('https://sunsigninc.com/privacypolicy/')
+//               }
+//             >
+//               {'Privacy Policy'}
+//             </CustomText>
+//           </CustomText>
+
+//           <TouchableOpacity
+//             disabled={processing || !subscriptions?.length}
+//             onPress={handleSubscription}
+//             style={styles.bottomButtonContainer}
+//           >
+//             <CustomText style={styles.buttonTitle}>
+//               {processing ? 'Processing...' : 'Purchase'}
+//             </CustomText>
+//           </TouchableOpacity>
+
+//           {/* {Platform.OS !== 'ios' && (
+//             <TouchableOpacity onPress={onClose}>
+//               <CustomText style={styles.cancelTitle}>{'Cancel'}</CustomText>
+//             </TouchableOpacity>
+//           )} */}
+
+//           <TouchableOpacity
+//             onPress={redeemOffer}
+//             style={styles.bottomButtonContainer}
+//           >
+//             <CustomText style={styles.buttonTitle}>{'Redeem Offer Code'}</CustomText>
+//           </TouchableOpacity>
+//         </View>
+//         <View style={{ height: scale(20) }} />
+//       </ScrollView>
 //     </CustomSafeAreaView>
 //   );
 // };
 
-// // Pagination Dot Component
-// const PaginationDot = ({ index, scrollX }) => {
-//   const dotWidth = 8;
-//   const activeDotWidth = 24;
-
-//   const animatedDotStyle = useAnimatedStyle(() => {
-//     const inputRange = [
-//       (index - 1) * SCREEN_WIDTH,
-//       index * SCREEN_WIDTH,
-//       (index + 1) * SCREEN_WIDTH,
-//     ];
-
-//     const width = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [dotWidth, activeDotWidth, dotWidth],
-//       Extrapolation.CLAMP,
-//     );
-
-//     const opacity = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [0.3, 1, 0.3],
-//       Extrapolation.CLAMP,
-//     );
-
-//     return {
-//       width,
-//       opacity,
-//     };
-//   });
-
-//   return <Animated.View style={[styles.indicator, animatedDotStyle]} />;
-// };
-
-// // Functional component
-// const ProductSliderItem = ({
-//   index,
-//   scrollX,
-//   image,
-//   title,
-//   description,
-//   itemImageBgColor,
-// }) => {
-//   // Defining
-//   const itemImageWrapperSize = SCREEN_WIDTH * 0.5;
-//   const translateYOffset = 50;
-//   const textTranslateYOffset = 20;
-
-//   // Declaring input range to avoid its duplication
-//   const inputRange = [
-//     (index - 1) * SCREEN_WIDTH,
-//     index * SCREEN_WIDTH,
-//     (index + 1) * SCREEN_WIDTH,
-//   ];
-
-//   // Defining item wrapper animated styles using useAnimatedStyle hook
-//   const itemImageWrapperAnimatedStyle = useAnimatedStyle(() => {
-//     // Scale
-//     const scaleValue = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [0.8, 1, 0.8],
-//       Extrapolation.CLAMP,
-//     );
-
-//     // Opacity
-//     const opacity = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [0.5, 1, 0.5],
-//       Extrapolation.CLAMP,
-//     );
-
-//     // Border radius
-//     const borderRadius = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [0, itemImageWrapperSize * 0.5, 0],
-//       Extrapolation.CLAMP,
-//     );
-
-//     // Returning animated styles
-//     return {
-//       transform: [{ scale: scaleValue }],
-//       opacity,
-//       borderRadius,
-//     };
-//   });
-
-//   // Defining item image animated styles using useAnimatedStyle hook
-//   const itemImageAnimatedStyle = useAnimatedStyle(() => {
-//     // Translate Y
-//     const translateY = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [translateYOffset, 0, -translateYOffset],
-//       Extrapolation.CLAMP,
-//     );
-
-//     // Returning animated styles
-//     return {
-//       transform: [{ translateY }],
-//     };
-//   });
-
-//   // Text animation styles
-//   const textAnimatedStyle = useAnimatedStyle(() => {
-//     const opacity = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [0, 1, 0],
-//       Extrapolation.CLAMP,
-//     );
-
-//     const translateY = interpolate(
-//       scrollX.value,
-//       inputRange,
-//       [textTranslateYOffset, 0, -textTranslateYOffset],
-//       Extrapolation.CLAMP,
-//     );
-
-//     return {
-//       opacity,
-//       transform: [{ translateY }],
-//     };
-//   });
-
-//   // Returning
-//   return (
-//     <View style={[styles.carouselItemWrapper, { width: SCREEN_WIDTH }]}>
-//       <Animated.View
-//         style={[
-//           styles.carouselItemImageWrapper,
-//           {
-//             width: itemImageWrapperSize,
-//             height: itemImageWrapperSize,
-//             backgroundColor: itemImageBgColor,
-//           },
-//           itemImageWrapperAnimatedStyle,
-//         ]}
-//       >
-//         <Animated.Image
-//           style={[
-//             {
-//               width: '70%',
-//               height: '70%',
-//               resizeMode: 'contain',
-//             },
-//             itemImageAnimatedStyle,
-//           ]}
-//           source={image}
-//         />
-//       </Animated.View>
-
-//       {/* Title and Description */}
-//       <Animated.View style={[styles.textContainer, textAnimatedStyle]}>
-//         <CustomText style={styles.titleText}>{title}</CustomText>
-//         <CustomText style={styles.descriptionText}>{description}</CustomText>
-//       </Animated.View>
-//     </View>
-//   );
-// };
-
 // export default UpgradeAccount;
+
+import React from 'react';
+import {
+  Image,
+  Linking,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  Alert,
+  AppState,
+} from 'react-native';
+import {
+  useIAP,
+  ErrorCode,
+  requestPurchase,
+  presentCodeRedemptionSheetIOS,
+  getAvailablePurchases,
+  getActiveSubscriptions,
+} from 'react-native-iap';
+import { scale } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
+
+import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
+import ProfileHeader from '../../components/ProfileHeader';
+import Colors from '../../constants/Colors';
+import styles from './styles';
+import SubscriptionSliders from './SubscriptionSliders';
+import { FONT_SIZE_XXS } from '../../constants/Constants';
+import { CustomText } from '../../components/global/CustomText';
+
+import {
+  setPlans,
+  setIsPlanActive,
+  setFirstTimeSubscribe,
+  mySubscribedPlan,
+  setSubscriptionPlan,
+  setSelectedPlan,
+} from '../../redux/slices/inAppPurchaseSlice';
+import { updateUserSubscription } from '../../api/firebase/firebase';
+
+const productIds = [
+  'vip_access_099_1m',
+  'vip_access_099_03m',
+  'vip_access_099_06m',
+  'vip_access_0999_1m',
+];
+
+const getSubscriptionDurationLabel = item => {
+  // ✅ ANDROID: use billingPeriod from pricingPhases
+  if (Platform.OS === 'android') {
+    const period =
+      item?.subscriptionOfferDetailsAndroid?.[0]?.pricingPhases
+        ?.pricingPhaseList?.[0]?.billingPeriod;
+
+    if (period === 'P1M') return '1 Month';
+    if (period === 'P3M') return '3 Months';
+    if (period === 'P6M') return '6 Months';
+    if (period === 'P1Y') return '1 Year';
+  }
+
+  // ✅ iOS: use subscriptionPeriodNumberIOS + subscriptionPeriodUnitIOS
+  const number = item?.subscriptionPeriodNumberIOS;
+  const unit = item?.subscriptionPeriodUnitIOS;
+
+  if (!number || !unit) return '';
+
+  if (unit === 'month') {
+    if (number === '1') return '1 Month';
+    if (number === '3') return '3 Months';
+    if (number === '6') return '6 Months';
+    return `${number} Months`;
+  }
+
+  return `${number} ${unit}`;
+};
+
+const UpgradeAccount = ({ navigation, route }) => {
+  const { title } = route.params;
+  const dispatch = useDispatch();
+  const userInfo = useSelector(state => state.users.users);
+
+  const [selectedSubscriptionIndex, setSelectedSubscriptionIndex] =
+    React.useState(0);
+  const [processing, setProcessing] = React.useState(false);
+
+  const { connected, subscriptions, fetchProducts, finishTransaction } = useIAP(
+    {
+      onPurchaseSuccess: async purchase => {
+        try {
+          console.log('✅ Purchase successful:', purchase);
+          const subscriptionPlan = {
+            active: true,
+            productId: purchase.productId || purchase.id,
+            transactionDate: purchase.transactionDate || Date.now(),
+            purchaseToken: purchase.purchaseToken || '',
+            receipt: purchase?.transactionReceipt || '', // iOS receipt
+            platform: Platform.OS,
+          };
+
+          const userID = userInfo?.id || userInfo?.userID;
+
+          // ✅ store in firebase
+          await updateUserSubscription(userID, subscriptionPlan);
+
+          // ✅ Save purchase data in redux
+          dispatch(mySubscribedPlan(purchase));
+          dispatch(
+            setSubscriptionPlan({ planId: purchase.productId || purchase.id }),
+          );
+          dispatch(setIsPlanActive(true));
+          dispatch(setFirstTimeSubscribe(true));
+
+          // ✅ Finish transaction
+          await finishTransaction({ purchase, isConsumable: false });
+
+          Alert.alert('Success', 'Subscription Activated!');
+          navigation.goBack();
+        } catch (e) {
+          console.log('onPurchaseSuccess error =>', e);
+        } finally {
+          setProcessing(false);
+        }
+      },
+
+      onPurchaseError: error => {
+        console.log('❌ Purchase failed:', error);
+        setProcessing(false);
+
+        if (error.code !== ErrorCode.UserCancelled) {
+          Alert.alert('Purchase Failed', error.message);
+        }
+      },
+    },
+  );
+
+  // ✅ Fetch subscriptions
+  React.useEffect(() => {
+    if (connected) {
+      fetchProducts({ skus: productIds, type: 'subs' });
+    }
+  }, [connected]);
+
+  // ✅ Save subscription plans list into redux
+  React.useEffect(() => {
+    if (Array.isArray(subscriptions) && subscriptions.length > 0) {
+      dispatch(setPlans({ plans: subscriptions }));
+
+      // default plan selection
+      const defaultPlan = subscriptions[selectedSubscriptionIndex];
+      if (defaultPlan?.id) {
+        dispatch(setSelectedPlan(defaultPlan));
+        dispatch(setSubscriptionPlan({ planId: defaultPlan.id }));
+      }
+    }
+  }, [subscriptions]);
+
+  const appStateRef = React.useRef(AppState.currentState);
+  const [redeemStarted, setRedeemStarted] = React.useState(false);
+
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const findValidSubscription = (purchases = [], activeSubs = []) => {
+  const all = [...activeSubs, ...purchases];
+
+  // Only keep your subscription SKUs
+  const matched = all.find(p =>
+    productIds.includes(p.productId || p.id),
+  );
+
+  return matched || null;
+};
+
+const refreshAfterRedeem = async () => {
+  // Retry 6 times with delay (total ~30 sec)
+  for (let i = 0; i < 6; i++) {
+    const { purchases, activeSubs } = await refreshPurchases();
+    const sub = findValidSubscription(purchases, activeSubs);
+
+    console.log(`🔁 Redeem retry ${i + 1}`, {
+      purchasesCount: purchases.length,
+      activeSubsCount: activeSubs.length,
+      found: !!sub,
+    });
+
+    if (sub) return sub;
+
+    await sleep(5000); // wait 5 seconds
+  }
+
+  return null;
+};
+  React.useEffect(() => {
+    const sub = AppState.addEventListener('change', async nextState => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextState === 'active'
+      ) {
+        if (Platform.OS === 'android' && redeemStarted) {
+          setRedeemStarted(false);
+
+          // ✅ now user returned after redeem
+          // const { activeSubs } = await refreshPurchases();
+          // await handleSubscriptionFromRestore(activeSubs);
+          const restoredSub = await refreshAfterRedeem();
+
+if (restoredSub) {
+  await handleSubscriptionFromRestore([restoredSub]);
+} else {
+  Alert.alert(
+    'Not Active',
+    'Redeem successful but subscription is not visible yet. Please try Restore again in a minute.',
+  );
+}
+        }
+      }
+      appStateRef.current = nextState;
+    });
+
+    return () => sub.remove();
+  }, [redeemStarted]);
+
+  console.log('pppppPPsubscriptionssubscriptions', Platform.OS, subscriptions);
+
+  // ✅ select plan
+  const onSubscriptioinPlanPress = (item, index) => {
+    setSelectedSubscriptionIndex(index);
+    dispatch(setSelectedPlan(item));
+    dispatch(setSubscriptionPlan({ planId: item.id }));
+  };
+
+  const handleSubscription = async () => {
+    try {
+      if (!subscriptions?.length || processing) return;
+
+      const subscription = subscriptions[selectedSubscriptionIndex];
+      if (!subscription?.id) return;
+
+      setProcessing(true);
+
+      await requestPurchase({
+        type: 'subs',
+        request: {
+          apple: { sku: subscription.id },
+          google: {
+            skus: [subscription.id],
+            subscriptionOffers:
+              subscription.subscriptionOfferDetailsAndroid?.map(offer => ({
+                sku: subscription.id,
+                offerToken: offer.offerToken,
+              })) || [],
+          },
+        },
+      });
+    } catch (e) {
+      console.log('handleSubscription error =>', e);
+      setProcessing(false);
+    }
+  };
+
+  const refreshPurchases = async () => {
+    try {
+      const [purchases, activeSubs] = await Promise.all([
+        getAvailablePurchases(),
+        getActiveSubscriptions(),
+      ]);
+
+      console.log('✅ available purchases:', purchases);
+      console.log('✅ active subscriptions:', activeSubs);
+
+      return { purchases, activeSubs };
+    } catch (e) {
+      console.warn('Refresh purchases failed:', e);
+      return { purchases: [], activeSubs: [] };
+    }
+  };
+
+  const handleSubscriptionFromRestore = async (activeSubs = []) => {
+    try {
+      if (!activeSubs?.length) {
+        Alert.alert('Not Active', 'No active subscription found after redeem.');
+        return;
+      }
+
+      const latest = activeSubs[0]; // you can also match productIds
+      console.log('✅ Restored subscription:', latest);
+
+      const userID = userInfo?.id || userInfo?.userID;
+
+      const subscriptionPlan = {
+        active: true,
+        productId: latest.productId || latest.id,
+        transactionDate: latest.transactionDate || Date.now(),
+        purchaseToken: latest.purchaseToken || '',
+        receipt: latest.transactionReceipt || '',
+        platform: Platform.OS,
+        source: 'redeem_restore',
+      };
+
+      // ✅ save firebase
+      await updateUserSubscription(userID, subscriptionPlan);
+
+      // ✅ redux update
+      dispatch(mySubscribedPlan(latest));
+      dispatch(setSubscriptionPlan({ planId: latest.productId || latest.id }));
+      dispatch(setIsPlanActive(true));
+      dispatch(setFirstTimeSubscribe(true));
+
+      Alert.alert('Success ✅', 'Subscription activated successfully.');
+      navigation.goBack();
+    } catch (e) {
+      console.log('handleSubscriptionFromRestore error:', e);
+    }
+  };
+
+  const onRedeemPress = async () => {
+    try {
+      if (Platform.OS === 'ios') {
+        await presentCodeRedemptionSheetIOS();
+        // iOS sheet returns no result, user redeems and closes sheet manually
+        // After that, refresh purchases
+        // ✅ after closing sheet
+        const { activeSubs } = await refreshPurchases();
+        await handleSubscriptionFromRestore(activeSubs);
+      } else if (Platform.OS === 'android') {
+        setRedeemStarted(true);
+        await Linking.openURL('https://play.google.com/redeem');
+
+        Alert.alert(
+          'Redeem Code',
+          'Please redeem code in Google Play, then come back to the app.',
+        );
+
+        // Refresh purchases when user returns
+        // await refreshPurchases();
+      } else {
+        Alert.alert(
+          'Not supported',
+          'Offer code redeem not supported on this platform.',
+        );
+      }
+    } catch (e) {
+      console.warn('Redeem flow failed:', e);
+      Alert.alert('Error', 'Failed to redeem code. Please try again.');
+    }
+  };
+
+  return (
+    <CustomSafeAreaView
+      style={[styles.mainWrapper, { backgroundColor: Colors.black }]}
+    >
+      <ProfileHeader
+        back={true}
+        iconColor={Colors.white}
+        title={title}
+        titleAlight={'center'}
+        titleFontSize={scale(16)}
+        headerBg={Colors.black}
+      />
+
+      <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+        <SubscriptionSliders />
+        <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginVertical: 5,
+            }}
+          >
+            <CustomText style={styles.featureTextStyle}>
+              Dietary option, Exercise option, Personality traits, Love language
+              included in search
+            </CustomText>
+          </View>
+        </View>
+        {/* Subscription Plans */}
+        <View style={styles.subscriptionPlansContainer}>
+          {subscriptions?.map((item, index) => {
+            const durationLabel = getSubscriptionDurationLabel(item);
+
+            return (
+              <View key={item.id} style={styles.subscriptionContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => onSubscriptioinPlanPress(item, index)}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={styles.selectContainer}>
+                      <View
+                        style={[
+                          styles.tickIconContainer,
+                          selectedSubscriptionIndex === index &&
+                            styles.selectedSubscription,
+                        ]}
+                      >
+                        {selectedSubscriptionIndex === index && (
+                          <Image
+                            style={styles.tick}
+                            source={require('../../assets/icons/png/tick.png')}
+                          />
+                        )}
+                      </View>
+                    </View>
+
+                    <View style={styles.rateContainer}>
+                      <CustomText style={styles.rateText}>
+                        {item?.displayPrice || ''}
+                        <CustomText style={styles.monthText}>
+                          {' / '}
+                          {durationLabel}
+                        </CustomText>
+                      </CustomText>
+                    </View>
+                  </View>
+
+                  <View style={styles.trialOptionContainer}>
+                    <View style={styles.trialContainer}>
+                      <CustomText style={styles.trialText}>
+                        {'Select Plan'}
+                      </CustomText>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Bottom */}
+        {/* Bottom */}
+        <View style={styles.bottomContainer}>
+          <CustomText style={styles.bottomHeaderTitle}>
+            {'Recurring billing, cancel anytime'}
+          </CustomText>
+
+          <CustomText style={styles.titleDescription}>
+            {`By tapping Continue, your payment will be charged to your ${
+              Platform.OS === 'ios' ? 'Apple account' : 'Play Account'
+            }, and your subscription will automatically renew for the same package length at the same price until you cancel in settings in the ${
+              Platform.OS === 'ios' ? 'Apple Store' : 'Play Store'
+            } at least 24 hours prior to the end of the current period. By tapping Continue, you agree to our `}
+            <CustomText
+              style={{
+                color: Colors.primary,
+                fontSize: FONT_SIZE_XXS,
+                textDecorationLine: 'underline',
+              }}
+              onPress={() =>
+                Linking.openURL('https:sunsigninc.com/terms-conditions/')
+              }
+            >
+              {'Terms '}
+            </CustomText>
+            {' and '}
+            <CustomText
+              style={{
+                color: Colors.primary,
+                fontSize: FONT_SIZE_XXS,
+                textDecorationLine: 'underline',
+              }}
+              onPress={() =>
+                Linking.openURL('https:sunsigninc.com/privacypolicy/')
+              }
+            >
+              {'Privacy Policy'}
+            </CustomText>
+          </CustomText>
+
+          <TouchableOpacity
+            disabled={processing || !subscriptions?.length}
+            onPress={handleSubscription}
+            style={styles.bottomButtonContainer}
+          >
+            <CustomText style={styles.buttonTitle}>
+              {processing ? 'Processing...' : 'Purchase'}
+            </CustomText>
+          </TouchableOpacity>
+
+          {/* {Platform.OS !== 'ios' && (
+             <TouchableOpacity onPress={onClose}>
+               <CustomText style={styles.cancelTitle}>{'Cancel'}</CustomText>
+             </TouchableOpacity>
+           )} */}
+          <TouchableOpacity
+            disabled={processing || !subscriptions?.length}
+            onPress={onRedeemPress}
+            style={styles.bottomButtonContainer}
+          >
+            <CustomText style={styles.buttonTitle}>
+              {processing ? 'Processing...' : 'Redeem Offer Code'}
+            </CustomText>
+          </TouchableOpacity>
+        </View>
+        <View style={{ height: scale(20) }} />
+      </ScrollView>
+    </CustomSafeAreaView>
+  );
+};
+
+export default UpgradeAccount;

@@ -179,3 +179,10 @@ export const signupFields= [
       placeholder: 'Age',
     },
   ];
+
+  export const productIds = [
+  'vip_access_099_1m',
+  'vip_access_099_03m',
+  'vip_access_099_06m',
+  'vip_access_0999_1m', // ⚠️ if this is not created in store, remove
+];

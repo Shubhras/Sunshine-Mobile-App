@@ -19,6 +19,12 @@ import { localizedErrorMessage } from '../../utils/ErrorCode';
 import styles from './styles';
 import { updateUser } from '../../redux/slices/SessionUser';
 import { normalizeTimestamp } from '../../constants/helpers/helperFunction';
+import { getUserSubscription } from '../../api/firebase/firebase';
+import {
+  mySubscribedPlan,
+  setIsPlanActive,
+  setSubscriptionPlan,
+} from '../../redux/slices/inAppPurchaseSlice';
 
 // Validation Schema
 const LoginSchema = Yup.object().shape({
@@ -44,23 +50,44 @@ const LoginScreen = ({ navigation }) => {
       email: values.email,
       password: values.password,
     })
-      .then(res => {
+      .then(async res => {
         // Handle successful login
         console.log('Login successful with values:', res);
         if (res?.user) {
+          const userID = res.user?.id || res.user?.userID;
+          const resSubcription = await getUserSubscription(userID);
+          console.log('resSubcription', resSubcription, userID);
+          if (resSubcription?.success == false) {
+            dispatch(setIsPlanActive(false));
+            dispatch(mySubscribedPlan(null));
+            dispatch(setSubscriptionPlan({ planId: '' }));
+          }
+          if (resSubcription?.success && resSubcription?.subscription?.active) {
+            dispatch(setIsPlanActive(true));
+            dispatch(mySubscribedPlan(resSubcription.subscription));
+            dispatch(
+              setSubscriptionPlan({
+                planId: resSubcription.subscription.productId,
+              }),
+            );
+          }
           dispatch(
             updateUser({
               ...res.user,
               isLogin: true,
               createdAt: normalizeTimestamp(res.user?.createdAt),
-              lastOnlineTimestamp: normalizeTimestamp(res.user?.lastOnlineTimestamp)
+              lastOnlineTimestamp: normalizeTimestamp(
+                res.user?.lastOnlineTimestamp,
+              ),
             }),
           );
-          setLoading(false);
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'HomeTopTab' }],
-          });
+          setTimeout(() => {
+            setLoading(false);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'HomeTopTab' }],
+            });
+          }, 2000);
         } else {
           showToast({
             title: 'Login Failed',
@@ -81,8 +108,6 @@ const LoginScreen = ({ navigation }) => {
           duration: 3000,
           type: 'error',
         });
-      })
-      .finally(() => {
         setLoading(false);
       });
   };

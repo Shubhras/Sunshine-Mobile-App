@@ -207,6 +207,12 @@ import { defaultProfilePhotoURL } from '../../constants/images';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../../redux/slices/SessionUser';
 import TNActivityIndicator from '../../components/TNActivityIndicator';
+import { getUserSubscription } from '../../api/firebase/firebase';
+import {
+  mySubscribedPlan,
+  setIsPlanActive,
+  setSubscriptionPlan,
+} from '../../redux/slices/inAppPurchaseSlice';
 
 // Validation Schema
 const SignupSchema = Yup.object().shape({
@@ -279,7 +285,7 @@ const SignupScreen = ({ navigation, route }) => {
       photoFile: profilePictureFile,
     };
     await register(userDetails)
-      .then(response => {
+      .then(async response => {
         console.log('responseresponseresponse', response);
 
         if (response.error) {
@@ -295,6 +301,23 @@ const SignupScreen = ({ navigation, route }) => {
           });
         } else {
           let user = response.user;
+          const userID = user?.id || user?.userID;
+          const resSubcription = await getUserSubscription(userID);
+          console.log('resSubcription', resSubcription, userID);
+          if (resSubcription?.success == false) {
+            dispatch(setIsPlanActive(false));
+            dispatch(mySubscribedPlan(null));
+            dispatch(setSubscriptionPlan({ planId: '' }));
+          }
+          if (resSubcription?.success && resSubcription?.subscription?.active) {
+            dispatch(setIsPlanActive(true));
+            dispatch(mySubscribedPlan(resSubcription.subscription));
+            dispatch(
+              setSubscriptionPlan({
+                planId: resSubcription.subscription.productId,
+              }),
+            );
+          }
           if (profilePictureFile) {
             processAndUploadMediaFile(profilePictureFile).then(response => {
               if (response.error) {
@@ -515,6 +538,7 @@ const SignupScreen = ({ navigation, route }) => {
                     onPress={() =>
                       navigation.navigate('Sms', {
                         isSigningUp: true,
+                        isUser: true
                       })
                     }
                   />

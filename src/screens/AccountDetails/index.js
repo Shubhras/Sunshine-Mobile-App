@@ -18,6 +18,12 @@ import { showToast } from '../../components/alerts/Toast/ToastManager';
 import TNActivityIndicator from '../../components/TNActivityIndicator';
 import Button from '../../components/buttons/Button';
 import { ErrorCode, localizedErrorMessage } from '../../utils/ErrorCode';
+import { deleteAllLocations } from '../../redux/slices/LocationSlice';
+import { deleteDisputeResons } from '../../redux/slices/DisputeResonsSlice';
+import { resetDating } from '../../redux/slices/datingSlice';
+import { resetUserReports } from '../../redux/slices/userReportsSlice';
+import { resetAllChat } from '../../redux/slices/chatSlice';
+import { usersTrackesLogout } from '../../redux/slices/usersTrackerSlice';
 
 const editInputField = DatingConfig.editProfileFields.sections;
 
@@ -178,6 +184,12 @@ const AccountDetails = ({ route, navigation }) => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    dispatch(deleteAllLocations());
+    dispatch(deleteDisputeResons());
+    dispatch(resetDating());
+    dispatch(resetUserReports());
+    dispatch(resetAllChat());
+    dispatch(usersTrackesLogout());
     setLoading(false);
     navigation.reset({
       index: 0,

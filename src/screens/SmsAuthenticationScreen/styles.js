@@ -1,5 +1,5 @@
 import { Dimensions, I18nManager, StyleSheet } from 'react-native';
-import { POPPINS_MEDIUM, POPPINS_SEMIBOLD, STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
+import { POPPINS_MEDIUM, POPPINS_REGULAR, POPPINS_SEMIBOLD, STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
 import Colors from '../../constants/Colors';
 import invert from 'invert-color';
 import { scale } from 'react-native-size-matters';
@@ -168,4 +168,11 @@ export default StyleSheet.create({
     justifyContent: 'center',
     height: scale(30),
   },
+   errorText: {
+      left: STANDARD_SPACING * 1,
+      color: Colors.error,
+      fontSize: scale(10),
+      fontFamily: POPPINS_REGULAR,
+      top: scale(4),
+    },
 });

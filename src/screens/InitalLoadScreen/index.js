@@ -1,12 +1,22 @@
 import React, { useEffect } from 'react';
-import { ImageBackground, StatusBar, View } from 'react-native';
+import { ImageBackground, Platform, StatusBar, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Images } from '../../constants/images';
 import styles from './styles';
+import { useIAP } from 'react-native-iap';
+import {
+  mySubscribedPlan,
+  setActiveSubscriptions,
+  setIsPlanActive,
+  setSubscriptionPlan,
+} from '../../redux/slices/inAppPurchaseSlice';
+import { productIds } from '../../constants/Constants';
+import { getUserSubscription } from '../../api/firebase/firebase';
 
 const InitalLoadScreen = ({ navigation }) => {
   const userInfo = useSelector(state => state.users.users);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setTimeout(() => {
@@ -14,10 +24,48 @@ const InitalLoadScreen = ({ navigation }) => {
     }, 5000);
   }, []);
 
+  const { getActiveSubscriptions, connected,hasActiveSubscriptions } = useIAP();
+
+  useEffect(() => {
+    const checkStorePurchases = async () => {
+      // const isActive = await hasActiveSubscriptions(productIds);
+      const list = await getActiveSubscriptions();
+      dispatch(setActiveSubscriptions(list));
+    };
+
+    if (connected) checkStorePurchases();
+  }, [connected]);
+
+  useEffect(() => {
+    const loadSubFromFirebase = async () => {
+      const userID = userInfo?.id || userInfo?.userID;
+      if (!userID) return;
+
+      // ✅ reset first
+      dispatch(setIsPlanActive(false));
+      dispatch(mySubscribedPlan(null));
+      dispatch(setSubscriptionPlan({ planId: '' }));
+
+      // ✅ then load
+      const res = await getUserSubscription(userID);
+
+      if (res?.success && res?.subscription?.active) {
+        dispatch(setIsPlanActive(true));
+        dispatch(mySubscribedPlan(res.subscription));
+        dispatch(setSubscriptionPlan({ planId: res.subscription.productId }));
+      }
+    };
+
+    if (userInfo?.id) loadSubFromFirebase();
+  }, [userInfo?.id]);
+
   const handleNavigationScreen = () => {
     const { isLogin = false, isOnbording = false } = userInfo || {};
 
-    console.log('userInfouserInfouserInfouserInfouserInfouserInfouserInfo', userInfo);
+    console.log(
+      'userInfouserInfouserInfouserInfouserInfouserInfouserInfo',
+      userInfo,
+    );
     if (!isLogin && isOnbording) {
       // ✅ Logged in + Business chosen but no review setup yet
       navigation.reset({

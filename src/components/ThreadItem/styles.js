@@ -58,9 +58,9 @@ export default StyleSheet.create({
     resizeMode: 'contain',
   },
   messageWrapper: {
-    padding: STANDARD_SPACING * 3,
-    marginBottom: STANDARD_SPACING * 3,
-    borderRadius: STANDARD_BORDER_RADIUS * 5,
+    padding: STANDARD_SPACING * 1.5,
+    marginBottom: STANDARD_SPACING * 2,
+    borderRadius: STANDARD_BORDER_RADIUS * 1.5,
   },
   message: {
     fontFamily: POPPINS_MEDIUM,
