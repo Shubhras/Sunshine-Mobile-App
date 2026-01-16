@@ -465,38 +465,6 @@ const UpgradeAccount = ({ navigation, route }) => {
   const appStateRef = React.useRef(AppState.currentState);
   const [redeemStarted, setRedeemStarted] = React.useState(false);
 
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-const findValidSubscription = (purchases = [], activeSubs = []) => {
-  const all = [...activeSubs, ...purchases];
-
-  // Only keep your subscription SKUs
-  const matched = all.find(p =>
-    productIds.includes(p.productId || p.id),
-  );
-
-  return matched || null;
-};
-
-const refreshAfterRedeem = async () => {
-  // Retry 6 times with delay (total ~30 sec)
-  for (let i = 0; i < 6; i++) {
-    const { purchases, activeSubs } = await refreshPurchases();
-    const sub = findValidSubscription(purchases, activeSubs);
-
-    console.log(`🔁 Redeem retry ${i + 1}`, {
-      purchasesCount: purchases.length,
-      activeSubsCount: activeSubs.length,
-      found: !!sub,
-    });
-
-    if (sub) return sub;
-
-    await sleep(5000); // wait 5 seconds
-  }
-
-  return null;
-};
   React.useEffect(() => {
     const sub = AppState.addEventListener('change', async nextState => {
       if (
@@ -507,18 +475,8 @@ const refreshAfterRedeem = async () => {
           setRedeemStarted(false);
 
           // ✅ now user returned after redeem
-          // const { activeSubs } = await refreshPurchases();
-          // await handleSubscriptionFromRestore(activeSubs);
-          const restoredSub = await refreshAfterRedeem();
-
-if (restoredSub) {
-  await handleSubscriptionFromRestore([restoredSub]);
-} else {
-  Alert.alert(
-    'Not Active',
-    'Redeem successful but subscription is not visible yet. Please try Restore again in a minute.',
-  );
-}
+          const { activeSubs } = await refreshPurchases();
+          await handleSubscriptionFromRestore(activeSubs);
         }
       }
       appStateRef.current = nextState;
@@ -771,7 +729,7 @@ if (restoredSub) {
                 textDecorationLine: 'underline',
               }}
               onPress={() =>
-                Linking.openURL('https:sunsigninc.com/privacypolicy/')
+                Linking.openURL('https://sunsigninc.com/privacypolicy/')
               }
             >
               {'Privacy Policy'}
@@ -799,7 +757,7 @@ if (restoredSub) {
             style={styles.bottomButtonContainer}
           >
             <CustomText style={styles.buttonTitle}>
-              {processing ? 'Processing...' : 'Redeem Offer Code'}
+              {'Redeem Offer Code'}
             </CustomText>
           </TouchableOpacity>
         </View>

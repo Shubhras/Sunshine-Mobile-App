@@ -209,13 +209,13 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             {/* Link */}
-            <View style={styles.loginMobileLinkWrapper}>
+            {/* <View style={styles.loginMobileLinkWrapper}>
               <Link
                 label={'Login with phone number'}
                 labelColor={Colors.primary}
                 onPress={() => navigation.navigate('Sms')}
               />
-            </View>
+            </View> */}
           </>
         )}
       </Formik>

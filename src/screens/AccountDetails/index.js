@@ -24,6 +24,7 @@ import { resetDating } from '../../redux/slices/datingSlice';
 import { resetUserReports } from '../../redux/slices/userReportsSlice';
 import { resetAllChat } from '../../redux/slices/chatSlice';
 import { usersTrackesLogout } from '../../redux/slices/usersTrackerSlice';
+import RestorePurchaseButton from './RestorePurchaseButton';
 
 const editInputField = DatingConfig.editProfileFields.sections;
 
@@ -273,13 +274,14 @@ const AccountDetails = ({ route, navigation }) => {
               onDeletePrompt();
             }}
           />
-          <Button
+         <RestorePurchaseButton  navigation={navigation}/>
+          {/* <Button
             label={'Restore Purchase'}
             labelColor={Colors.primary}
             onPress={() => {
               alert('subscription module IN development');
             }}
-          />
+          /> */}
         </View>
         {loading && <TNActivityIndicator />}
       </ImageBackground>

@@ -527,11 +527,10 @@ const SignupScreen = ({ navigation, route }) => {
             />
 
             {renderSignupWithEmail(formik)}
-            {isSMSAuthEnabled && (
+            {/* {isSMSAuthEnabled && (
               <>
                 <CustomText style={styles.orTextStyle}>OR</CustomText>
-                {/* Link */}
-                <View style={styles.signWithEmailContainer1}>
+                                <View style={styles.signWithEmailContainer1}>
                   <Link
                     label={'Sign up with phone number'}
                     labelColor={Colors.primary}
@@ -544,7 +543,8 @@ const SignupScreen = ({ navigation, route }) => {
                   />
                 </View>
               </>
-            )}
+            )} */}
+            <View style={{margin:scale(20)}} />
           </KeyboardAwareScrollView>
         )}
       </Formik>
