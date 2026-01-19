@@ -24,6 +24,7 @@ import { resetDating } from '../../redux/slices/datingSlice';
 import { resetUserReports } from '../../redux/slices/userReportsSlice';
 import { resetAllChat } from '../../redux/slices/chatSlice';
 import { usersTrackesLogout } from '../../redux/slices/usersTrackerSlice';
+import { logOut } from '../../redux/slices/inAppPurchaseSlice';
 import RestorePurchaseButton from './RestorePurchaseButton';
 
 const editInputField = DatingConfig.editProfileFields.sections;
@@ -191,6 +192,7 @@ const AccountDetails = ({ route, navigation }) => {
     dispatch(resetUserReports());
     dispatch(resetAllChat());
     dispatch(usersTrackesLogout());
+    dispatch(logOut()); // ✅ Clear subscription state on logout
     setLoading(false);
     navigation.reset({
       index: 0,

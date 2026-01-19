@@ -18,7 +18,7 @@ import { STANDARD_SPACING } from '../../constants/Constants';
 import { localizedErrorMessage } from '../../utils/ErrorCode';
 import styles from './styles';
 import { updateUser } from '../../redux/slices/SessionUser';
-import { normalizeTimestamp } from '../../constants/helpers/helperFunction';
+import { deepNormalize, normalizeTimestamp } from '../../constants/helpers/helperFunction';
 import { getUserSubscription } from '../../api/firebase/firebase';
 import {
   mySubscribedPlan,
@@ -55,21 +55,31 @@ const LoginScreen = ({ navigation }) => {
         console.log('Login successful with values:', res);
         if (res?.user) {
           const userID = res.user?.id || res.user?.userID;
+          
+          // ✅ Clear subscription state first (in case of previous user data)
+          dispatch(setIsPlanActive(false));
+          dispatch(mySubscribedPlan(null));
+          dispatch(setSubscriptionPlan({ planId: '' }));
+          
+          // ✅ Load subscription from Firebase (user-specific, not device-specific)
           const resSubcription = await getUserSubscription(userID);
           console.log('resSubcription', resSubcription, userID);
-          if (resSubcription?.success == false) {
-            dispatch(setIsPlanActive(false));
-            dispatch(mySubscribedPlan(null));
-            dispatch(setSubscriptionPlan({ planId: '' }));
-          }
+          
           if (resSubcription?.success && resSubcription?.subscription?.active) {
+            // ✅ User has active subscription
             dispatch(setIsPlanActive(true));
-            dispatch(mySubscribedPlan(resSubcription.subscription));
+            // dispatch(mySubscribedPlan(resSubcription.subscription));
+             dispatch(mySubscribedPlan(deepNormalize(resSubcription.subscription)));
             dispatch(
               setSubscriptionPlan({
                 planId: resSubcription.subscription.productId,
               }),
             );
+          } else {
+            // ✅ No active subscription for this user
+            dispatch(setIsPlanActive(false));
+            dispatch(mySubscribedPlan(null));
+            dispatch(setSubscriptionPlan({ planId: '' }));
           }
           dispatch(
             updateUser({
@@ -89,6 +99,7 @@ const LoginScreen = ({ navigation }) => {
             });
           }, 2000);
         } else {
+          setLoading(false);
           showToast({
             title: 'Login Failed',
             text:

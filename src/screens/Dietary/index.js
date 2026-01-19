@@ -30,6 +30,8 @@ const DIETARY_OPTIONS = [
   { label: 'Pescatarian Diet', type: 'pescatarian', key: 'pescatarian' },
   { label: 'Flexitarian Diet', type: 'flexitarian', key: 'flexitarian' },
   { label: 'Raw Food Diet', type: 'raw_food', key: 'raw_food' },
+  { label: 'Carnivore diet', type: 'carnivore_diet', key: 'carnivore_diet' },
+  { label: 'Other', type: 'other', key: 'other' },
 ];
 const MAX_SELECTION = 3;
 

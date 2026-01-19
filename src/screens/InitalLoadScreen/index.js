@@ -13,6 +13,7 @@ import {
 } from '../../redux/slices/inAppPurchaseSlice';
 import { productIds } from '../../constants/Constants';
 import { getUserSubscription } from '../../api/firebase/firebase';
+import { deepNormalize } from '../../constants/helpers/helperFunction';
 
 const InitalLoadScreen = ({ navigation }) => {
   const userInfo = useSelector(state => state.users.users);
@@ -27,37 +28,53 @@ const InitalLoadScreen = ({ navigation }) => {
   const { getActiveSubscriptions, connected,hasActiveSubscriptions } = useIAP();
 
   useEffect(() => {
-    const checkStorePurchases = async () => {
-      // const isActive = await hasActiveSubscriptions(productIds);
-      const list = await getActiveSubscriptions();
-      dispatch(setActiveSubscriptions(list));
-    };
-
-    if (connected) checkStorePurchases();
-  }, [connected]);
-
-  useEffect(() => {
+     // const isActive = await hasActiveSubscriptions(productIds);
     const loadSubFromFirebase = async () => {
       const userID = userInfo?.id || userInfo?.userID;
-      if (!userID) return;
+      if (!userID) {
+        // ✅ No user logged in - clear subscription state
+        dispatch(setIsPlanActive(false));
+        dispatch(mySubscribedPlan(null));
+        dispatch(setSubscriptionPlan({ planId: '' }));
+        dispatch(setActiveSubscriptions([]));
+        return;
+      }
 
-      // ✅ reset first
+      // ✅ Reset first to clear any previous user's data
       dispatch(setIsPlanActive(false));
       dispatch(mySubscribedPlan(null));
       dispatch(setSubscriptionPlan({ planId: '' }));
+      dispatch(setActiveSubscriptions([]));
 
-      // ✅ then load
+      // ✅ Load subscription from Firebase (user-specific, not device-specific)
       const res = await getUserSubscription(userID);
 
       if (res?.success && res?.subscription?.active) {
+        // ✅ User has active subscription in Firebase
         dispatch(setIsPlanActive(true));
-        dispatch(mySubscribedPlan(res.subscription));
+        dispatch(mySubscribedPlan(deepNormalize(res.subscription)));
         dispatch(setSubscriptionPlan({ planId: res.subscription.productId }));
+      } else {
+        // ✅ No active subscription for this user
+        dispatch(setIsPlanActive(false));
+        dispatch(mySubscribedPlan(null));
+        dispatch(setSubscriptionPlan({ planId: '' }));
+      }
+
+      // ✅ Optionally sync store purchases (for restore functionality only)
+      // But don't override Firebase data - Firebase is the source of truth
+      if (connected) {
+        try {
+          const storeSubs = await getActiveSubscriptions();
+          dispatch(setActiveSubscriptions(storeSubs || []));
+        } catch (e) {
+          console.warn('Error fetching store subscriptions:', e);
+        }
       }
     };
 
-    if (userInfo?.id) loadSubFromFirebase();
-  }, [userInfo?.id]);
+    loadSubFromFirebase();
+  }, [userInfo?.id, connected]);
 
   const handleNavigationScreen = () => {
     const { isLogin = false, isOnbording = false } = userInfo || {};

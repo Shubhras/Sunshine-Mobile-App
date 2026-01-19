@@ -25,7 +25,7 @@ const RELIGION_OPTIONS = [
   { label: 'Catholicism', type: 'catholicism', key: 'catholicism' },
   { label: 'Methodist', type: 'methodist', key: 'methodist' },
   { label: 'Baptist', type: 'baptist', key: 'baptist' },
-  { label: 'Pentecostalism', type: 'pentecostalism', key: 'pentecostalism' },
+  { label: 'Pentecostal', type: 'pentecostal', key: 'pentecostal' },
   { label: 'Other', type: 'other', key: 'other' },
 ];
 

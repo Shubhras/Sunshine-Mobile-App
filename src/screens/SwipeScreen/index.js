@@ -40,6 +40,7 @@ import Geolocation from '@react-native-community/geolocation';
 import { updateUser } from '../../redux/slices/SessionUser';
 import { getApp } from '@react-native-firebase/app';
 import {
+  deepNormalize,
   filterUsers,
   filterUsersByMyProfile,
 } from '../../constants/helpers/helperFunction';
@@ -152,7 +153,9 @@ const SwipeScreen = ({ navigation }) => {
 
     if (status === receiptValidationStatus.SUCCESS) {
       dispatch(setIsPlanActive(true));
-      dispatch(mySubscribedPlan(subscription));
+      // dispatch(mySubscribedPlan(subscription));
+
+      dispatch(mySubscribedPlan(deepNormalize(subscription)));
       if (userID) {
         updateUserSubscription(userID, updatedReceipt);
         // updateUser(userID, { isVIP: true })

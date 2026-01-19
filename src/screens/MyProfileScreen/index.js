@@ -39,6 +39,7 @@ import { resetDating } from '../../redux/slices/datingSlice';
 import { resetUserReports } from '../../redux/slices/userReportsSlice';
 import {  resetAllChat } from '../../redux/slices/chatSlice';
 import { usersTrackesLogout } from '../../redux/slices/usersTrackerSlice';
+import { logOut } from '../../redux/slices/inAppPurchaseSlice';
 
 var selectedItemIndex = -1;
 // const myphotoss = [
@@ -287,6 +288,7 @@ console.log("source",source);
           dispatch(resetUserReports());
           dispatch(resetAllChat());
           dispatch(usersTrackesLogout());
+          dispatch(logOut()); // ✅ Clear subscription state on logout
           navigation.reset({
             index: 0,
             routes: [{ name: 'AuthStack' }],

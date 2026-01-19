@@ -213,6 +213,7 @@ import {
   setIsPlanActive,
   setSubscriptionPlan,
 } from '../../redux/slices/inAppPurchaseSlice';
+import { deepNormalize } from '../../constants/helpers/helperFunction';
 
 // Validation Schema
 const SignupSchema = Yup.object().shape({
@@ -302,21 +303,31 @@ const SignupScreen = ({ navigation, route }) => {
         } else {
           let user = response.user;
           const userID = user?.id || user?.userID;
+          
+          // ✅ Clear subscription state first (new user, no subscription)
+          dispatch(setIsPlanActive(false));
+          dispatch(mySubscribedPlan(null));
+          dispatch(setSubscriptionPlan({ planId: '' }));
+          
+          // ✅ Load subscription from Firebase (user-specific)
           const resSubcription = await getUserSubscription(userID);
           console.log('resSubcription', resSubcription, userID);
-          if (resSubcription?.success == false) {
-            dispatch(setIsPlanActive(false));
-            dispatch(mySubscribedPlan(null));
-            dispatch(setSubscriptionPlan({ planId: '' }));
-          }
+          
           if (resSubcription?.success && resSubcription?.subscription?.active) {
+            // ✅ User has active subscription (unlikely for new signup, but check anyway)
             dispatch(setIsPlanActive(true));
-            dispatch(mySubscribedPlan(resSubcription.subscription));
+            // dispatch(mySubscribedPlan(resSubcription.subscription));
+            dispatch(mySubscribedPlan(deepNormalize(resSubcription.subscription)));
             dispatch(
               setSubscriptionPlan({
                 planId: resSubcription.subscription.productId,
               }),
             );
+          } else {
+            // ✅ No active subscription for new user
+            dispatch(setIsPlanActive(false));
+            dispatch(mySubscribedPlan(null));
+            dispatch(setSubscriptionPlan({ planId: '' }));
           }
           if (profilePictureFile) {
             processAndUploadMediaFile(profilePictureFile).then(response => {

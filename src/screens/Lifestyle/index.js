@@ -24,6 +24,7 @@ const LIFESTYLE_OPTIONS = [
     key: 'recreational_drugs',
   },
   { label: 'Others', type: 'others', key: 'others' },
+  { label: 'None', type: 'none', key: 'none' },
 ];
 
 const Lifestyle = ({ route, navigation }) => {

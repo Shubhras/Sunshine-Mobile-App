@@ -13,6 +13,7 @@ import { updateUserSubscription } from '../../api/firebase/firebase';
 import { productIds } from '../../constants/Constants';
 import Button from '../../components/buttons/Button';
 import Colors from '../../constants/Colors';
+import { deepNormalize } from '../../constants/helpers/helperFunction';
 
 // const productIds = [
 //   'vip_access_099_1m',
@@ -54,6 +55,7 @@ export default function RestorePurchaseButton({navigation, style}) {
       const userID = userInfo?.id || userInfo?.userID;
       if (!userID) {
         Alert.alert('Error', 'User not found');
+        setLoading(false);
         return;
       }
 
@@ -88,7 +90,7 @@ export default function RestorePurchaseButton({navigation, style}) {
       });
 
       // ✅ update redux
-      dispatch(mySubscribedPlan(restored));
+      dispatch(mySubscribedPlan(deepNormalize(restored)));
       dispatch(setSubscriptionPlan({planId}));
       dispatch(setIsPlanActive(true));
 
