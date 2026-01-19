@@ -5,14 +5,15 @@ import { TouchableOpacity, View } from 'react-native';
 import { CustomText } from '../../global/CustomText';
 import IMConversationIconView from '../IMConversationIconView';
 import styles from './styles';
-import { getMessageTime, timeFormat } from '../../../constants/helpers/helperFunction';
+import {
+  getMessageTime,
+  isValidUrl,
+  timeFormat,
+} from '../../../constants/helpers/helperFunction';
 
 function IMConversationView(props) {
   const { onChatItemPress, item, user, onChatLongPress } = props;
-
-  const userID = user.userID || user.id;
-  const lastName = item.lastName || '';
-
+ 
   let title = item.title;
   const getIsRead = () => {
     return item.markedAsRead;
@@ -20,6 +21,10 @@ function IMConversationView(props) {
 
   const formatMessage = message => {
     const mime = message?.url?.mime || message?.mime;
+    const isURL = isValidUrl(message);
+    if (isURL) {
+      return 'Someone sent a photo.';
+    }
     if (mime) {
       if (mime.startsWith('video')) {
         return 'Someone sent a video.';
@@ -38,8 +43,6 @@ function IMConversationView(props) {
     }
     return '';
   };
-
-
 
   return (
     <TouchableOpacity

@@ -87,6 +87,7 @@ export const STANDARD_OTP_TEXT_VIEW_BORDER_SIZE = scale(2);
 
 export const tosLink= 'https://sunsigninc.com/terms-conditions/';
 export const privacyPolicyLink= 'https://sunsigninc.com/privacypolicy/';
+export const firebaseServerKey = 'AAAAHofJalE:APA91bGQ9LqEGXdTvEh8xyZp1WErkkHN7HB20hQyy-6Jfek3y8gqFrGIswh5R_hf4fIvr1f4KNclPN7nJXQdMTP-QEzGKDlbhVdiIIZjNeIHT15ooiJQChylFqYAoFvvA5p0kXR8Puy-';
 export const isSMSAuthEnabled= true;
 export const smsSignupFields= [
     {

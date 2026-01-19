@@ -14,6 +14,7 @@ import {
 import { productIds } from '../../constants/Constants';
 import { getUserSubscription } from '../../api/firebase/firebase';
 import { deepNormalize } from '../../constants/helpers/helperFunction';
+import { fetchAndStorePushTokenIfPossible } from '../../api/firebase/auth';
 
 const InitalLoadScreen = ({ navigation }) => {
   const userInfo = useSelector(state => state.users.users);
@@ -39,7 +40,9 @@ const InitalLoadScreen = ({ navigation }) => {
         dispatch(setActiveSubscriptions([]));
         return;
       }
-
+      if (userID) {
+         fetchAndStorePushTokenIfPossible(userID)
+      }
       // ✅ Reset first to clear any previous user's data
       dispatch(setIsPlanActive(false));
       dispatch(mySubscribedPlan(null));

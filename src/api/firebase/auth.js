@@ -228,6 +228,7 @@ import { ErrorCode } from '../../utils/ErrorCode';
 import { Images } from '../../constants/images';
 import DatingConfig from '../../data/DatingConfig';
 import { Platform } from 'react-native';
+import messaging from '@react-native-firebase/messaging'
 
 const timestamp = serverTimestamp();
 const db = getFirestore(); // Modular DB instance
@@ -600,5 +601,60 @@ export const setUserInfo = async (userID, data) => {
   } catch (error) {
     console.log('Update error:', error);
     return { success: false, message: error?.message || 'Update failed', error };
+  }
+};
+
+export const getUserByID = async (userID) => {
+  try {
+    if (!userID) return null;
+
+    const userDocRef = doc(db, 'users', userID);
+    const userSnap = await getDoc(userDocRef);
+
+    if (userSnap.exists()) {
+      return { id: userSnap.id, ...userSnap.data() };
+    }
+
+    return null;
+  } catch (error) {
+    console.log('getUserByID error:', error);
+    return null;
+  }
+};
+
+
+export const fetchAndStorePushTokenIfPossible = async (userID) => {
+  try {
+    if (!userID) return;
+
+    // ✅ Request permission (iOS mainly, Android 13+ also)
+    const authStatus = await messaging().requestPermission();
+
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    console.log('Push permission status:', authStatus);
+
+    if (!enabled) {
+      console.log('Push notifications permission not granted');
+      return;
+    }
+
+    // ✅ Get FCM token
+    const token = await messaging().getToken();
+    console.log('FCM token:', token);
+
+    if (!token) return;
+
+    // ✅ Store token in user profile
+    await updateUserInfo(userID, {
+      pushToken: token,
+      pushKitToken: '',
+      badgeCount: 0,
+    });
+
+  } catch (error) {
+    console.log('fetchAndStorePushTokenIfPossible error:', error);
   }
 };

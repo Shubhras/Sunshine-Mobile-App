@@ -6,10 +6,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
 import Colors from '../../../constants/Colors';
 import { Images } from '../../../constants/images';
-import ChatStack from '../../stacks/ChatStack';
-import MyProfileStack from '../../stacks/MyProfileStack';
-import SwipeStack from '../../stacks/SwipeStack';
+// import ChatStack from '../../stacks/ChatStack';
+// import MyProfileStack from '../../stacks/MyProfileStack';
+// import SwipeStack from '../../stacks/SwipeStack';
 import styles from './styles';
+import MyProfileScreen from '../../../screens/MyProfileScreen';
+import SwipeScreen from '../../../screens/SwipeScreen';
+import Conversations from '../../../screens/Conversations';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -25,21 +28,21 @@ const ALIGNMENTS = ['flex-start', 'center', 'flex-end'];
 
 const TAB_CONFIG = [
   {
-    name: 'MyProfileStack',
-    component: MyProfileStack,
+    name: 'MyProfile',
+    component: MyProfileScreen,
     icon: Images.profileTabIcon,
     type: TAB_TYPES.TINT,
   },
   {
     name: 'SwipeStack',
-    component: SwipeStack,
+    component: SwipeScreen,
     activeIcon: Images.swipeTabActiveIcon,
     inactiveIcon: Images.swipeTabInactiveIcon,
     type: TAB_TYPES.IMAGE,
   },
   {
-    name: 'ChatStack',
-    component: ChatStack,
+    name: 'Conversations',
+    component: Conversations,
     icon: Images.chatTabIcon,
     type: TAB_TYPES.TINT,
   },
@@ -89,30 +92,30 @@ const TabButton = ({ alignment, icon, onPress }) => (
 
 // Custom Tab Bar Component
 const CustomTabBar = ({ state, descriptors, navigation }) => {
+  const onPress = (route) => {
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+
+    if (!event.defaultPrevented) {
+      navigation.navigate(route.name);
+    }
+  };
   return (
     <View style={styles.tabWrapper}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const focused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
 
         return (
           <TabButton
             key={route.key}
             alignment={ALIGNMENTS[index] || 'center'}
             icon={options.tabBarIcon?.({ focused })}
-            onPress={onPress}
+            onPress={()=>onPress(route)}
           />
         );
       })}

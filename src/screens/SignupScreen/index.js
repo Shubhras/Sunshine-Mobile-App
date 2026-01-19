@@ -200,7 +200,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { showToast } from '../../components/alerts/Toast/ToastManager';
 import { createUserWithEmailAndPassword } from '@react-native-firebase/auth';
-import { register, updateProfilePhoto } from '../../api/firebase/auth';
+import { fetchAndStorePushTokenIfPossible, register, updateProfilePhoto } from '../../api/firebase/auth';
 import { localizedErrorMessage } from '../../utils/ErrorCode';
 import { processAndUploadMediaFile } from '../../api/firebase/storage';
 import { defaultProfilePhotoURL } from '../../constants/images';
@@ -303,6 +303,7 @@ const SignupScreen = ({ navigation, route }) => {
         } else {
           let user = response.user;
           const userID = user?.id || user?.userID;
+          fetchAndStorePushTokenIfPossible(userID)
           
           // ✅ Clear subscription state first (new user, no subscription)
           dispatch(setIsPlanActive(false));

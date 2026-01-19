@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Pressable,  View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Badge, Surface, Text } from 'react-native-paper';
 import { scale } from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
@@ -45,7 +45,11 @@ const ChatHeader = ({
           <View style={styles.avatarImageContainer}>
             <FastImage
               source={{
-                uri: profilePictureURL ?? defaultProfilePhotoURL,
+                uri:
+                  profilePictureURL ==
+                  'https://firebasestorage.googleapis.com/v0/b/sun-sign-inc-1e12b.appspot.com/o/pic2.jpg?alt=media&token=0afb6fe0-16c4-4600-8b81-5dbd618c71d5'
+                    ? defaultProfilePhotoURL
+                    : profilePictureURL ?? defaultProfilePhotoURL,
                 priority: FastImage.priority.high,
               }}
               style={styles.avatarImage}
@@ -58,13 +62,9 @@ const ChatHeader = ({
   // Right view component
   const RightView = () => (
     <View style={[styles.view, styles.rightView]}>
-     
-     
-    
-        <Pressable onPress={onRightPress}>
-           <Feather name="settings" size={IconSize} color={Colors.grayBgColor} />
-        </Pressable>
-   
+      <Pressable onPress={onRightPress}>
+        <Feather name="settings" size={IconSize} color={Colors.grayBgColor} />
+      </Pressable>
     </View>
   );
   // Title view component

@@ -586,7 +586,16 @@ export const launchCameraWithOptions = () => {
   });
 };
 
+export const isValidUrl = (text) => {
+  if (!text) return false;
 
+  const str = text.trim();
+
+  // must start with http/https OR www
+  const urlRegex = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i;
+
+  return urlRegex.test(str);
+};
 export {
   formatMessage,
   getMessageTime,

@@ -226,9 +226,10 @@ const PostPictureSelector = props => {
             backgroundColor: Colors.primary,
           },
         ]}
-      //   onPress={() => alert('ss')}
-      // >
-        onPress={showActionSheet}>
+        //   onPress={() => alert('ss')}
+        // >
+        onPress={showActionSheet}
+      >
         <Icon name="camera" size={scale(30)} color={Colors.black} />
       </TouchableOpacity>
 
@@ -394,8 +395,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   myphotosItemView: {
-    width: Math.floor(width * 0.24),
-    height: Math.floor(width * 0.24),
+    width: Math.floor(width * 0.27),
+    height: Math.floor(width * 0.27),
     marginHorizontal: 8,
     marginVertical: 8,
     borderRadius: 15,

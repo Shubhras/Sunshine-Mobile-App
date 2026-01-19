@@ -36,7 +36,7 @@ const CardDetailsView = props => {
   const [firstName] = useState(props.firstName || '');
   const [lastName] = useState(props.lastName || '');
   const [age] = useState(props.age || '');
-  const [school] = useState(props.school || 'UCLA');
+  const [school] = useState(props.school || 'None');
   const [distance] = useState(props.distance || '');
   const [bio] = useState(props.bio || '');
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);

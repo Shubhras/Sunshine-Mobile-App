@@ -222,6 +222,7 @@ import ActionSheet from 'react-native-actions-sheet';
 import * as reportingManager from '../../api/firebase/reportingManager';
 import { getImagesForUsers } from '../../constants/helpers/helperFunction';
 import { processAndUploadMediaFileWithProgressTracking } from '../../api/firebase/storage';
+import { notificationManager } from '../../api/firebase/notificationManager';
 
 const ChatScreen = ({ navigation, route }) => {
   const openedFromPushNotification = route?.params?.openedFromPushNotification;
@@ -433,17 +434,17 @@ const ChatScreen = ({ navigation, route }) => {
       }
     }
 
-    // participants.forEach(participant => {
-    //   if (participant.id !== currentUser.id) {
-    //     notificationManager.sendPushNotification(
-    //       participant,
-    //       fromTitle,
-    //       message,
-    //       'chat_message',
-    //       { channelID: channel.id },
-    //     )
-    //   }
-    // })
+    participants.forEach(participant => {
+      if (participant.id !== currentUser.id) {
+        notificationManager.sendPushNotification(
+          participant,
+          fromTitle,
+          message,
+          'chat_message',
+          { channelID: channel.id },
+        )
+      }
+    })
   };
 
   const sendMessage = newChannel => {

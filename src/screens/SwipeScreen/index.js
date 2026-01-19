@@ -48,6 +48,10 @@ import TNActivityIndicator from '../../components/TNActivityIndicator';
 import { SCREEN_WIDTH } from '../../constants/Constants';
 import { CustomText } from '../../components/global/CustomText';
 
+const shuffleArray = (arr) => {
+  return arr.sort(() => Math.random() - 0.5);
+};
+
 const SwipeScreen = ({ navigation }) => {
   // Local State
   const userInfo = useSelector(state => state.users.users);
@@ -667,7 +671,7 @@ const SwipeScreen = ({ navigation }) => {
               <TNActivityIndicator />
             ) : (
               <DeckItemCard
-                data={recommendations}
+                data={shuffleArray(recommendations)}
                 // setShowMode={setShowMode}
                 onUndoSwipe={undoSwipe}
                 onSwipe={onSwipe}

@@ -52,7 +52,7 @@ export default StyleSheet.create({
     ),
     borderRadius: 15,
     overflow: 'hidden',
-    backgroundColor: 'white',
+    backgroundColor: Colors.grey6,
   },
   name_info_container: {
     padding: scale(20),

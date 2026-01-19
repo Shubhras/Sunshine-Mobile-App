@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-import { loginWithEmailAndPassword } from '../../api/firebase/auth';
+import { fetchAndStorePushTokenIfPossible, loginWithEmailAndPassword } from '../../api/firebase/auth';
 import { showToast } from '../../components/alerts/Toast/ToastManager';
 import Button from '../../components/buttons/Button';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
@@ -55,7 +55,7 @@ const LoginScreen = ({ navigation }) => {
         console.log('Login successful with values:', res);
         if (res?.user) {
           const userID = res.user?.id || res.user?.userID;
-          
+          fetchAndStorePushTokenIfPossible(userID)
           // ✅ Clear subscription state first (in case of previous user data)
           dispatch(setIsPlanActive(false));
           dispatch(mySubscribedPlan(null));
