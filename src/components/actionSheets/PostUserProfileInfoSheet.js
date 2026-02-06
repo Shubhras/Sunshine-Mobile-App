@@ -10,10 +10,11 @@ import CardDetailsView from '../cards/CardDetailsView';
 import SwipeControls from '../cards/SwipeControls';
 
 const PostUserProfileInfoSheet = props => {
-  const { item, useSwiper } = props;
+  const { item, useSwiper,photoInfoActionSheetRef } = props;
 
   const handleLike = () => {
-    SheetManager.hide('post-user-profile-info-sheet');
+    // SheetManager.hide('post-user-profile-info-sheet');
+     photoInfoActionSheetRef?.current?.hide();
 
     setTimeout(() => {
       useSwiper.current?.swipeRight();
@@ -21,7 +22,8 @@ const PostUserProfileInfoSheet = props => {
   };
 
   const handleDislike = () => {
-    SheetManager.hide('post-user-profile-info-sheet');
+    // SheetManager.hide('post-user-profile-info-sheet');
+     photoInfoActionSheetRef?.current?.hide();
 
     setTimeout(() => {
       useSwiper.current?.swipeLeft();
@@ -31,7 +33,8 @@ const PostUserProfileInfoSheet = props => {
   return (
     <>
       <ActionSheet
-        id="post-user-profile-info-sheet"
+        // id="post-user-profile-info-sheet"
+        ref={photoInfoActionSheetRef}
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
@@ -68,7 +71,9 @@ const PostUserProfileInfoSheet = props => {
                   ? item.photos
                   : [item?.profilePictureURL]
               }
-              onPress={() => SheetManager.hide('post-user-profile-info-sheet')}
+              onPress={() => {
+                 photoInfoActionSheetRef?.current?.hide();
+              }}
               handleDislike={handleDislike}
             />
           )}

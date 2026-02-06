@@ -593,7 +593,7 @@ export const subscribeThreadSnapshot = (channel, callback, userID) => {
           .orderBy('createdAt', 'desc')
           .onSnapshot(querySnapshot => {
             const data = []
-            querySnapshot.docs.forEach(doc => {
+            querySnapshot?.docs?.forEach(doc => {
               const message = doc.data()
               if (
                 !message.content ||
@@ -612,7 +612,7 @@ export const subscribeThreadSnapshot = (channel, callback, userID) => {
           .orderBy('createdAt', 'desc')
           .onSnapshot(querySnapshot => {
             const data = []
-            querySnapshot.docs.forEach(doc => {
+            querySnapshot?.docs?.forEach(doc => {
               const message = doc.data()
               if (
                 !message.content ||

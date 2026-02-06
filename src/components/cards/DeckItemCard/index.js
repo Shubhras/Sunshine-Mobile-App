@@ -222,6 +222,7 @@ const DeckItemCard = ({
   canUserSwipe,
 }) => {
   const swiperRef = useRef(null);
+  const photoInfoActionSheetRef = useRef(null);
   const [cardIndex, setCardIndex] = useState(0); // Use state to track current visible card
   const [cardInfo, setCardInfo] = useState(null);
 
@@ -303,7 +304,8 @@ const DeckItemCard = ({
   const handleTapCard = (index) => {
     setCardInfo(data[index]);
     setTimeout(() => {
-      SheetManager.show('post-user-profile-info-sheet');
+      // SheetManager.show('post-user-profile-info-sheet');
+      photoInfoActionSheetRef.current?.show();
     }, 100);
   };
 
@@ -359,7 +361,7 @@ const DeckItemCard = ({
           onUndoPressed={undoSwipe} // Added undo to controls if available
         />
       </View>
-      <PostUserProfileInfoSheet item={cardInfo} useSwiper={swiperRef} />
+      <PostUserProfileInfoSheet photoInfoActionSheetRef={photoInfoActionSheetRef}  item={cardInfo} useSwiper={swiperRef} />
     </>
   );
 };

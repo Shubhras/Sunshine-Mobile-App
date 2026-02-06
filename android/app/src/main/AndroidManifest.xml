@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -16,17 +17,20 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
+      tools:replace="android:allowBackup"
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="${usesCleartextTraffic}"
       android:supportsRtl="true"
+      android:networkSecurityConfig="@xml/network_security_config"
       android:enableOnBackInvokedCallback="false">
+
       <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyCVK_VgrYl1dx7qC8fZjF60pFoh3R-pb1E"/>
@@ -36,7 +40,7 @@
 
       <meta-data
         android:name="androidx.activity.PhotoPicker.Enable"
-        android:value="true" />  
+        android:value="true" />
 
       <activity
         android:name=".MainActivity"
@@ -51,9 +55,11 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
       <activity android:name="com.reactnative.googlecast.GoogleCastActivity" android:exported="false" android:theme="@style/Theme.AppCompat.NoActionBar"/>
       <activity android:name="expo.modules.payments.applepay.ApplePayActivity" android:exported="false"/>
       <activity android:name="expo.modules.imagepicker.ImagePickerActivity" android:exported="false"/>
       <activity android:name="com.zoontek.rnphonenumber.PhoneNumberActivity" android:exported="false"/>
+
     </application>
 </manifest>

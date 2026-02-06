@@ -160,12 +160,12 @@ const PostPictureMoreOption = props => {
   const showActionSheet = () => {
     Keyboard.dismiss();
     setTimeout(() => {
-      SheetManager.show('profile-photo-sheet-post-more-option');
+      // SheetManager.show('profile-photo-sheet-post-more-option');
     }, 200);
   };
 
   const onActionDone = index => {
-    SheetManager.hide('profile-photo-sheet-post-more-option');
+    // SheetManager.hide('profile-photo-sheet-post-more-option');
 
     setTimeout(() => {
       switch (index) {
@@ -176,6 +176,7 @@ const PostPictureMoreOption = props => {
           props.onPressMakeProfile();
           break;
         case 2: // Cancel - do nothing
+          props.onPressCancel();
           break;
         default:
           break;
@@ -188,7 +189,8 @@ const PostPictureMoreOption = props => {
       
 
       <ActionSheet
-        id="profile-photo-sheet-post-more-option"
+        // id="profile-photo-sheet-post-more-option"
+        ref={props.photoDialogActionSheetRef}
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}

@@ -95,6 +95,7 @@ const TNProfilePictureSelector = props => {
         setProfilePictureURL(asset.uri);
         if (props.setProfilePictureFile) {
           props.setProfilePictureFile(asset);
+          actionSheet.current?.hide();
         }
       }
     });
@@ -175,6 +176,7 @@ const TNProfilePictureSelector = props => {
         setProfilePictureURL(asset.uri);
         if (props.setProfilePictureFile) {
           props.setProfilePictureFile(asset);
+          actionSheet.current?.hide();
         }
       }
     });
@@ -192,7 +194,7 @@ const TNProfilePictureSelector = props => {
   const showActionSheet = () => {
     Keyboard.dismiss();
     setTimeout(() => {
-      SheetManager.show('profile-photo-sheet');
+      actionSheet.current?.show();
     }, 200);
   };
 
@@ -214,6 +216,7 @@ const TNProfilePictureSelector = props => {
           if (props.setProfilePictureFile) {
             props.setProfilePictureFile(null);
           }
+          actionSheet.current?.hide();
           break;
         default:
           break;
@@ -244,7 +247,8 @@ const TNProfilePictureSelector = props => {
       </View>
 
       <ActionSheet
-        id="profile-photo-sheet"
+        // id="profile-photo-sheet"
+        ref={actionSheet}
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
@@ -290,7 +294,11 @@ const TNProfilePictureSelector = props => {
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => onActionDone(2)}
+            onPress={() => {
+              setTimeout(() => {
+                actionSheet.current?.hide();
+              }, 200);
+            }}
           >
             <CustomText style={styles.cancelText}>Cancel</CustomText>
           </TouchableOpacity>
@@ -312,8 +320,8 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    backgroundColor:Colors.grayBgColor,
-    borderWidth:0.3
+    backgroundColor: Colors.grayBgColor,
+    borderWidth: 0.3,
   },
   imageBlock: {
     // flex: 2,

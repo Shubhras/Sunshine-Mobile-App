@@ -1,8 +1,9 @@
 import { Dimensions, I18nManager, StyleSheet } from 'react-native';
-import { POPPINS_MEDIUM, POPPINS_REGULAR, POPPINS_SEMIBOLD, STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
+import { FONT_SIZE_MD, POPPINS_MEDIUM, POPPINS_REGULAR, POPPINS_SEMIBOLD, STANDARD_FLEX, STANDARD_SPACING } from '../../constants/Constants';
 import Colors from '../../constants/Colors';
 import invert from 'invert-color';
 import { scale } from 'react-native-size-matters';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const width = Dimensions.get('window').width;
 const codeInptCellWidth = width * 0.13;
@@ -11,7 +12,13 @@ const codeInptCellWidth = width * 0.13;
 export default StyleSheet.create({
   mainWrapper: {
     flex: STANDARD_FLEX,
-    paddingHorizontal: STANDARD_SPACING * 3.5,
+    // paddingHorizontal: STANDARD_SPACING * 3.5,
+    // justifyContent:'center',
+    //  width:widthPercentageToDP('90'),
+    //  backgroundColor:Colors.black,
+    // alignContent:'center',
+    // alignItems:'center',
+    // alignSelf:'center'
   },
   largeHeadingComponentWrapper: {
     marginTop: STANDARD_SPACING * 5,
@@ -58,9 +65,11 @@ export default StyleSheet.create({
   },
   buttonWrapper: {
     marginHorizontal: STANDARD_SPACING * 3,
+    marginTop: STANDARD_SPACING * 10,
   },
   loginMobileLinkWrapper: {
     marginTop: STANDARD_SPACING * 4,
+    marginBottom: STANDARD_SPACING * 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -101,19 +110,29 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   codeFieldContainer: {
-    marginTop: 20,
-    alignItems: 'center',
+    marginTop: scale(20),
+    // marginBottom: scale(50),
+    alignSelf: 'center',
+    width:widthPercentageToDP('90'),
+    // paddingHorizontal: STANDARD_SPACING * 0,
+    // position:'absolute'
+    // zIndex:1,
+    
+    // borderWidth:1, borderColor:'red'
   },
   codeInputCell: {
-    width: codeInptCellWidth,
-    height: codeInptCellWidth,
-    lineHeight: 55,
-    fontSize: 26,
-    fontWeight: '400',
+    width: widthPercentageToDP('12'),
+    height: widthPercentageToDP('12'),
+    fontFamily:POPPINS_MEDIUM,
+    fontSize:FONT_SIZE_MD,
+    lineHeight: scale(45),
+    // fontSize: 26,
+    // fontWeight: '400',
     textAlign: 'center',
-    marginLeft: 8,
-    borderRadius: 6,
+    marginLeft: scale(8),
+    borderRadius: scale(6),
     backgroundColor: Colors.grey3,
+    color:Colors.textHighContrast
   },
   focusCell: {
     borderColor: '#000',

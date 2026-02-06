@@ -13,7 +13,28 @@
           "package_name": "com.digi.sunshine"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "582138799762-2nvth55jk9f5hh4jpa31ncnufvem91n2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digi.sunshine",
+            "certificate_hash": "7983b828f6cc2d43a47b7dba973db6dae034d050"
+          }
+        },
+        {
+          "client_id": "582138799762-chrshqguk69fv5l5t7gfrurog98dqna0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digi.sunshine",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "582138799762-kj1mrfjumll3itqg57ftje3j3nkavsic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDDii9mftsWuH722sIjOQGRunPzIq4wqUM"
@@ -21,7 +42,20 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582138799762-kj1mrfjumll3itqg57ftje3j3nkavsic.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "582138799762-fpt461bd0t0a43ih081l66f4s7794ddu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.digi.sunsign",
+                "app_store_id": "1586800924"
+              }
+            }
+          ]
         }
       }
     },
@@ -32,7 +66,12 @@
           "package_name": "com.digi.sunsigninc"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "582138799762-kj1mrfjumll3itqg57ftje3j3nkavsic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDDii9mftsWuH722sIjOQGRunPzIq4wqUM"
@@ -40,7 +79,20 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582138799762-kj1mrfjumll3itqg57ftje3j3nkavsic.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "582138799762-fpt461bd0t0a43ih081l66f4s7794ddu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.digi.sunsign",
+                "app_store_id": "1586800924"
+              }
+            }
+          ]
         }
       }
     }

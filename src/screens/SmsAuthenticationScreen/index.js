@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import PhoneInput from 'react-native-phone-input';
 import CountriesModalPicker from '../../components/CountriesModalPicker';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
@@ -26,6 +26,7 @@ import { scale } from 'react-native-size-matters';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import {
+  fetchAndStorePushTokenIfPossible,
   fetchUserProfileViaUUID,
   getUserDataByPhone,
   sendSMSToPhoneNumber,
@@ -41,13 +42,25 @@ import { updateUser } from '../../redux/slices/SessionUser';
 import { serverTimestamp } from '@react-native-firebase/firestore';
 import TNActivityIndicator from '../../components/TNActivityIndicator';
 import { useDispatch } from 'react-redux';
-import { normalizeTimestamp } from '../../constants/helpers/helperFunction';
+import {
+  deepNormalize,
+  normalizeTimestamp,
+} from '../../constants/helpers/helperFunction';
+import { STANDARD_SPACING } from '../../constants/Constants';
+import {
+  mySubscribedPlan,
+  setIsPlanActive,
+  setSubscriptionPlan,
+} from '../../redux/slices/inAppPurchaseSlice';
+import { getUserSubscription } from '../../api/firebase/firebase';
+import { showToast } from '../../components/alerts/Toast/ToastManager';
+import { localizedErrorMessage } from '../../utils/ErrorCode';
 
 const codeInputCellCount = 6;
 
 const SmsAuthenticationScreen = ({ navigation, route }) => {
   const appConfig = DatingConfig;
-  const { isSigningUp, isUser } = route?.params || {};
+  const { isSigningUp = false, isUser } = route?.params || {};
   const phoneRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -60,38 +73,37 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
   const [formValues, setFormValues] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const auth = getAuth();
-  useEffect(() => {
-    // Subscriber for auth state changes
-    const subscriber = onAuthStateChanged(auth, user => {
-      if (!isUser) {
-        
-        if (user) {
-          console.log('User UID:', user.uid);
-          if (isSigningUp) {
-            setUserInfo(user.uid, formValues).then(res => {
-              handleStoreNavigation(res?.user);
-            });
-          } else {
-            fetchUserProfileViaUUID(userCredential.user.uid).then(res => {
-              console.log('USER INFORMATIONuserrrrrrRRRRRRRR', res);
-              handleStoreNavigation(res);
-            });
-          }
-  
-          // fetchUserProfileViaUUID(user.uid).then(res => {
-          //   console.log('USER INFORMATIONUUUUSSSEEEFFFEEECCCTT', res);
-          //   if (res.success) {
-          //     // sendOTP(number)
-          //   } else {
-          //     alert(res.message);
-          //   }
-          // });
-          // Successful login: Navigate or update UI
-        }
-      }
-    });
-    return subscriber; // cleanup on unmount
-  }, []);
+  // useEffect(() => {
+  //   // Subscriber for auth state changes
+  //   const subscriber = onAuthStateChanged(auth, user => {
+  //     if (!isUser) {
+  //       if (user) {
+  //         console.log('User UID:', user.uid);
+  //         if (isSigningUp) {
+  //           setUserInfo(user.uid, formValues).then(res => {
+  //             handleStoreNavigation(res?.user);
+  //           });
+  //         } else {
+  //           fetchUserProfileViaUUID(userCredential.user.uid).then(res => {
+  //             console.log('USER INFORMATIONuserrrrrrRRRRRRRR', res);
+  //             handleStoreNavigation(res);
+  //           });
+  //         }
+
+  //         // fetchUserProfileViaUUID(user.uid).then(res => {
+  //         //   console.log('USER INFORMATIONUUUUSSSEEEFFFEEECCCTT', res);
+  //         //   if (res.success) {
+  //         //     // sendOTP(number)
+  //         //   } else {
+  //         //     alert(res.message);
+  //         //   }
+  //         // });
+  //         // Successful login: Navigate or update UI
+  //       }
+  //     }
+  //   });
+  //   return subscriber; // cleanup on unmount
+  // }, []);
 
   // Initialize countries data from PhoneInput
   useEffect(() => {
@@ -179,14 +191,31 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
   };
 
   const findUserByPhone = (number, values) => {
-    getUserDataByPhone(number).then(res => {
-      console.log('res confirmation', res);
-      setIsPhoneVisible(false);
-      setFormValues(values);
-      if (!res.success) {
-        sendOTP(number);
-      }
-    });
+    setLoading(true);
+    getUserDataByPhone(number)
+      .then(res => {
+        console.log('res confirmation', res, isSigningUp);
+        if (isSigningUp == true) {
+          if (res.success) {
+            alert('This number alredy in use.');
+          } else {
+            // setIsPhoneVisible(false);
+            setFormValues(values);
+            sendOTP(number);
+          }
+        } else {
+          if (res.success) {
+            // setIsPhoneVisible(false);
+            setFormValues(values);
+            sendOTP(number);
+          } else {
+            alert('This number is not register.');
+          }
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
   const sendOTP = number => {
     sendSMSToPhoneNumber(number).then(res => {
@@ -196,20 +225,22 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
         alert('Error sending OTP: ' + res.error);
       } else {
         alert('OTP sent successfully');
+         setIsPhoneVisible(false);
       }
     });
   };
 
   const verifyOTP = async (code, values) => {
+    setLoading(true);
     try {
       // 1. If this succeeds, the user is authenticated
       const userCredential = await confirm.confirm(code);
 
       // Successful verification logic here
-      console.log('Verification successful! User:', userCredential.user.uid, formValues);
+
       if (isSigningUp) {
         setUserInfo(userCredential.user.uid, formValues).then(res => {
-          handleStoreNavigation(res?.user);
+          handleStoreNavigation(res.user);
         });
       } else {
         fetchUserProfileViaUUID(userCredential.user.uid).then(res => {
@@ -221,27 +252,67 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
       // navigation.navigate('Home');
     } catch (error) {
       // If the code is wrong, it enters this block
-      console.error('Invalid Verification Code:', error.message);
+      console.error('Invalid Verification Code:', error?.message);
+      setLoading(false);
       alert('The code you entered is incorrect.');
     }
   };
 
-  const handleStoreNavigation = values => {
-    dispatch(
-      updateUser({
-        ...values,
-        isLogin: true,
-        createdAt: normalizeTimestamp(values?.createdAt),
-        lastOnlineTimestamp: normalizeTimestamp(values?.createdAt),
-      }),
-    );
-    setTimeout(() => {
+  const handleStoreNavigation = async res => {
+    if (res?.userID) {
+      const userID = res?.id || res?.userID;
+      fetchAndStorePushTokenIfPossible(userID);
+      // ✅ Clear subscription state first (in case of previous user data)
+      dispatch(setIsPlanActive(false));
+      dispatch(mySubscribedPlan(null));
+      dispatch(setSubscriptionPlan({ planId: '' }));
+
+      // ✅ Load subscription from Firebase (user-specific, not device-specific)
+      const resSubcription = await getUserSubscription(userID);
+      console.log('resSubcription', resSubcription, userID);
+
+      if (resSubcription?.success && resSubcription?.subscription?.active) {
+        // ✅ User has active subscription
+        dispatch(setIsPlanActive(true));
+        // dispatch(mySubscribedPlan(resSubcription.subscription));
+        dispatch(mySubscribedPlan(deepNormalize(resSubcription.subscription)));
+        dispatch(
+          setSubscriptionPlan({
+            planId: resSubcription.subscription.productId,
+          }),
+        );
+      } else {
+        // ✅ No active subscription for this user
+        dispatch(setIsPlanActive(false));
+        dispatch(mySubscribedPlan(null));
+        dispatch(setSubscriptionPlan({ planId: '' }));
+      }
+      dispatch(
+        updateUser({
+          ...res,
+          isLogin: true,
+          createdAt: normalizeTimestamp(res?.createdAt),
+          lastOnlineTimestamp: normalizeTimestamp(res?.lastOnlineTimestamp),
+          updatedAt: normalizeTimestamp(res?.updatedAt),
+        }),
+      );
+      setTimeout(() => {
+        setLoading(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'HomeTopTab' }],
+        });
+      }, 2000);
+    } else {
       setLoading(false);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'HomeTopTab' }],
+      showToast({
+        title: 'Login Failed',
+        text:
+          localizedErrorMessage(res?.error) || 'Unable to login at this time.',
+        duration: 3000,
+        type: 'error',
       });
-    }, 2000);
+    }
   };
   return (
     <Formik
@@ -249,6 +320,7 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
       validationSchema={validationSchema}
       enableReinitialize
       onSubmit={values => {
+        Keyboard.dismiss();
         if (isPhoneVisible) {
           // ✅ Send Code button submit
           const fullPhone =
@@ -257,7 +329,6 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
         } else {
           // ✅ Verify OTP submit
           verifyOTP(values.otpCode, formValues);
-          alert('Verify OTP: ' + values.otpCode);
         }
       }}
     >
@@ -280,14 +351,14 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
                   ref={phoneRef}
                   onPressFlag={onPressFlag}
                   offset={10}
-                  initialCountry="in"
+                  initialCountry="us"
                   allowZeroAfterCountryCode
                   onChangePhoneNumber={text => {
                     setFieldValue('phoneNumber', text);
                   }}
                   textProps={{
                     placeholder: 'Phone number',
-                    placeholderTextColor: '#aaaaaa',
+                    placeholderTextColor: 'red',
                   }}
                 />
               </View>
@@ -341,14 +412,21 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
                   textContentType="oneTimeCode"
                   renderCell={renderCodeInputCell}
                 />
+                {/* ✅ otp error */}
+                {touched.otpCode && errors.otpCode ? (
+                  <CustomText
+                    style={{
+                      // color: 'red',
+                      marginHorizontal: scale(15),
+                      alignSelf: 'flex-start',
+                      textAlign: 'left',
+                      marginTop: scale(8),
+                    }}
+                  >
+                    {errors.otpCode}
+                  </CustomText>
+                ) : null}
               </View>
-
-              {/* ✅ otp error */}
-              {touched.otpCode && errors.otpCode ? (
-                <CustomText style={{ color: 'red', marginTop: 6 }}>
-                  {errors.otpCode}
-                </CustomText>
-              ) : null}
 
               <View style={styles.buttonWrapper}>
                 <Button
@@ -408,8 +486,9 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
             />
 
             <KeyboardAwareScrollView
-              style={{ flexGrow: 1 }}
-              keyboardShouldPersistTaps="always"
+              style={{ flexGrow: 1, paddingHorizontal: STANDARD_SPACING * 7 }}
+              keyboardShouldPersistTaps="handled"
+              bounces={false}
             >
               {isSigningUp ? (
                 <>
@@ -467,8 +546,8 @@ const SmsAuthenticationScreen = ({ navigation, route }) => {
                   </View>
                 </>
               )}
+              {loading && <TNActivityIndicator />}
             </KeyboardAwareScrollView>
-            {loading && <TNActivityIndicator />}
           </CustomSafeAreaView>
         );
       }}

@@ -300,9 +300,9 @@ console.log("source",source);
   const onSelectDelPhoto = index => {
     selectedItemIndex = index;
 
-    // photoDialogActionSheetRef.current?.show();
     setTimeout(() => {
-      SheetManager.show('profile-photo-sheet-post-more-option');
+      photoDialogActionSheetRef.current?.show();
+      // SheetManager.show('profile-photo-sheet-post-more-option');
     }, 200);
   };
 
@@ -508,11 +508,17 @@ console.log("source",source);
         </ScrollView>
         {loading && <TNActivityIndicator />}
         <PostPictureMoreOption
+        photoDialogActionSheetRef={photoDialogActionSheetRef}
           onPressRemove={() => {
+            photoDialogActionSheetRef?.current?.hide();
             onPhotoDialogDone(0);
           }}
           onPressMakeProfile={() => {
+            photoDialogActionSheetRef?.current?.hide();
             onPhotoDialogDone(2);
+          }}
+           onPressCancel={() => {
+            photoDialogActionSheetRef?.current?.hide();
           }}
         />
       </ImageBackground>

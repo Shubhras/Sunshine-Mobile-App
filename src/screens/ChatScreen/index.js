@@ -678,9 +678,9 @@ const ChatScreen = ({ navigation, route }) => {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         // keyboardVerticalOffset={scale(70)}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? scale(40) : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? scale(40) : scale(40)}
       >
         {/* CHAT LIST */}
         <FlatList

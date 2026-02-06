@@ -1,8 +1,8 @@
+import Firebase
 import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import Firebase
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

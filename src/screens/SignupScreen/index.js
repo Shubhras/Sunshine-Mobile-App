@@ -176,7 +176,7 @@
 // }
 
 import React, { use, useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { scale } from 'react-native-size-matters';
 import Header from '../../components/Header';
@@ -280,11 +280,13 @@ const SignupScreen = ({ navigation, route }) => {
       setSubmitting(false);
       return;
     }
+    Keyboard.dismiss();
     setLoading(true);
     const userDetails = {
       ...trimFields(values),
       photoFile: profilePictureFile,
     };
+
     await register(userDetails)
       .then(async response => {
         console.log('responseresponseresponse', response);
@@ -523,7 +525,7 @@ const SignupScreen = ({ navigation, route }) => {
             showsVerticalScrollIndicator={false}
             style={styles.keyboardAwareScrollView}
             contentContainerStyle={styles.mainScrollView}
-            keyboardShouldPersistTaps="always"
+            keyboardShouldPersistTaps="never"
           >
             {/* Large heading */}
             <View style={styles.largeHeadingComponentWrapper}>
@@ -539,7 +541,7 @@ const SignupScreen = ({ navigation, route }) => {
             />
 
             {renderSignupWithEmail(formik)}
-            {/* {isSMSAuthEnabled && (
+            {isSMSAuthEnabled && (
               <>
                 <CustomText style={styles.orTextStyle}>OR</CustomText>
                                 <View style={styles.signWithEmailContainer1}>
@@ -555,7 +557,7 @@ const SignupScreen = ({ navigation, route }) => {
                   />
                 </View>
               </>
-            )} */}
+            )}
             <View style={{margin:scale(20)}} />
           </KeyboardAwareScrollView>
         )}

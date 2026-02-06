@@ -30,7 +30,20 @@ const formatMessage = message => {
 };
 
 const getMessageTime = createdAt => {
-  const messageDate = moment(createdAt?.seconds * 1000 || new Date());
+  let messageDate;
+
+  // Firestore Timestamp
+  if (createdAt?.seconds) {
+    messageDate = moment(createdAt.seconds * 1000);
+  }
+  // Milliseconds timestamp (like 1769667132000)
+  else if (typeof createdAt === 'number') {
+    messageDate = moment(createdAt);
+  }
+  // JS Date object
+  else {
+    messageDate = moment(createdAt || new Date());
+  }
 
   if (moment().isSame(messageDate, 'day')) {
     return messageDate.format('hh:mm A');

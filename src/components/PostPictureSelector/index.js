@@ -33,7 +33,7 @@ const PostPictureSelector = props => {
   );
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
   const [tappedImage, setTappedImage] = useState([]);
-  const actionSheet = useRef(null);
+  const actionSheetMyPhoto = useRef(null);
 
   // ✅ Proper way to sync with props changes
 
@@ -90,6 +90,7 @@ const PostPictureSelector = props => {
         setProfilePictureURL(asset.uri);
         if (props.setProfilePictureFile) {
           props.setProfilePictureFile(asset);
+          actionSheetMyPhoto?.current?.hide();
         }
       }
     });
@@ -170,6 +171,7 @@ const PostPictureSelector = props => {
         setProfilePictureURL(asset.uri);
         if (props.setProfilePictureFile) {
           props.setProfilePictureFile(asset);
+          actionSheetMyPhoto?.current?.hide();
         }
       }
     });
@@ -187,12 +189,13 @@ const PostPictureSelector = props => {
   const showActionSheet = () => {
     Keyboard.dismiss();
     setTimeout(() => {
-      SheetManager.show('profile-photo-sheet-POST');
+      // SheetManager.show('profile-photo-sheet-POST');
+      actionSheetMyPhoto?.current?.show();
     }, 200);
   };
 
   const onActionDone = index => {
-    SheetManager.hide('profile-photo-sheet-POST');
+    // SheetManager.hide('profile-photo-sheet-POST');
 
     setTimeout(() => {
       switch (index) {
@@ -208,6 +211,7 @@ const PostPictureSelector = props => {
           setProfilePictureURL('');
           if (props.setProfilePictureFile) {
             props.setProfilePictureFile(null);
+            actionSheetMyPhoto?.current?.hide();
           }
           break;
         default:
@@ -234,7 +238,8 @@ const PostPictureSelector = props => {
       </TouchableOpacity>
 
       <ActionSheet
-        id="profile-photo-sheet-POST"
+        // id="profile-photo-sheet-POST"
+        ref={actionSheetMyPhoto}
         gestureEnabled={true}
         containerStyle={styles.actionSheetContainer}
         indicatorStyle={styles.actionSheetIndicator}
@@ -265,7 +270,9 @@ const PostPictureSelector = props => {
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => onActionDone(2)}
+            onPress={() => {
+              actionSheetMyPhoto?.current?.hide();
+            }}
           >
             <CustomText style={styles.cancelText}>Cancel</CustomText>
           </TouchableOpacity>

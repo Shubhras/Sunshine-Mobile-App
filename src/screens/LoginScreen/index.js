@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import { fetchAndStorePushTokenIfPossible, loginWithEmailAndPassword } from '../../api/firebase/auth';
@@ -45,6 +45,7 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async values => {
     console.log('val', values);
     // return;
+    Keyboard.dismiss();
     setLoading(true);
     await loginWithEmailAndPassword({
       email: values.email,
@@ -141,7 +142,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <Formik
-        initialValues={{ email: 'sam@gmail.com', password: 'Test@123' }}
+        initialValues={{ email: '', password: '' }}
         validationSchema={LoginSchema}
         onSubmit={handleLogin}
         validateOnBlur={true}
@@ -220,13 +221,13 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             {/* Link */}
-            {/* <View style={styles.loginMobileLinkWrapper}>
+            <View style={styles.loginMobileLinkWrapper}>
               <Link
                 label={'Login with phone number'}
                 labelColor={Colors.primary}
                 onPress={() => navigation.navigate('Sms')}
               />
-            </View> */}
+            </View>
           </>
         )}
       </Formik>
